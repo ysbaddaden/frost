@@ -1,0 +1,12 @@
+# crystal temporary files
+.crystal
+
+# shards libraries and caches
+/libs
+/.shards
+
+# documentation
+/doc
+
+# binaries
+/test/sample/bootstrap

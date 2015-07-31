@@ -1,0 +1,13 @@
+name: trail
+version: 0.0.0
+
+authors:
+  - Julien Portalier <julien@portalier.com>
+
+dependencies:
+  minitest:
+    github: ysbaddaden/minitest.cr
+    branch: master
+  pg:
+    github: will/crystal-pg
+    version: ">= 0.2.0"

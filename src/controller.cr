@@ -1,7 +1,11 @@
+require "./support/core_ext/http/request"
 require "./support/core_ext/http/response"
 require "./controller/**"
 
 module Trail
+  # TODO: cookies (read, create, replace, delete + encryption)
+  # TODO: sessions (with engines: cookie, memory, memcached)
+  # TODO: CSRF protection
   class Controller
     include Filtering
     include Rendering
@@ -25,7 +29,7 @@ module Trail
 
     # Returns the controller name as an underscored String.
     def controller_name
-      @controller_name ||= self.class.name.underscore
+      @controller_name ||= self.class.name.gsub(/Controller\Z/, "").underscore
     end
 
     # Default URL options used by generated named routes.
@@ -50,7 +54,7 @@ module Trail
     end
 
     macro inherited
-      generate_run_action_callbacks
+      #generate_run_action_callbacks
       generate_view_class
     end
   end

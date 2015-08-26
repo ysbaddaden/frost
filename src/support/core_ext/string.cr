@@ -18,7 +18,9 @@ module Trail
         end
 
         # Alias for `camelcase`.
-        alias_method :camelize, :camelcase
+        def camelize
+          camelcase
+        end
 
         # Replaces underscores with dashes.
         def dasherize
@@ -112,7 +114,9 @@ module Trail
         end
 
         # Alias for `titlecase`.
-        alias_method :titleize, :titlecase
+        def titleize
+          titlecase
+        end
 
         # Replaces any accented characters for their non accented counterparts.
         def transliterate

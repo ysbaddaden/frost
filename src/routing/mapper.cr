@@ -57,14 +57,11 @@ module Trail
 
         String.build do |str|
           str << "class Dispatcher < Trail::Dispatcher\n"
-          str << "  def dispatch(request)\n"
-          str << "    params = Trail::Controller::Params.new\n\n"
-          str << "    params.parse(request)\n\n"
-
+          str << "  def _dispatch(request, params)\n"
           str << "    case request.method.upcase\n"
           aggregate.each do |method, routes|
-            str << "    when #{ method.upcase.inspect }\n"
-            str << "      case request.path\n"
+            str << "    when " << method.upcase.inspect << "\n"
+            str << "      case request.uri.path\n"
             routes.each { |route| str << route.to_crystal_s }
             str << "      end\n"
           end
@@ -73,7 +70,7 @@ module Trail
           str << "    if controller\n"
           str << "      controller.response\n"
           str << "    else\n"
-          str << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
+          str << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.uri.path.inspect }\")\n"
           str << "    end\n"
           str << "  end\n"
           str << "end\n\n"
@@ -88,10 +85,16 @@ module Trail
               builder = UrlBuilder.new(route.path)
 
               str << "  def #{ name }_path(#{ builder.to_args })\n"
+              builder.required_params.each do |name|
+                str << "    if #{ name }.responds_to?(:to_param); #{ name } = #{ name }.to_param; end\n"
+              end
               str << "    " << builder.to_path
               str << "  end\n\n"
 
               str << "  def #{ name }_url(#{ builder.to_args(url: true) })\n"
+              builder.required_params.each do |name|
+                str << "    if #{ name }.responds_to?(:to_param); #{ name } = #{ name }.to_param; end\n"
+              end
               str << builder.to_url << "\n"
               str << "  end\n\n"
             end

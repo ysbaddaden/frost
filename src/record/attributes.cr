@@ -4,7 +4,9 @@ require "./connection"
 module Trail
   class Record
 
-    # TODO: generate json_mapping
+    # TODO: generate Record.json_mapping
+    # TODO: generate Record.create(attr = nil, ...)
+    # TODO: generate Record.update(id, attr = nil, ...)
     class Attributes
       getter :class_name, :table
 
@@ -18,7 +20,7 @@ module Trail
           str << ", " unless index == 0
           str << "@" << column.name << " = " << (column.default || "nil")
 
-          if types = column.type.to_crystal
+          if types = column.to_crystal
             str << " : " << types
             str << " | ::Nil" unless types.includes?("::Nil") || types.index("?")
           end
@@ -29,6 +31,7 @@ module Trail
 
       def generate_attributes_setter(str)
         str << "def attributes=(attributes : Hash)\n"
+
         table.columns.each do |column|
           str << "  if attributes.has_key?(#{ column.name.inspect })\n"
 
@@ -36,10 +39,10 @@ module Trail
             str << "    if attributes[#{ column.name.inspect }] == nil\n"
             str << "      self.#{ column.name } = nil\n"
             str << "    else\n"
-            str << "      self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.type.as_crystal }\n"
+            str << "      self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
             str << "    end\n"
           else
-            str << "    self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.type.as_crystal }\n"
+            str << "    self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
           end
 
           if column.default?
@@ -49,6 +52,30 @@ module Trail
 
           str << "  end\n\n"
         end
+        str << "end\n\n"
+      end
+
+      def generate_from_pg_result(str)
+        str << "def self.from_pg_result(result : PG::TrailResult, row)\n"
+        str << "  record = new\n"
+        str << "  record.new_record = false\n\n"
+
+        str << "  result.each_field(row) do |attr, value|\n"
+        str << "    case attr\n"
+
+        table.columns.each do |column|
+          str << "    when #{ column.name.inspect }\n"
+
+          if column.null?
+            str << "      record.#{ column.name } = value == nil ? nil : value as #{ column.as_crystal }\n"
+          else
+            str << "      record.#{ column.name } = value as #{ column.as_crystal }\n"
+          end
+        end
+        str << "    end\n"
+        str << "  end\n\n"
+
+        str << "  record\n"
         str << "end\n\n"
       end
 
@@ -65,7 +92,7 @@ module Trail
           str << "end\n\n"
 
           if table.primary_key? && table.primary_key == column.name && table.primary_key != "id"
-            str << "alias_method :id, :" << table.primary_key << "\n\n"
+            str << "def id\n  " << table.primary_key << ";\nend\n\n"
             str << "def id=(value)\n  self." << table.primary_key << " = value\nend\n\n"
           end
         end
@@ -99,6 +126,7 @@ module Trail
           str << "@@attribute_names = {" << table.attribute_names.map(&.inspect).join(", ") << "}\n\n"
 
           generate_initialize(str)
+          generate_from_pg_result(str)
           generate_attributes_setter(str)
           generate_properties(str)
           generate_to_hash(str)

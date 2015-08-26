@@ -5,8 +5,9 @@ module Trail::Routing::Mapper
     {{ method.id }} "/match/{{ method.id }}", "mapper#match"
   {% end %}
 
-  match "/", "mapper#root", via: %i(get post), as: "root"
+  match "/", "mapper#root", via: %i(get post delete), as: "root"
 
+  get "/posts/search(.:format)", "mapper#search", as: "search_post"
   get "/posts/:id", "mapper#root", as: "post"
   get "/posts/:post_id/comments/:id(.:format)", "mapper#root", as: "post_comment"
 end

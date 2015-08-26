@@ -4,6 +4,11 @@ ifndef CRYSTAL_BIN
 	CRYSTAL_BIN := $(shell which crystal)
 endif
 
+.PHONY: tasks
+tasks:
+	@echo "Available tasks:"
+	@grep --color=never -e "^[a-z]\+:" Makefile | sed s/://g
+
 .PHONY: test
 test:
 	$(CRYSTAL_BIN) run test/record/schema.cr

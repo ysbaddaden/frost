@@ -1,5 +1,8 @@
 module Trail
   module Support
+    # NOTE: no longer work on Crystal > 0.7.5 (inherited hook is ran before
+    #       evaluating the class body, so no longer can collect callbacks and
+    #       generate methods)
     class Callbacks
       # :nodoc:
       HOOK_NAMES = %w(before around after)

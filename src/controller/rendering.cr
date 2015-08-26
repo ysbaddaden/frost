@@ -74,27 +74,27 @@ module Trail
       # ```
       #
       # Raises DoubleRenderError if the controller already rendered or redirected.
-      def render(action = nil, text = nil, format = nil, status = 200)
+      def render(action = nil, text = nil, format = nil, layout = nil, status = 200)
         format ||= self.format
 
         prevent_double_rendering do
           response.status_code = status.to_i
-          response.headers["Content-Type"] = Support::Mime.mime_type(format)
-          response.body = render_to_string(action, text, format)
+          response.headers["Content-Type"] ||= Support::Mime.mime_type(format)
+          response.body = render_to_string(action, text, format, layout)
         end
       end
 
       # Renders a template. Unlike `render` this won't set the response body.
       #
       # You may render the template for a specific action, which will search for
-      # a `controller_name/show.format.ecr` template (for instance
+      # a `controller/action.format.ecr` template (for instance
       # `posts/show.html.ecr`):
       # ```
       # render_to_string :show
       # ```
       #
       # You may specify a specific format (searches for a `posts/show.json.ecr`)
-      # templates:
+      # template:
       # ```
       # render_to_string :show, format: "json"
       # ```
@@ -103,12 +103,26 @@ module Trail
       # ```
       # render_to_string text: "I'm done"
       # ```
-      def render_to_string(action = nil, text = nil, format = nil)
+      def render_to_string(action = nil, text = nil, format = nil, layout = nil)
         if text
           text.to_s
         else
-          view.render(action || action_name, format: format)
+          format ||= self.format
+          action ||= action_name
+
+          if layout == false
+            view.render(action, format: format)
+          else
+            layout ||= self.layout
+            layouts_view.render(layout, format) do
+              view.render(action, format)
+            end
+          end
         end
+      end
+
+      def layout
+        "application"
       end
 
       # Returns the requested format as a String.
@@ -124,7 +138,7 @@ module Trail
         @format ||= begin
                       if format = params["format"]?
                         if format.is_a?(String)
-                          format
+                          return format
                         end
                       end
 
@@ -143,10 +157,6 @@ module Trail
         @__rendered = true
       end
 
-      #macro def view : Trail::View+
-      #  @view ||= {{ @type.name.gsub(/Controller\Z/, "View") }}.new(self)
-      #end
-
       # :nodoc:
       macro generate_view_class
         {% name = @type.name.gsub(/Controller\Z/, "View") %}
@@ -156,9 +166,13 @@ module Trail
           end
 
           protected def view
-            @view ||= {{ name.id }}.new(self)
+            {{ name.id }}.new(self)
           end
         {% end %}
+      end
+
+      def layouts_view
+        LayoutsView.new(self)
       end
     end
   end

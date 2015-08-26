@@ -62,8 +62,13 @@ module Trail
           !!@primary_key
         end
 
+        # Delegates to `type`
         delegate :to_crystal, :type
+
+        # Delegates to `type`
         delegate :as_crystal, :type
+
+        # Delegates to `type`
         delegate :to_cast, :type
       end
     end

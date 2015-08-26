@@ -7,3 +7,6 @@ end
 
 class ApplicationView < Trail::View
 end
+
+class LayoutsView < ApplicationView
+end

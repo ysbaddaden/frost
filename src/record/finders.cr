@@ -3,6 +3,7 @@ require "../query/builder"
 module Trail
   class Record
     # TODO: pluck(attr_name)
+    # TODO: reload
     module Finders
       {% for method in %w(select where group having order reorder limit) %}
         # Delegates to `Trail::Record::Query::Builder#{{ method.id }}`
@@ -31,13 +32,19 @@ module Trail
         end
 
         def to_a
-          Record.connection.select_all(to_sql).map do |attributes|
-            @klass.build(attributes).tap do |record|
-              record.new_record = false
-            end
+          records = [] of T
+
+          Record.connection.select(to_sql) do |result, row|
+            records << @klass.from_pg_result(result, row)
           end
+
+          records
         end
-        alias_method :all, :to_a
+
+        # Alias for `#to_a` (may eventually return an iterable self).
+        def all
+          to_a
+        end
 
         #def count
         #  query = select("COUNT(*)").to_sql
@@ -65,11 +72,10 @@ module Trail
         end
 
         def first
-          if attributes = Record.connection.select_one(limit(1).to_sql)
-            @klass.build(attributes).tap do |record|
-              record.new_record = false
-            end
+          Record.connection.select(limit(1).to_sql) do |result, _|
+            return @klass.from_pg_result(result, 0)
           end
+          nil
         end
 
         def last
@@ -108,7 +114,5 @@ module Trail
         end
       end
     end
-
-    extend Finders
   end
 end

@@ -12,7 +12,7 @@ module Trail
           end
 
           def to_crystal
-            super "::Bool | ::Int | ::String"
+            super "::Bool | ::Int8 | ::Int16 | ::Int32 | ::Int64 | ::String"
           end
 
           def to_cast

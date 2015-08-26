@@ -38,16 +38,14 @@ module Trail
     end
 
     def test_build
-      skip "fails to compile with 'can't cast String to Int32' or 'can't cast String to Bool' error messages"
-
-      #post = Post.build({ "title" => "Hello", "body" => "lorem ipsum", "published" => "1" })
-      #assert_nil post.id
-      #assert_equal "Hello", post.title
-      #assert_equal "lorem ipsum", post.body
-      #assert_equal true, post.published
-      #assert_equal 0, post.views
-      #assert_nil post.created_at
-      #assert_nil post.updated_at
+      post = Post.build({ "title" => "Hello", "body" => "lorem ipsum", "published" => "1" })
+      assert_nil post.id
+      assert_equal "Hello", post.title
+      assert_equal "lorem ipsum", post.body
+      assert_equal true, post.published
+      assert_equal 0, post.views
+      assert_nil post.created_at
+      assert_nil post.updated_at
     end
 
     def test_to_hash

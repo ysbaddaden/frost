@@ -14,6 +14,11 @@ module Trail::Routing
         def root
           render text: "ROOT: #{ request.method }"
         end
+
+        def search
+          args = params.map { |k, v| "#{k}:#{v}" }.compact
+          render text: "SEARCH: #{ args.join(", ") }"
+        end
       end
 
       {{ run "../fixtures/routes/mapper.cr" }}
@@ -39,6 +44,11 @@ module Trail::Routing
       response = dispatch("POST", "/")
       assert_equal 200, response.status_code
       assert_match "ROOT: POST", response.body
+    end
+
+    def test_routes_legacy_method_as_param
+      response = dispatch("POST", "/", { "Content-Type" => "application/x-www-form-urlencoded" }, "_method=delete")
+      assert_equal "ROOT: DELETE", response.body
     end
 
     def test_routing_error
@@ -80,8 +90,26 @@ module Trail::Routing
         controller.post_comment_url("6757", "98172", format: "xml")
     end
 
-    def dispatch(method, url)
-      dispatcher.dispatch(HTTP::Request.new(method, url))
+    def test_query_string
+      response = dispatch("GET", "/posts/search?q=thing")
+      assert_equal 200, response.status_code
+      assert_match "SEARCH: q:thing", response.body
+    end
+
+    def test_match_skips_trailing_slash
+      response = dispatch("GET", "/posts/search/?q=lorem")
+      assert_equal 200, response.status_code
+      assert_match "SEARCH: q:lorem", response.body
+    end
+
+    def dispatch(method, url, headers = nil, body = nil)
+      request = HTTP::Request.new(method, url, body: body)
+
+      headers.each do |key, value|
+        request.headers[key] = value
+      end if headers
+
+      dispatcher.dispatch(request)
     end
 
     def dispatcher

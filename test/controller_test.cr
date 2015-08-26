@@ -3,46 +3,40 @@ require "./test_helper"
 module Trail
   class ControllerTest < Minitest::Test
     class AppController < Trail::Controller
-      before_action :app_before
-      around_action :app_around
-      after_action :app_after
-
-      def app_before
+      def before_action
         response.headers["X-Before-App"] = "app:before"
       end
 
-      def app_around
+      def around_action
         response.headers["X-Around-App"] = "app:around:before"
         yield
         response.headers["X-Around-App"] += ", app:around:after"
       end
 
-      def app_after
+      def after_action
         response.headers["X-After-App"] = "app:after"
       end
     end
 
     class PagesController < AppController
-      before_action :before
-      around_action :around
-      after_action :after
-
       def index
         render text: "index"
       end
 
-      def before
+      def before_action
+        super
         response.headers["X-Before"] = "pages:before"
       end
 
-      def around
+      def around_action
         response.headers["X-Around"] = "pages:around:before"
-        yield
+        super { yield }
         response.headers["X-Around"] += ", pages:around:after"
       end
 
-      def after
+      def after_action
         response.headers["X-After"] = "pages:after"
+        super
       end
     end
 

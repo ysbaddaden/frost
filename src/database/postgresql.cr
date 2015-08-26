@@ -1,4 +1,5 @@
 require "pg"
+require "./pg_ext"
 require "./errors"
 require "./postgresql/table"
 require "./postgresql/table_definition"
@@ -22,6 +23,14 @@ module Trail
         raise StatementInvalid.new(ex.message)
       end
 
+      def trail_execute(sql)
+        STDERR.puts(sql); STDERR.flush
+
+        @conn.trail_exec(sql)
+      rescue ex : PG::ResultError
+        raise StatementInvalid.new(ex.message)
+      end
+
       def execute(types, sql)
         STDERR.puts(sql); STDERR.flush
 
@@ -36,6 +45,11 @@ module Trail
 
       def select_all(sql)
         execute(sql).to_hash
+      end
+
+      def select(sql)
+        result = trail_execute(sql)
+        result.each_row { |row| yield result, row }
       end
 
       def select_values(sql)

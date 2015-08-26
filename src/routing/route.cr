@@ -30,7 +30,7 @@ module Trail
           .gsub(/_LPAREN_/, "(?:")
           .gsub(/_RPAREN_/, ")?")
 
-         "/\\A#{ matcher }\\Z/"
+         "/\\A#{ matcher }\\/?\\Z/"
       end
 
       def route_name
@@ -47,7 +47,7 @@ module Trail
         String.build do |str|
           str << "      when #{ regular_expression }\n"
           params.each_with_index do |name, index|
-            str << "        params[#{ name }] = $#{ index + 1} if $#{ index + 1 }?\n"
+            str << "        params[#{ name }] = CGI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
           end
          #str << "        params[\"controller\"] = #{ controller.inspect }\n"
          #str << "        params[\"action\"] = #{ action.inspect }\n"

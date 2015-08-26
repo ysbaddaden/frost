@@ -2,7 +2,7 @@ require "./record_test_helper"
 
 module Trail
   class Record
-    class FindersTest < Minitest::Test
+    class PersistenceTest < Minitest::Test
       def setup
         Record.connection.execute(
           "INSERT INTO posts (id, title, body, published, created_at) VALUES
@@ -13,27 +13,43 @@ module Trail
 
       def teardown
         Record.connection.execute("TRUNCATE posts")
+        Record.connection.execute("TRUNCATE comments")
       end
 
       def test_save
-        post = Comment.new(email: "me@example.com", body: "contents")
-        assert post.new_record?
+        comment = Comment.new(email: "me@example.com", body: "contents")
+        assert comment.new_record?
 
         # create
-        post.save
-        refute post.new_record?
-        assert post.created_at
-        assert post.updated_at
+        comment.save
+        refute comment.new_record?
+        assert comment.created_at
+        assert comment.updated_at
 
-        post = Comment.find(post.id)
-        refute post.new_record?
+        comment = Comment.find(comment.id)
+        refute comment.new_record?
 
         # update
-        post.body = "alternate"
-        post.save
+        comment.body = "alternate"
+        comment.save
 
-        post = Comment.find(post.id)
-        assert_equal "alternate", post.body
+        comment = Comment.find(comment.id)
+        assert_equal "alternate", comment.body
+      end
+
+      def test_create
+        comment = Comment.create({ "email" => "me@example.com", "body" => "great!" })
+        refute comment.new_record?
+
+        comment = Comment.find(comment.id)
+        assert comment.uuid
+        assert_equal "me@example.com", comment.email
+        assert_equal "great!", comment.body
+      end
+
+      def test_update
+        post = Post.update(1, { "title" => "Incredible News!" })
+        assert_equal "Incredible News!", Post.find(post.id).title
       end
 
       def test_delete

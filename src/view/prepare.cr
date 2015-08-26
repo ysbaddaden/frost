@@ -1,18 +1,27 @@
+require "../support/core_ext/file"
+require "./ecr"
+
 module Trail
   class View
     # :nodoc:
     class PrepareViews
-      def initialize(@views_path, controller_name)
+      getter :views_path
+
+      def initialize(views_path, controller_name)
         @controller_path = controller_name
           .gsub(/View\Z/, "")
           .split("::")
           .map(&.underscore)
           .join('/')
-        @actions = {} of String => Array(String)
-      end
 
-      def views_path
-        File.join(@views_path, @controller_path)
+        path = File.join(views_path, @controller_path)
+        @views_path = if Dir.exists?(path)
+                        File.realpath(path)
+                      else
+                        path
+                      end
+
+        @actions = {} of String => Array(String)
       end
 
       # TODO: recursively search directories (?)
@@ -30,15 +39,15 @@ module Trail
         @actions[format] ||= [] of String
         @actions[format] << action_name
 
-        str << "def #{ to_method_name(action_name, format) }\n"
-        str << "  String.build do |__str__|\n"
-        str << "    embed_ecr #{ path.inspect }, \"__str__\"\n"
+        str << "def #{ to_method_name(action_name, format) }(&block)\n"
+        str << "  with_output_buffer do\n"
+        str << ECR.process_file(path, "__buf__")
         str << "  end\n"
         str << "end\n\n"
       end
 
       def dispatch_renders(str)
-        str << "def render(action, format = DEFAULT_FORMAT)\n"
+        str << "def render(action, format = DEFAULT_FORMAT, &block)\n"
 
         if @actions.size > 0
           str << "  case format\n"
@@ -49,7 +58,7 @@ module Trail
 
             action_names.each do |action_name|
               str << "    when #{ action_name.inspect }\n"
-              str << "      return #{ to_method_name(action_name, format) }\n"
+              str << "      return #{ to_method_name(action_name, format) } { yield }\n"
             end
             str << "    end\n"
           end

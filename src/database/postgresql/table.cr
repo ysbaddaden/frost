@@ -26,7 +26,7 @@ module Trail
         end
 
         def primary_key_type
-          @primary_key_type ||= columns.find(&.primary_key?).try(&.type.as_crystal)
+          @primary_key_type ||= columns.find(&.primary_key?).try(&.as_crystal)
         end
 
         def primary_key?

@@ -1,6 +1,9 @@
 require "./routing/errors"
 
 module Trail
+  # Dispatcher connects the mapped routed (see `Routing`) and controller
+  # actions (see `Controller`). This is an abstract class and the actual class
+  # will be implemented by `Routing::Mapper`.
   abstract class Dispatcher
     # Dispatches a request, catching any exception.
     #

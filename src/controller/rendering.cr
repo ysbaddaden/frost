@@ -121,6 +121,8 @@ module Trail
         end
       end
 
+      # Overload to change the layout template name to use when rendering.
+      # Defaults to `"application"`.
       def layout
         "application"
       end
@@ -146,7 +148,7 @@ module Trail
                     end
       end
 
-      # Returns true if the controller already rendered.
+      # Returns true if the controller already rendered a template.
       def already_rendered?
         !!@__rendered
       end
@@ -171,6 +173,7 @@ module Trail
         {% end %}
       end
 
+      # :nodoc:
       def layouts_view
         LayoutsView.new(self)
       end

@@ -73,18 +73,14 @@ module Trail
         "render_#{ action.gsub('/', '_') }_#{ format }"
       end
 
-      def to_crystal_s
-        String.build do |str|
-          find_templates do |path, action, format|
-            embed_template(path, action, format, str)
-          end
-          dispatch_renders(str)
+      def to_crystal_s(io : IO)
+        find_templates do |path, action, format|
+          embed_template(path, action, format, io)
         end
+        dispatch_renders(io)
       end
     end
 
-    at_exit do
-      puts PrepareViews.new(ARGV[0], ARGV[1]).to_crystal_s
-    end
+    PrepareViews.new(ARGV[0], ARGV[1]).to_crystal_s(STDOUT)
   end
 end

@@ -39,31 +39,29 @@ module Trail
         end
       end
 
-      def to_crystal_s
+      def to_crystal_s(io : IO)
         params = path
           .scan(FIND_PARAM_NAME)
           .map { |match| match[1].inspect }
 
-        String.build do |str|
-          str << "      when #{ regular_expression }\n"
-          params.each_with_index do |name, index|
-            str << "        params[#{ name }] = CGI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
-          end
-         #str << "        params[\"controller\"] = #{ controller.inspect }\n"
-         #str << "        params[\"action\"] = #{ action.inspect }\n"
-
-          str << "        controller = #{ controller_class }.new(request, params, #{ action.inspect })\n"
-          str << "        controller.run_action do\n"
-          str << "          controller.#{ action }\n"
-          str << "          controller.render unless controller.already_rendered?\n"
-          str << "        end\n"
-
-         #str << "        if controller.responds_to?(:#{ action }_with_filters)\n"
-         #str << "          controller.#{ action }_with_filters\n"
-         #str << "        else\n"
-         #str << "          controller.#{ action }\n"
-         #str << "        end\n"
+        io << "      when #{ regular_expression }\n"
+        params.each_with_index do |name, index|
+          io << "        params[#{ name }] = CGI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
         end
+       #io << "        params[\"controller\"] = #{ controller.inspect }\n"
+       #io << "        params[\"action\"] = #{ action.inspect }\n"
+
+        io << "        controller = #{ controller_class }.new(request, params, #{ action.inspect })\n"
+        io << "        controller.run_action do\n"
+        io << "          controller.#{ action }\n"
+        io << "          controller.render unless controller.already_rendered?\n"
+        io << "        end\n"
+
+       #io << "        if controller.responds_to?(:#{ action }_with_filters)\n"
+       #io << "          controller.#{ action }_with_filters\n"
+       #io << "        else\n"
+       #io << "          controller.#{ action }\n"
+       #io << "        end\n"
       end
     end
   end

@@ -14,130 +14,125 @@ module Trail
         @table = Record.connection.table(@class_name.tableize)
       end
 
-      def generate_initialize(str)
-        str << "def initialize("
+      def generate_initialize(io)
+        io << "def initialize("
         table.columns.each_with_index do |column, index|
-          str << ", " unless index == 0
-          str << "@" << column.name << " = " << (column.default || "nil")
+          io << ", " unless index == 0
+          io << "@" << column.name << " = " << (column.default || "nil")
 
           if types = column.to_crystal
-            str << " : " << types
-            str << " | ::Nil" unless types.includes?("::Nil") || types.index("?")
+            io << " : " << types
+            io << " | ::Nil" unless types.includes?("::Nil") || types.index("?")
           end
         end
-        str << ")\n"
-        str << "end\n\n"
+        io << ")\n"
+        io << "end\n\n"
       end
 
-      def generate_attributes_setter(str)
-        str << "def attributes=(attributes : Hash)\n"
+      def generate_attributes_setter(io)
+        io << "def attributes=(attributes : Hash)\n"
 
         table.columns.each do |column|
-          str << "  if attributes.has_key?(#{ column.name.inspect })\n"
+          io << "  if attributes.has_key?(#{ column.name.inspect })\n"
 
           if column.null?
-            str << "    if attributes[#{ column.name.inspect }] == nil\n"
-            str << "      self.#{ column.name } = nil\n"
-            str << "    else\n"
-            str << "      self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
-            str << "    end\n"
+            io << "    if attributes[#{ column.name.inspect }] == nil\n"
+            io << "      self.#{ column.name } = nil\n"
+            io << "    else\n"
+            io << "      self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
+            io << "    end\n"
           else
-            str << "    self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
+            io << "    self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
           end
 
           if column.default?
-            str << "  else\n"
-            str << "    self.#{ column.name } = #{ column.default_with_type }\n"
+            io << "  else\n"
+            io << "    self.#{ column.name } = #{ column.default_with_type }\n"
           end
 
-          str << "  end\n\n"
+          io << "  end\n\n"
         end
-        str << "end\n\n"
+        io << "end\n\n"
       end
 
-      def generate_from_pg_result(str)
-        str << "def self.from_pg_result(result : PG::TrailResult, row)\n"
-        str << "  record = new\n"
-        str << "  record.new_record = false\n\n"
+      def generate_from_pg_result(io)
+        io << "def self.from_pg_result(result : PG::TrailResult, row)\n"
+        io << "  record = new\n"
+        io << "  record.new_record = false\n\n"
 
-        str << "  result.each_field(row) do |attr, value|\n"
-        str << "    case attr\n"
+        io << "  result.each_field(row) do |attr, value|\n"
+        io << "    case attr\n"
 
         table.columns.each do |column|
-          str << "    when #{ column.name.inspect }\n"
+          io << "    when #{ column.name.inspect }\n"
 
           if column.null?
-            str << "      record.#{ column.name } = value == nil ? nil : value as #{ column.as_crystal }\n"
+            io << "      record.#{ column.name } = value == nil ? nil : value as #{ column.as_crystal }\n"
           else
-            str << "      record.#{ column.name } = value as #{ column.as_crystal }\n"
+            io << "      record.#{ column.name } = value as #{ column.as_crystal }\n"
           end
         end
-        str << "    end\n"
-        str << "  end\n\n"
+        io << "    end\n"
+        io << "  end\n\n"
 
-        str << "  record\n"
-        str << "end\n\n"
+        io << "  record\n"
+        io << "end\n\n"
       end
 
-      def generate_properties(str)
+      def generate_properties(io)
         table.columns.each do |column|
-          str << "def " << column.name << "\n"
-          str << "  @" << column.name << "\n"
-          str << "end\n\n"
+          io << "def " << column.name << "\n"
+          io << "  @" << column.name << "\n"
+          io << "end\n\n"
 
           # TODO: validate value limit/range
-          str << "def " << column.name << "=(value : " << column.to_crystal << ")\n"
-          #str << "def " << column.name << "=(value)\n"
-          str << "  @" << column.name << " = " << column.to_cast << "\n"
-          str << "end\n\n"
+          io << "def " << column.name << "=(value : " << column.to_crystal << ")\n"
+          #io << "def " << column.name << "=(value)\n"
+          io << "  @" << column.name << " = " << column.to_cast << "\n"
+          io << "end\n\n"
 
           if table.primary_key? && table.primary_key == column.name && table.primary_key != "id"
-            str << "def id\n  " << table.primary_key << ";\nend\n\n"
-            str << "def id=(value)\n  self." << table.primary_key << " = value\nend\n\n"
+            io << "def id\n  " << table.primary_key << ";\nend\n\n"
+            io << "def id=(value)\n  self." << table.primary_key << " = value\nend\n\n"
           end
         end
       end
 
-      def generate_to_hash(str)
-        str << "def to_hash\n"
-        str << "  {\n"
+      def generate_to_hash(io)
+        io << "def to_hash\n"
+        io << "  {\n"
         table.columns.each do |column|
-          str << "    " << column.name.inspect << " => " << column.name << ",\n"
+          io << "    " << column.name.inspect << " => " << column.name << ",\n"
         end
-        str << "  }\n"
-        str << "end\n\n"
+        io << "  }\n"
+        io << "end\n\n"
       end
 
-      def generate_to_tuple(str)
-        str << "def to_tuple\n"
-        str << "  {"
+      def generate_to_tuple(io)
+        io << "def to_tuple\n"
+        io << "  {"
         table.columns.each_with_index do |column, index|
-          str << ", " unless index == 0
-          str << column.name
+          io << ", " unless index == 0
+          io << column.name
         end
-        str << "}\n"
-        str << "end\n"
+        io << "}\n"
+        io << "end\n"
       end
 
-      def to_crystal_s
-        String.build do |str|
-          str << "@@primary_key = " << (table.primary_key || "id").inspect << "\n"
-          str << "@@primary_key_type = " << (table.primary_key_type || "Int32") << "\n"
-          str << "@@attribute_names = {" << table.attribute_names.map(&.inspect).join(", ") << "}\n\n"
+      def to_crystal_s(io : IO)
+        io << "@@primary_key = " << (table.primary_key || "id").inspect << "\n"
+        io << "@@primary_key_type = " << (table.primary_key_type || "Int32") << "\n"
+        io << "@@attribute_names = {" << table.attribute_names.map(&.inspect).join(", ") << "}\n\n"
 
-          generate_initialize(str)
-          generate_from_pg_result(str)
-          generate_attributes_setter(str)
-          generate_properties(str)
-          generate_to_hash(str)
-          generate_to_tuple(str)
-        end
+        generate_initialize(io)
+        generate_from_pg_result(io)
+        generate_attributes_setter(io)
+        generate_properties(io)
+        generate_to_hash(io)
+        generate_to_tuple(io)
       end
     end
 
-    at_exit do
-      attributes = Attributes.new(ARGV[0])
-      puts attributes.to_crystal_s
-    end
+    Attributes.new(ARGV[0]).to_crystal_s(STDOUT)
   end
 end

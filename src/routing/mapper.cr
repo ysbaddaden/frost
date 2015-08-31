@@ -117,6 +117,7 @@ module Trail
         routes.push path.to_s, controller.not_nil!, action, via, as
       end
 
+      # :nodoc:
       def self.to_crystal_s(io : IO)
         aggregate = {} of String => Array(Route)
 
@@ -134,7 +135,7 @@ module Trail
         aggregate.each do |method, routes|
           io << "    when " << method.upcase.inspect << "\n"
           io << "      case request.uri.path\n"
-          routes.each { |route| io << route.to_crystal_s }
+          routes.each { |route| route.to_crystal_s(io) }
           io << "      end\n"
         end
         io << "    end\n\n"

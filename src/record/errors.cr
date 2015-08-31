@@ -6,16 +6,13 @@ module Trail
     #class ConnectionError < Exception
     #end
 
-    class RangeError < Error
-    end
+    #class RangeError < Error
+    #end
 
     class RecordNotFound < Error
     end
 
-    class RecordInvalid < Error
-    end
-
-    #class StatementInvalid < Error
+    #class RecordInvalid < Error
     #end
   end
 end

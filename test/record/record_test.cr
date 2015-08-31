@@ -14,7 +14,17 @@ module Trail
 
     def test_attribute_names
       assert_equal({"id", "title", "body", "published", "views", "created_at", "updated_at"}, Post.attribute_names)
-      assert_equal({"uuid", "email", "body", "created_at", "updated_at"}, Comment.attribute_names)
+      assert_equal({"uuid", "post_id", "email", "body", "created_at", "updated_at"}, Comment.attribute_names)
+    end
+
+    def test_equal
+      uuid = SecureRandom.uuid
+      assert_equal Comment.new(uuid: uuid), Comment.new(uuid: uuid)
+      assert_equal Post.new(id: 1), Post.new(id: 1)
+
+      refute_equal Post.new(id: 1), Post.new(id: 2)
+      refute_equal Post.new(id: 1), Comment.new(uuid: uuid)
+      refute_same Post.new(id: 1), Post.new(id: 1)
     end
 
     def test_initialize

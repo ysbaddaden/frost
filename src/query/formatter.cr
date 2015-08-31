@@ -99,12 +99,7 @@ module Trail
       end
 
       def inspect(io : IO)
-        io << to_sql
-
-        if params = data.params
-          io << "; "
-          params.inspect(io)
-        end
+        data.inspect(io)
       end
     end
   end

@@ -33,8 +33,8 @@ module Trail
         assert first.updated_at.is_a?(Nil)
       end
 
-      def test_all
-        posts = Post.all
+      def test_to_a
+        posts = Post.all.to_a
         assert typeof(posts) == Array(Post)
         assert_equal 3, posts.size
         assert_equal [1, 2, 3], posts.map(&.id.not_nil!).sort

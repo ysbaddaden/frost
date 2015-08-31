@@ -15,6 +15,7 @@ Trail::Record.connection do
     end
 
     create_table :comments, force: true, id: :uuid, primary_key: :uuid, default: "uuid_generate_v4()" do |t|
+      t.integer :post_id
       t.string  :email, null: false
       t.text    :body,  null: false
       t.timestamps

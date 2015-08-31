@@ -17,7 +17,7 @@ module Trail
       end
 
       def test_save
-        comment = Comment.new(email: "me@example.com", body: "contents")
+        comment = Comment.new(post_id: 1, email: "me@example.com", body: "contents")
         assert comment.new_record?
 
         # create
@@ -38,7 +38,7 @@ module Trail
       end
 
       def test_create
-        comment = Comment.create({ "email" => "me@example.com", "body" => "great!" })
+        comment = Comment.create({ "post_id" => 1, "email" => "me@example.com", "body" => "great!" })
         refute comment.new_record?
 
         comment = Comment.find(comment.id)

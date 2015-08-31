@@ -1,6 +1,7 @@
 require "./record/errors"
 require "./record/connection"
 require "./record/finders"
+require "./record/associations"
 require "./record/persistence"
 require "./record/validation"
 require "./support/core_ext/time"
@@ -10,6 +11,7 @@ module Trail
   # TODO: dirty attributes
   class Record
     extend Finders
+    include Associations
     include Persistence
     include Validation
 
@@ -34,6 +36,10 @@ module Trail
       new.tap do |record|
         record.attributes = attributes
       end
+    end
+
+    def ==(other)
+      self.class == other.class && id == other.id
     end
 
     #def to_hash

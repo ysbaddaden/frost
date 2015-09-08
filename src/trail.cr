@@ -1,4 +1,5 @@
 require "./support/core_ext/**"
+require "./logger"
 require "./dispatcher"
 require "./controller"
 require "./record"

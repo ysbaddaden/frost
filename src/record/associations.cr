@@ -1,8 +1,9 @@
 module Trail
   class Record
-    # TODO: customize foreign_key
+    # TODO: keep a list of associations (so #save and #delete can access them)
     # TODO: customize dependent (delete, destroy, nullify)
-    # TODO: pass nullable column state
+    # TODO: customize foreign_key
+    # TODO: pass nullable column state (?)
     module Associations
       macro belongs_to(name)
         {{ run "./associations/belongs_to.cr", name }}

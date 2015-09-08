@@ -1,0 +1,25 @@
+require "minitest/autorun"
+require "./record/fixtures"
+
+class Minitest::Test
+  include Trail::Record::TransactionalFixtures
+
+  def before_setup
+    super
+
+    if self.responds_to?(:preload_fixtures)
+      preload_fixtures
+    end
+
+    @transaction = Trail::Record.connection.transaction
+  end
+
+  def after_teardown
+    clear_fixtures_cache
+    super
+  ensure
+    if transaction = @transaction
+      transaction.rollback unless transaction.completed?
+    end
+  end
+end

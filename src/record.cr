@@ -1,16 +1,19 @@
 require "./record/errors"
 require "./record/connection"
+require "./record/callbacks"
 require "./record/finders"
 require "./record/associations"
 require "./record/persistence"
 require "./record/validation"
 require "./support/core_ext/time"
 
+
 module Trail
   # TODO: associations (has_many :children, belongs_to :parent)
   # TODO: dirty attributes
   class Record
     extend Finders
+    include Callbacks
     include Associations
     include Persistence
     include Validation
@@ -39,6 +42,10 @@ module Trail
     end
 
     def ==(other)
+      false
+    end
+
+    def ==(other : Record)
       self.class == other.class && id == other.id
     end
 
@@ -52,6 +59,10 @@ module Trail
 
     abstract def to_tuple
 
+    # OPTIMIZE: avoid loading attributes twice
+    #
+    # it doesn't work with the following:
+    # % unless @type.methods.any? { |m| m.name.stringify == "attributes=" } %
     macro generate_attributes
       {{ run "./record/attributes.cr", @type.name.stringify }}
     end

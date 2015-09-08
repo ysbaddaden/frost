@@ -1,0 +1,23 @@
+hello_world:
+  id: 1001
+  title: hello
+  body: hello world
+  published: false
+  created_at: "2015-08-01 00:00:00"
+  updated_at: "2015-08-01 00:00:00"
+
+first:
+  id: 1002
+  title: first
+  body: body
+  published: true
+  created_at: "2015-08-15 00:00:00"
+  updated_at: "2015-08-15 00:00:00"
+
+second:
+  id: 1003
+  title: second
+  body: body
+  published: true
+  created_at: "2015-08-25 00:00:00"
+  updated_at: "2015-08-25 00:00:00"

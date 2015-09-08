@@ -1,5 +1,6 @@
 require "../test_helper"
 require "../../src/record"
+require "../../src/minitest"
 require "secure_random"
 
 ENV["DATABASE_URL"] ||= "postgres://postgres@/trail_test"
@@ -22,4 +23,8 @@ end
 
 class Comment < Trail::Record
   belongs_to :post
+end
+
+class Minitest::Test
+  fixtures "#{ __DIR__ }/../fixtures"
 end

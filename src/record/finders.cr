@@ -15,6 +15,18 @@ module Trail
         delegate :{{ method.id }}, :query
       {% end %}
 
+      def count(column_name = "*", distinct = false, group = nil : Nil)
+        query.count(column_name, distinct, nil)
+      end
+
+      def count(column_name = "*", distinct = false, group = "" : String | Symbol)
+        query.count(column_name, distinct, group)
+      end
+
+      def count(column_name = "*", distinct = false, group = nil : Array | Tuple)
+        query.count(column_name, distinct, group)
+      end
+
       private def query
         Query::Executor.new(self)
       end
@@ -28,6 +40,14 @@ module Trail
         # :nodoc:
         def initialize(@klass : T.class, data = Trail::Query::Data.new)
           super(@klass.table_name, Record.connection, data)
+        end
+
+        macro method_missing(name, args, block)
+          {% if args.length > 0 %}
+            @klass.{{ name.id }}({{ args.argify }}, context: self)
+          {% else %}
+            @klass.{{ name.id }}(context: self)
+          {% end %}
         end
 
         def to_a
@@ -66,19 +86,49 @@ module Trail
           to_a.map_with_index { |record, index| yield record, index }
         end
 
-        # OPTIMIZE: execute SQL COUNT until @records is loaded
         def size
-          to_a.size
+          if @records
+            to_a.size
+          else
+            count
+          end
         end
 
         def all
           self
         end
 
-        #def count
-        #  query = select("COUNT(*)").to_sql
-        #  Record.connection.select_values(select("COUNT(*)").to_sql)[0][0] as Int32
-        #end
+        # TODO: raise if data.group isn't empty (use count(group: columns) instead)
+        def count(column_name = "*", distinct = false, group = nil : Nil)
+          distinct = distinct ? "DISTINCT " : ""
+          column_name = with_table_name(column_name.to_s) unless column_name == "*"
+          sql = select("COUNT(#{ distinct }#{ column_name })").to_sql
+          Record.connection.select_values(sql)[0][0] as Int32
+        end
+
+        def count(column_name = "*", distinct = false, group = "" : String | Symbol)
+          distinct = distinct ? "DISTINCT " : ""
+          quoted_column_name = column_name == "*" ? "*" : with_table_name(column_name.to_s)
+          as_column_name = column_name == "*" ? "count_all" : "count_#{ column_name }"
+          sql = self.group(group).select(group, "COUNT(#{ distinct }#{ quoted_column_name }) AS #{ as_column_name }").to_sql
+
+          rows = Record.connection.select_values(sql)
+          rows.each_with_object(Hash(typeof(rows[0][0]), Int32).new) do |row, hash|
+            hash[row[0]] = row[1] as Int32
+          end
+        end
+
+        def count(column_name = "*", distinct = false, group = Tuple(String).new : Tuple)
+          distinct = distinct ? "DISTINCT " : ""
+          quoted_column_name = column_name == "*" ? "*" : with_table_name(column_name.to_s)
+          as_column_name = column_name == "*" ? "count_all" : "count_#{ column_name }"
+          sql = self.group(*group).select(*group, "COUNT(#{ distinct }#{ quoted_column_name }) AS #{ as_column_name }").to_sql
+
+          rows = Record.connection.select_values(sql)
+          rows.each_with_object(Hash(Array(typeof(rows[0][0])), Int32).new) do |row, hash|
+            hash[row[0 ... -1]] = row[-1] as Int32
+          end
+        end
 
         # Finds a record by id. Raises RecordNotFound if it can't be found.
         # ```

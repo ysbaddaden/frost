@@ -1,5 +1,6 @@
 module Trail
   module Query
+    # :nodoc:
     class Data
       property :selects
       property :joins

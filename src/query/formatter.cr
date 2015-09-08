@@ -6,6 +6,9 @@ module Trail
       DELETE
     end
 
+    # :nodoc:
+    FUNCTION_CALL = /[\w_]+\(.*?\)/
+
     # TODO: make it a class (?)
     module Formatter
       # FIXME: don't quote when column name is a function, eg: COUNT(*)
@@ -14,9 +17,16 @@ module Trail
           columns = selects.compact.uniq
 
           if columns.any?
-            sql << columns
-              .map { |column_name| with_table_name(column_name.to_s) }
-              .join(", ")
+            columns.each_with_index do |column_name, index|
+              sql << ", " unless index == 0
+
+              if column_name =~ FUNCTION_CALL
+                sql << column_name.to_s
+              else
+                sql << with_table_name(column_name.to_s)
+              end
+            end
+
             return
           end
         end

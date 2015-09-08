@@ -35,8 +35,6 @@ module Trail
         assert post.save
         refute post.errors.any?
         refute post.new_record?
-      ensure
-        Record.connection.execute("TRUNCATE posts")
       end
 
       def test_validates_on_update
@@ -49,8 +47,6 @@ module Trail
         refute post.save
         assert post.errors.any?
         refute post.new_record?
-      ensure
-        Record.connection.execute("TRUNCATE posts")
       end
     end
   end

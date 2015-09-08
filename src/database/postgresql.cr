@@ -1,6 +1,7 @@
 require "pg"
 require "./pg_ext"
 require "./errors"
+require "./transaction"
 require "./postgresql/table"
 require "./postgresql/table_definition"
 
@@ -11,29 +12,27 @@ module Trail
 
       def initialize(url)
         @conn = PG.connect(url)
+        @transactions = [] of Transaction
       rescue ex : PG::ConnectionError
         raise ConnectionError.new(ex.message)
       end
 
       def execute(sql)
-        STDERR.puts(sql); STDERR.flush
-
+        log(sql)
         @conn.exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
 
       def trail_execute(sql)
-        STDERR.puts(sql); STDERR.flush
-
+        log(sql)
         @conn.trail_exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
 
       def execute(types, sql)
-        STDERR.puts(sql); STDERR.flush
-
+        log(sql)
         @conn.exec(types, sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
@@ -95,27 +94,45 @@ module Trail
       end
 
       def add_index(table_name, column_name, name = nil, unique = false, using = :btree)
-        name ||= "index_#{ table_name }_on_#{ column_name }"
+        add_index(table_name, {column_name}, name, unique, using)
+      end
+
+      def add_index(table_name, column_names : Tuple, name = nil, unique = false, using = :btree)
+        name ||= "index_#{ table_name }_on_#{ column_names.join("_and_") }"
 
         execute String.build do |sql|
           sql << "CREATE"
           sql << " UNIQUE" if unique
           sql << " INDEX " << name
-          sql << " ON (" << quote(table_name) << "." << quote(column_name) << ")"
+          sql << " ON " << quote(table_name)
           sql << " USING " << using if using
+          sql << " (" << column_names.map { |column_name| quote(column_name) }.join(", ") << ")"
         end
       end
 
+      # :nodoc:
       def transaction
-        execute "BEGIN"
+        Transaction.new(self).tap(&.begin)
+      end
+
+      def transaction(requires_new = false)
+        if Transaction.any? && !requires_new
+          return yield
+        end
+
+        transaction = self.transaction
 
         begin
           yield
         rescue ex
-          execute "ROLLBACK"
+          transaction.rollback
           raise ex
         else
-          execute "COMMIT"
+          transaction.commit
+        end
+      ensure
+        if transaction
+          transaction.rollback unless transaction.completed?
         end
       end
 
@@ -148,6 +165,14 @@ module Trail
         end
 
         @conn.escape_literal(value.to_s)
+      end
+
+      private def log(sql)
+        if t = Trail
+          if t.responds_to?(:logger)
+            t.logger.debug(sql)
+          end
+        end
       end
     end
   end

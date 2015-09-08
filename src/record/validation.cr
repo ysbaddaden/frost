@@ -32,6 +32,7 @@ module Trail
     # ```
     module Validation
       class Errors < Hash(Symbol, Array(String))
+        # :nodoc:
         def initialize(@record : Record)
           super()
         end
@@ -59,10 +60,6 @@ module Trail
         def full_messages
           #values.flatten # NOTE: crystal > 0.7.6
           values.inject([] of String) { |a, e| a + e }
-        end
-
-        def any?
-          !empty?
         end
       end
 

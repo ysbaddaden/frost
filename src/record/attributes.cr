@@ -29,21 +29,43 @@ module Trail
         io << "end\n\n"
       end
 
+      def generate_columns(io)
+        io << "def self.columns\n"
+        io << "  {\n"
+        table.columns.each do |column|
+          io << "    " << column.name << ": " << column.as_crystal << ",\n"
+        end
+        io << "  }\n"
+        io << "end\n\n"
+      end
+
+      # TODO: should attributes= have loose type restriction and break at runtime,
+      #       or continue to break at compilation?
       def generate_attributes_setter(io)
         io << "def attributes=(attributes : Hash)\n"
 
         table.columns.each do |column|
-          io << "  if attributes.has_key?(#{ column.name.inspect })\n"
+          io << "  if value = attributes[#{ column.name.inspect }]?\n"
 
           if column.null?
-            io << "    if attributes[#{ column.name.inspect }] == nil\n"
+            io << "    if value.is_a?(Nil)\n"
             io << "      self.#{ column.name } = nil\n"
             io << "    else\n"
-            io << "      self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
+            io << "      self.#{ column.name } = value as #{ column.to_crystal }\n"
             io << "    end\n"
           else
-            io << "    self.#{ column.name } = attributes[#{ column.name.inspect }] as #{ column.to_crystal }\n"
+            io << "    self.#{ column.name } = value as #{ column.to_crystal }\n"
           end
+
+          #io << "    if value.is_a?(#{ column.to_crystal })\n"
+          #io << "      self.#{ column.name } = value\n"
+          #if column.null?
+          #  io << "    elsif value.is_a?(Nil)\n"
+          #  io << "      self.#{ column.name } = nil\n"
+          #end
+          #io << "    else\n"
+          #io << "      raise TypeError.new(\"#{ column_name } expects a #{ column.to_crystal } but got a #{ value.class.name }\")\n"
+          #io << "    end\n"
 
           if column.default?
             io << "  else\n"
@@ -67,7 +89,11 @@ module Trail
           io << "    when #{ column.name.inspect }\n"
 
           if column.null?
-            io << "      record.#{ column.name } = value == nil ? nil : value as #{ column.as_crystal }\n"
+            io << "      record.#{ column.name } = if value.is_a?(Nil)\n"
+            io << "        nil\n"
+            io << "      else\n"
+            io << "        value as #{ column.as_crystal }\n"
+            io << "      end\n"
           else
             io << "      record.#{ column.name } = value as #{ column.as_crystal }\n"
           end
@@ -125,6 +151,7 @@ module Trail
         io << "@@attribute_names = {" << table.attribute_names.map(&.inspect).join(", ") << "}\n\n"
 
         generate_initialize(io)
+        generate_columns(io)
         generate_from_pg_result(io)
         generate_attributes_setter(io)
         generate_properties(io)

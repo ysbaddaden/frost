@@ -27,7 +27,7 @@ module Trail
           )
         end
 
-        def primary_key(name, type = :serial, null = true, limit = nil, default = nil, precision = nil, scale = nil)
+        def primary_key(name, type = :serial, null = false, limit = nil, default = nil, precision = nil, scale = nil)
           column(
             name,
             type,
@@ -70,7 +70,7 @@ module Trail
               sql << column.type.to_sql
               sql << " PRIMARY KEY" if column.primary_key?
              #sql << " UNIQUE" if column.unique?
-              sql << " NOT NULL" if column.null?
+              sql << " NOT NULL" unless column.null?
               if column.default?(drop_functions: false)
                 sql << " DEFAULT " << @pg.escape(column.default(drop_functions: false), skip_functions: true)
               end

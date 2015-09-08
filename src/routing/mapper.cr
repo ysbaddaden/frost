@@ -4,6 +4,7 @@ require "./scope"
 require "./url_builder"
 
 module Trail
+  # See `Routing::Mapper` for documentation.
   module Routing
     # HTTP Requests route generator.
     #
@@ -29,25 +30,77 @@ module Trail
     # module with helpers to generate routes. The later is meant to be included
     # in your app's ApplicationController.
     #
-    # ### Simple Routes
+    # ### Mapping Routes
+    #
+    # Mapper declares how an HTTP request must be handled. In its most basic
+    # form, it checks the request pathname and the HTTP method:
     #
     # ```
     # match "/posts", "posts#index"
     # # GET /posts  => PostsController#index
     # ```
     #
-    # You may have path params, that will be available as `params["id"]` in
-    # the controller:
+    # An advanced form (TODO) will allow to match on whatever else: the domain,
+    # the HTTP protocol (HTTP or HTTPS) or whatever HTTP header.
+    #
+    # #### Path Params
+    #
+    # Routes may have path params, which are declared with a leading `:`. The
+    # following example will make the param available as `params["id"]` in
+    # PostsController:
     # ```
     # match "/posts/:id", "posts#show"
-    # # GET /posts/:id  => PostsController#show
+    # # GET /posts/123  => { "id" => "123" }
     # ```
     #
-    # You may specify the HTTP method, and have many of them:
+    # Path params are sometimes optional:
     # ```
+    # match "/posts/:id(.:format)", "posts#show"
+    # # GET /posts/1  => { "id" => "1" }
+    # # GET /posts/1.json  => { "id" => "1", "format" => "1" }
+    # ```
+    #
+    # In this example, the `:format` param and the preceding dot (`.`) are both
+    # optional, so both `/posts/1` and `/posts/1.json` would match, whereas
+    # `/posts/1.` wouldn't. If the dot wasn't optional it would be required and
+    # `/posts/1` wouldn't match anymore.
+    #
+    # Path params are expected to be constrained within slashes (`/`) or dots
+    # (`.`) but sometimes we want to match these separators too, this can be
+    # achieved with the `*path` declaration:
+    # ```
+    # match "/wiki/*name", "wiki#show"
+    # # GET /wiki/path/to/page  => { "name" => "path/to/page" }
+    # ```
+    #
+    # You can still have leading params:
+    # ```
+    # match "/wiki/*name(.:format)", "wiki#show"
+    # # GET /wiki/path/to/page.html  => { "name" => "path/to/page", "format" => "html" }
+    # ```
+    #
+    # #### HTTP methods
+    #
+    # You may specify the HTTP method the route must match. The route will only
+    # match for this (or these) method(s), and will never match another one.
+    # ```
+    # match "/posts/:id", "posts#delete", via: :delete
+    # # DELETE /posts/:id  => PostsController#delete
+    #
     # match "/posts/:id", "posts#update", via: [:put, :patch]
     # # PUT /posts/:id  => PostsController#update
     # # PATCH /posts/:id  => PostsController#update
+    # ```
+    #
+    # You are encouraged to use one of the helper methods (`#options`, `#head`,
+    # `#get`, `#post`, `#put`, `#patch` or `#delete`) for increased readability
+    # of your route definitions:
+    # ```
+    # get "/posts", "posts#index"
+    # # GET /posts  => PostsController#show
+    #
+    # post "/posts", "posts#create"
+    # # POST /posts  => PostsController#create
     # ```
     #
     # ### Named Routes
@@ -76,6 +129,33 @@ module Trail
     # post = Post.find(1)
     # post_path(post) # => "/posts/1"
     # ```
+    #
+    # ### Resources
+    #
+    # In order to achieve a full REST API, Trail provides the `#resource` and
+    # `#resources` helpers to generate many routes at once:
+    #
+    # ```
+    # resources :posts
+    # # GET    /posts(.:format)           => PostsController#index
+    # # GET    /posts/:id(.:format)       => PostsController#show
+    # # GET    /posts/new(.:format)       => PostsController#new
+    # # GET    /posts/:id/edit(.:format)  => PostsController#edit
+    # # POST   /posts(.:format)           => PostsController#create
+    # # PUT    /posts/:id(.:format)       => PostsController#replace
+    # # PATCH  /posts/:id(.:format)       => PostsController#update
+    # # DELETE /posts/:id(.:format)       => PostsController#delete
+    # ```
+    #
+    # See `Resources` for more information.
+    #
+    # ### Scopes
+    #
+    # To further cleanup your route definitions, you can group options or a set
+    # of routes under a same name or path.
+    #
+    # See `Scope` for more information.
+    #
     module Mapper
       # TODO: constraints (segments, request, custom)
 
@@ -94,6 +174,13 @@ module Trail
         end
       {% end %}
 
+      # Maps a route.
+      #
+      # * `path` — the HTTP request pathname the route will match (eg: # `"/posts/:post_id/comments/:id(.:format)"`
+      # * `action` — the controller and method to match (eg: `"posts#show"`)
+      # * `via` — the route matches the given HTTP verb(s) (defaults to `:get`)
+      # * `as` — generate named route helpers
+      #
       def self.match(path, action = nil, via = :get, as = nil)
         if action.is_a?(Nil)
           if path.is_a?(Symbol)

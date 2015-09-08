@@ -1,10 +1,11 @@
 module Trail
-  # TODO: save, create, update & destroy callbacks (before, after, around)
+  # TODO: after_commit & after_rollback callbacks
   # TODO: save!, create!, update!
   class Record
     module Persistence
       macro included
         extend ClassMethods
+        define_model_callbacks :save, :create, :update, :destroy
       end
 
       def new_record?
@@ -15,8 +16,16 @@ module Trail
       def new_record=(@new_record)
       end
 
+      def persisted?
+        !new_record?
+      end
+
       def deleted?
         @deleted == true
+      end
+
+      def transaction(requires_new = false)
+        Record.connection.transaction(requires_new) { yield }
       end
 
       def save(validate = true)
@@ -24,10 +33,14 @@ module Trail
           return false
         end
 
-        if new_record?
-          _create
-        else
-          _update
+        transaction(requires_new: true) do
+          run_save_callbacks do
+            if new_record?
+              run_create_callbacks { _create }
+            else
+              run_update_callbacks { _update }
+            end
+          end
         end
       end
 
@@ -38,8 +51,12 @@ module Trail
 
       private def _create
         Time.now.tap do |time|
-          self.created_at ||= time
-          self.updated_at ||= time
+          if self.responds_to?(:created_at)
+            self.created_at ||= time
+          end
+          if self.responds_to?(:updated_at)
+            self.updated_at ||= time
+          end
         end
 
         attributes = to_hash.delete_if do |k, v|
@@ -63,9 +80,11 @@ module Trail
       end
 
       private def _update
-        self.updated_at = Time.now
+        if self.responds_to?(:updated_at)
+          self.updated_at = Time.now
+        end
 
-        attributes = to_hash.delete_if do |k, _v|
+        attributes = to_hash.delete_if do |k, _|
           k == self.class.primary_key
         end
 
@@ -77,9 +96,9 @@ module Trail
         @deleted = true
       end
 
-      #def destroy
-      #  delete
-      #end
+      def destroy
+        run_destroy_callbacks { delete }
+      end
 
       module ClassMethods
         def create(attributes)
@@ -94,9 +113,9 @@ module Trail
           where({ primary_key => id }).delete_all
         end
 
-        #def destroy(id)
-        #  find(id).tap { |record| record.destroy }
-        #end
+        def destroy(id)
+          find(id).tap { |record| record.destroy }
+        end
       end
     end
   end

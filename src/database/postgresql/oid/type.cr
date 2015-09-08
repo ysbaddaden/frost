@@ -26,7 +26,7 @@ module Trail
 
           def to_cast(str)
             if @nullable
-              "value == nil ? nil : #{ str }"
+              "if value.is_a?(Nil)\n    nil\n  else\n    #{ str }\n  end"
             else
               str
             end

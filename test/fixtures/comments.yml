@@ -1,0 +1,39 @@
+one:
+  uuid: 2e4834e0-11c7-40d1-a52f-3b2923d1b5a4
+  post_id: 1
+  email: me@example.com
+  body: one
+  created_at: "2015-08-01 00:00:00"
+  updated_at: "2015-08-01 00:00:00"
+
+two:
+  uuid: 1a604129-cf39-4b23-86c4-cb537ea0d840
+  post_id: 1
+  email: you@example.com
+  body: two
+  created_at: "2015-08-15 00:00:00"
+  updated_at: "2015-08-15 00:00:00"
+
+three:
+  uuid: 2de27d78-142a-4296-b76e-df1d1e1a8b35
+  post_id: 2
+  email: her@example.com
+  body: three
+  created_at: "2015-08-25 00:00:00"
+  updated_at: "2015-08-25 00:00:00"
+
+four:
+  uuid: b6e34677-cabd-474c-82f2-90fa20324003
+  post_id: 3
+  email: him@example.com
+  body: four
+  created_at: "2015-08-27 00:00:00"
+  updated_at: "2015-08-27 00:00:00"
+
+five:
+  uuid: 2c2f8a28-1ac5-4d95-9143-9abacf301aa6
+  post_id: 1
+  email: kid@example.com
+  body: five
+  created_at: "2015-08-29 00:00:00"
+  updated_at: "2015-08-29 00:00:00"

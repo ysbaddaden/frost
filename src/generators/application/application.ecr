@@ -1,0 +1,13 @@
+require "http/server"
+require "./config/bootstrap"
+
+# server
+dispatcher = <%= name.camelcase %>::Dispatcher.new
+
+server = HTTP::Server.new(9292) do |request|
+  dispatcher.call(request)
+end
+
+puts "Listening on http://0.0.0.0:9292"
+server.listen
+

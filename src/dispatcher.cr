@@ -14,9 +14,9 @@ module Trail
     def call(request)
       dispatch(request)
     rescue ex : Trail::Routing::RoutingError
-      not_found(ex)
+      not_found(request, ex)
     rescue ex
-      internal_server_error(ex)
+      internal_server_error(request, ex)
     end
 
     # :nodoc:
@@ -39,14 +39,14 @@ module Trail
     abstract def _dispatch(request)
 
     # TODO: render a generic 404 page (production)
-    def not_found(ex)
+    def not_found(request, ex)
       response = HTTP::Response.new(404, "#{ ex.message }\n")
       response.headers["Content-Type"] = "text/plain"
       response
     end
 
     # TODO: render a generic 500 page (production)
-    def internal_server_error(ex)
+    def internal_server_error(request, ex)
       response = HTTP::Response.new(500, "#{ ex.class.name }: #{ ex.message }\n#{ ex.backtrace.join("\n") }")
       response.headers["Content-Type"] = "text/plain"
       response

@@ -133,7 +133,7 @@ module Trail
       #
       # * `"json"` for a `/posts.json` request
       # * `"html"` for a `/posts.html` request
-      # * `"html"` for a `/posts` request
+      # * `default_format` for a `/posts` request
       #
       # TODO: parse request's Accept header
       def format
@@ -144,8 +144,13 @@ module Trail
                         end
                       end
 
-                      "html"
+                      default_format
                     end
+      end
+
+      # Returns `"html"`. Overload to change to another format.
+      def default_format
+        "html"
       end
 
       # Returns true if the controller already rendered a template.
@@ -157,6 +162,7 @@ module Trail
         raise DoubleRenderError.new if already_rendered?
         yield
         @__rendered = true
+        nil
       end
 
       # :nodoc:
@@ -165,6 +171,8 @@ module Trail
 
         {% unless name.stringify == "ApplicationView" %}
           class ::{{ name.id }} < ApplicationView
+            def initialize(@controller : {{ @type.name }})
+            end
           end
 
           protected def view

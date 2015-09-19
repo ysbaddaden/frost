@@ -73,7 +73,7 @@ module Trail::Routing
         def destroy; head 200; end
       end
 
-      {{ run "../fixtures/routes/resources.cr" }}
+      {{ run "../fixtures/routes/resources.cr", "--codegen" }}
     end
 
     def test_resources

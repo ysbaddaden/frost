@@ -17,7 +17,11 @@ module Trail
         def to_crystal_s(io : IO)
           io << "def #{ name }(reload = false)\n"
           io << "  @#{ name } = nil if reload\n"
-          io << "  @#{ name } ||= #{ model_name }.find(#{ foreign_key })\n"
+          io << "  @#{ name } ||= begin\n"
+          io << "    unless #{ foreign_key }.nil?\n"
+          io << "      #{ model_name }.find(#{ foreign_key })\n"
+          io << "    end\n"
+          io << "  end\n"
           io << "end\n\n"
 
           io << "def #{ name }=(record : #{ model_name })\n"

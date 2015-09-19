@@ -13,7 +13,7 @@ module Trail
         end
       end
 
-      {{ run "./fixtures/routes/dispatcher.cr" }}
+      {{ run "./fixtures/routes/dispatcher.cr", "--codegen" }}
     end
 
     def test_routes

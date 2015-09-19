@@ -44,8 +44,8 @@ module Trail
         end
 
         with_scope do |constraints|
-          constraints[:resources_member_path] = "/#{ plural }/:id"
-          constraints[:resources_collection_path] = "/#{ plural }"
+          constraints[:resources_member_path] = "#{ constraints[:path]? }/#{ plural }/:id"
+          constraints[:resources_collection_path] = "#{ constraints[:path]? }/#{ plural }"
 
           scope(path: "/#{ plural }/:#{ singular }_id", as: singular, controller: controller) do
             yield

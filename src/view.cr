@@ -12,8 +12,7 @@ module Trail
     include UrlHelper
     include FormTagHelper
 
-    def initialize(@controller)
-    end
+    #abstract def initialize(controller)
 
     forward_missing_to @controller
 

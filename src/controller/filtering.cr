@@ -45,6 +45,8 @@ module Trail
         if self.responds_to?(:after_action)
           self.after_action
         end
+
+        nil
       end
     end
   end

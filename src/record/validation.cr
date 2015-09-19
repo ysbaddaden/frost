@@ -58,8 +58,11 @@ module Trail
         # post.errors.full_messages # => ["title is required", "body is required"]
         # ```
         def full_messages
-          #values.flatten # NOTE: crystal > 0.7.6
-          values.inject([] of String) { |a, e| a + e }
+          values.flatten
+        end
+
+        def to_json
+          full_messages.to_json
         end
       end
 

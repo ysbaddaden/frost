@@ -21,7 +21,7 @@ module Trail::Routing
         end
       end
 
-      {{ run "../fixtures/routes/mapper.cr" }}
+      {{ run "../fixtures/routes/mapper.cr", "--codegen" }}
 
       class MapperController
         include App::NamedRoutes

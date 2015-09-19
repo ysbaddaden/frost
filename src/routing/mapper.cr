@@ -22,7 +22,7 @@ module Trail
     #
     # # my_app.cr
     # module MyApp
-    #   {{ run "config/routes.cr" }}
+    #   {{ run "config/routes.cr", "--codegen" }}
     # end
     # ```
     #
@@ -262,13 +262,43 @@ module Trail
         io << "end\n\n"
       end
 
+      def self.pretty_print(io : IO)
+        lines = routes.map do |route|
+          [
+            route.route_name.to_s,
+            route.method.upcase,
+            route.path,
+            "#{ route.controller }##{ route.action }"
+          ]
+        end
+
+        sizes = lines.inject([0, 0, 0, 0]) do |acc, line|
+          line.each_with_index do |arg, i|
+            acc[i] = arg.size if arg.size > acc[i]
+          end
+          acc
+        end
+
+        lines.each do |args|
+          args.each_with_index do |arg, i|
+            io << "  " unless i == 0
+            io << arg.ljust(sizes[i])
+          end
+          io.puts
+        end
+      end
+
       private def self.routes
         @@routes
       end
     end
 
     at_exit do
-      Mapper.to_crystal_s(STDOUT)
+      if ARGV.any? { |arg| arg == "--codegen" }
+        Mapper.to_crystal_s(STDOUT)
+      else
+        Mapper.pretty_print(STDOUT)
+      end
     end
   end
 end

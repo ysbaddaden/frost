@@ -1,0 +1,8 @@
+ENV["TRAIL_ENV"] ||= "test"
+
+require "../config/bootstrap"
+require "trail/minitest"
+
+class Minitest::Test
+  fixtures "#{ __DIR__ }/fixtures"
+end

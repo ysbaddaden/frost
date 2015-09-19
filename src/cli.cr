@@ -1,0 +1,148 @@
+require "ecr/macros"
+require "colorize"
+
+module Trail
+  module Commands
+    module ShellActions
+      TEMPLATES_PATH = __DIR__
+
+      def mkdir(*path_names)
+        path_name = File.join(*path_names)
+
+        if Dir.exists?(File.join(path, path_name))
+          log "exist", path_name, :blue
+        else
+          log "create", path_name
+          Dir.mkdir(File.join(path, path_name))
+        end
+      end
+
+      def touch(*path_names)
+        path_name = File.join(*path_names)
+
+        if File.exists?(File.join(path, path_name))
+          log "exist", path_name, :blue
+        else
+          log "create", path_name
+          File.write(File.join(path, path_name), "")
+        end
+      end
+
+      macro template(template_name, path)
+        contents = String.build do |__buf__|
+          embed_ecr {{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }}, "__buf__"
+        end
+
+        if File.exists?(File.join(path, {{ path }}))
+          if File.read(File.join(path, {{ path }})).strip == contents.strip
+            log "identical", {{ path }}, :blue
+          else
+            log "conflict", {{ path }}, :red
+          end
+        else
+          log "create", {{ path }}
+          File.write(File.join(path, {{ path }}), contents)
+        end
+      end
+
+      def log(action, detail, color = :green)
+        STDOUT << action.rjust(12).colorize(color).bold << "  " << detail << "\n"
+        STDOUT.flush
+      end
+    end
+
+    class ApplicationGenerator
+      TEMPLATES_PATH = "#{ __DIR__ }/generators/application"
+
+      include ShellActions
+      getter :name, :path, :templates_path
+
+      def initialize(@path)
+        @name = File.basename(path)
+      end
+
+      def run
+        mkdir
+
+        template "Makefile", "Makefile"
+        template "application", "#{ name }.cr"
+        template "shard", "shard.yml"
+        template "gitignore", ".gitignore"
+
+        mkdir "app"
+        generate_controllers
+        generate_models
+        generate_views
+        generate_config
+        generate_database
+        mkdir "log"
+        touch "log", ".keep"
+        #generate_public
+
+        generate_tests
+      end
+
+      def generate_config
+        mkdir "config"
+        template "routes", File.join("config", "routes.cr")
+        template "bootstrap", File.join("config", "bootstrap.cr")
+      end
+
+      def generate_controllers
+        mkdir "app", "controllers"
+        template "application_controller", File.join("app", "controllers", "application_controller.cr")
+      end
+
+      def generate_database
+        mkdir "db"
+        template "schema", File.join("db", "schema.cr")
+      end
+
+      def generate_models
+        mkdir "app", "models"
+        touch "app", "models", ".keep"
+      end
+
+      def generate_views
+        mkdir "app", "views"
+        template "application_view", File.join("app", "views", "application_view.cr")
+        template "layouts_view", File.join("app", "views", "layouts_view.cr")
+      end
+
+      #def generate_public
+      #  mkdir "public"
+      #  %w(stylesheets javascripts images).each do |name|
+      #    mkdir "public", name
+      #    touch "public", name, ".keep"
+      #  end
+      #end
+
+      def generate_tests
+        mkdir "test"
+        %w(controllers fixtures models).each do |folder|
+          mkdir "test", folder
+          touch "test", folder, ".keep"
+        end
+        template "test_helper", File.join("test", "test_helper.cr")
+      end
+
+      def self.run(path)
+        new(path).run
+      end
+    end
+  end
+
+  module CLI
+    def self.run(args = ARGV)
+      case args[0]?
+      when "new"
+        Commands::ApplicationGenerator.run(args[1])
+      else
+        STDERR.puts "Usage: trail new <project>"
+        STDERR.flush
+      end
+    end
+  end
+end
+
+Trail::CLI.run

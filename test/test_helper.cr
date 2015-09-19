@@ -7,8 +7,10 @@ module Trail
   VIEWS_PATH = "#{ __DIR__ }/views"
 end
 
-class ApplicationView < Trail::View
+abstract class ApplicationView < Trail::View
 end
 
 class LayoutsView < ApplicationView
+  def initialize(@controller)
+  end
 end

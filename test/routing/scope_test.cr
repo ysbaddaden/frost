@@ -22,7 +22,7 @@ module Trail::Routing
         end
       end
 
-      {{ run "../fixtures/routes/scope.cr" }}
+      {{ run "../fixtures/routes/scope.cr", "--codegen" }}
     end
 
     def test_scope_path

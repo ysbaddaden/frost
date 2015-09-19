@@ -10,3 +10,6 @@
 
 # binaries
 /test/sample/bootstrap
+
+# test artefacts
+/logs

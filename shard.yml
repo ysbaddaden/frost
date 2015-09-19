@@ -12,5 +12,4 @@ dependencies:
 development_dependencies:
   minitest:
     github: ysbaddaden/minitest.cr
-    branch: master
-    #version: "> 0.1.2"
+    version: ">= 0.1.3"

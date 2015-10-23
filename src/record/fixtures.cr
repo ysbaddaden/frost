@@ -1,4 +1,5 @@
 require "yaml"
+require "./errors"
 
 module Trail
   class Record

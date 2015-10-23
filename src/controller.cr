@@ -61,10 +61,10 @@ module Trail
   # See `Filtering` for more information.
   #
   class Controller
-    # TODO: cookies (read, create, replace, delete + encryption)
     # TODO: sessions (with engines: cookie, memory, memcached)
     # TODO: CSRF protection
 
+    include Session
     include Filtering
     include Rendering
 

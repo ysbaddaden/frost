@@ -221,7 +221,7 @@ module Trail
         io << "    case request.method.upcase\n"
         aggregate.each do |method, routes|
           io << "    when " << method.upcase.inspect << "\n"
-          io << "      case request.uri.path\n"
+          io << "      case request.path\n"
           routes.each { |route| route.to_crystal_s(io) }
           io << "      end\n"
         end
@@ -230,7 +230,7 @@ module Trail
         io << "    if controller\n"
         io << "      controller.response\n"
         io << "    else\n"
-        io << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.uri.path.inspect }\")\n"
+        io << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
         io << "    end\n"
         io << "  end\n"
         io << "end\n\n"
@@ -263,14 +263,26 @@ module Trail
       end
 
       def self.pretty_print(io : IO)
-        lines = routes.map do |route|
-          [
+        lines = Array(Array(String)).new(routes.size)
+
+        routes.each do |route|
+          lines << [
             route.route_name.to_s,
             route.method.upcase,
             route.path,
-            "#{ route.controller }##{ route.action }"
+            "#{ route.controller }##{ route.action }",
           ]
         end
+
+        # FIXME: using map results in "expected block to return Array(String), not NoReturn"
+        #lines = routes.map do |route|
+        #  [
+        #    route.route_name.to_s as String,
+        #    route.method.upcase as String,
+        #    route.path as String,
+        #    "#{ route.controller }##{ route.action }" as String,
+        #  ]
+        #end
 
         sizes = lines.inject([0, 0, 0, 0]) do |acc, line|
           line.each_with_index do |arg, i|

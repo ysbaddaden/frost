@@ -48,7 +48,7 @@ module Trail
 
       def select(sql)
         result = trail_execute(sql)
-        result.each_row { |row| yield result, row }
+        result.each { |row| yield row }
       end
 
       def select_values(sql)
@@ -73,11 +73,11 @@ module Trail
       end
 
       def primary_key(table_name)
-        result = execute String.build do |sql|
+        result = execute(String.build do |sql|
           sql << "SELECT pg_attribute.attname FROM pg_attribute "
           sql << "INNER JOIN pg_constraint ON pg_attribute.attrelid = pg_constraint.conrelid AND pg_attribute.attnum = any(pg_constraint.conkey) "
           sql << "WHERE pg_constraint.contype = 'p' AND pg_constraint.conrelid = '" << quote(table_name) << "'::regclass ;"
-        end
+        end)
         if row = result.rows[0]?
           row[0]?
         end

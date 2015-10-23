@@ -1,4 +1,4 @@
-require "cgi"
+require "http/params"
 
 module Trail
   class Controller
@@ -7,7 +7,7 @@ module Trail
     class Params < Hash(String, ParamType)
       # Parses the Query String and the Body of a HTTP::Request object.
       def parse(request)
-        parse_urlencoded(request.uri.query)
+        parse_urlencoded(request.query)
         parse_body(request)
       end
 
@@ -23,7 +23,7 @@ module Trail
       def parse_urlencoded(query)
         return self unless query
 
-        CGI.parse(query) do |key, value|
+        HTTP::Params.parse(query) do |key, value|
           subkeys = key.scan(/\[(.*?)\]/).map { |m| m[1] }
 
           if subkeys.empty?

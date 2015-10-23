@@ -46,7 +46,7 @@ module Trail
 
         io << "      when #{ regular_expression }\n"
         params.each_with_index do |name, index|
-          io << "        params[#{ name }] = CGI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
+          io << "        params[#{ name }] = URI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
         end
        #io << "        params[\"controller\"] = #{ controller.inspect }\n"
        #io << "        params[\"action\"] = #{ action.inspect }\n"

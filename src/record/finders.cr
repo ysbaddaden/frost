@@ -43,7 +43,7 @@ module Trail
         end
 
         macro method_missing(name, args, block)
-          {% if args.length > 0 %}
+          {% if args.size > 0 %}
             @klass.{{ name.id }}({{ args.argify }}, context: self)
           {% else %}
             @klass.{{ name.id }}(context: self)
@@ -54,8 +54,8 @@ module Trail
           @records ||= begin
                          records = [] of T
 
-                         Record.connection.select(to_sql) do |result, row|
-                           records << @klass.from_pg_result(result, row)
+                         Record.connection.select(to_sql) do |row|
+                           records << @klass.from_pg_result(row)
                          end
 
                          records
@@ -103,7 +103,7 @@ module Trail
           distinct = distinct ? "DISTINCT " : ""
           column_name = with_table_name(column_name.to_s) unless column_name == "*"
           sql = select("COUNT(#{ distinct }#{ column_name })").to_sql
-          Record.connection.select_values(sql)[0][0] as Int32
+          Record.connection.select_values(sql)[0][0] as Int64
         end
 
         def count(column_name = "*", distinct = false, group = "" : String | Symbol)
@@ -113,8 +113,8 @@ module Trail
           sql = self.group(group).select(group, "COUNT(#{ distinct }#{ quoted_column_name }) AS #{ as_column_name }").to_sql
 
           rows = Record.connection.select_values(sql)
-          rows.each_with_object(Hash(typeof(rows[0][0]), Int32).new) do |row, hash|
-            hash[row[0]] = row[1] as Int32
+          rows.each_with_object(Hash(typeof(rows[0][0]), Int64).new) do |row, hash|
+            hash[row[0]] = row[1] as Int64
           end
         end
 
@@ -125,8 +125,8 @@ module Trail
           sql = self.group(*group).select(*group, "COUNT(#{ distinct }#{ quoted_column_name }) AS #{ as_column_name }").to_sql
 
           rows = Record.connection.select_values(sql)
-          rows.each_with_object(Hash(Array(typeof(rows[0][0])), Int32).new) do |row, hash|
-            hash[row[0 ... -1]] = row[-1] as Int32
+          rows.each_with_object(Hash(Array(typeof(rows[0][0])), Int64).new) do |row, hash|
+            hash[row[0 ... -1]] = row[-1] as Int64
           end
         end
 
@@ -171,8 +171,8 @@ module Trail
         # # => SELECT * FROM posts ORDER BY published_at ASC LIMIT 1;
         # ```
         def first
-          Record.connection.select(limit(1).to_sql) do |result, _|
-            return @klass.from_pg_result(result, 0)
+          Record.connection.select(limit(1).to_sql) do |row|
+            return @klass.from_pg_result(row)
           end
           nil
         end

@@ -78,11 +78,11 @@ module Trail
       end
 
       def generate_from_pg_result(io)
-        io << "def self.from_pg_result(result : PG::TrailResult, row)\n"
+        io << "def self.from_pg_result(row : PG::TrailResult::Row)\n"
         io << "  record = new\n"
         io << "  record.new_record = false\n\n"
 
-        io << "  result.each_field(row) do |attr, value|\n"
+        io << "  row.each do |attr, value|\n"
         io << "    case attr\n"
 
         table.columns.each do |column|

@@ -11,7 +11,7 @@ class Post < Trail::Record
   def validate
     if title.blank?
       errors.add(:title, "Title is required")
-    elsif title.to_s.length >= 100
+    elsif title.to_s.size >= 100
       errors.add(:title, "Title must be less than 100 characters")
     end
 

@@ -14,7 +14,7 @@ module Trail
     #   def validate
     #     if title.blank?
     #       errors.add(:title, "Title is required")
-    #     elsif title.length > 500
+    #     elsif title.size > 500
     #       errors.add(:title, "Title must be 100 characters maximum")
     #     end
     #

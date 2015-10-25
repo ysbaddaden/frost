@@ -60,13 +60,16 @@ module Trail
   #
   # See `Filtering` for more information.
   #
+  # ### Session
+  #
+  # See `Session` and `Session::Store` for more information.
+  #
   class Controller
-    # TODO: sessions (with engines: cookie, memory, memcached)
     # TODO: CSRF protection
 
-    include Session
     include Filtering
     include Rendering
+    include Session
 
     # The received `HTTP::Request` object.
     getter :request
@@ -90,6 +93,12 @@ module Trail
     # Returns the controller name as an underscored String.
     def controller_name
       @controller_name ||= self.class.name.gsub(/Controller\Z/, "").underscore
+    end
+
+    # Overload to either enable or disable sessions automatically. Defaults to
+    # true.
+    def session_enabled?
+      true
     end
 
     # Overload to change the default URL options.

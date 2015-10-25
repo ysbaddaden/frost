@@ -7,12 +7,6 @@ module Trail
         response.headers["X-Before-App"] = "app:before"
       end
 
-      def around_action
-        response.headers["X-Around-App"] = "app:around:before"
-        yield
-        response.headers["X-Around-App"] += ", app:around:after"
-      end
-
       def after_action
         response.headers["X-After-App"] = "app:after"
       end
@@ -26,12 +20,6 @@ module Trail
       def before_action
         super
         response.headers["X-Before"] = "pages:before"
-      end
-
-      def around_action
-        response.headers["X-Around"] = "pages:around:before"
-        super { yield }
-        response.headers["X-Around"] += ", pages:around:after"
       end
 
       def after_action
@@ -49,11 +37,9 @@ module Trail
 
       assert_equal "pages:before", response.headers["X-Before"]
       assert_equal "pages:after", response.headers["X-After"]
-      assert_equal "pages:around:before, pages:around:after", response.headers["X-Around"]
 
       assert_equal "app:before", response.headers["X-Before-App"]
       assert_equal "app:after", response.headers["X-After-App"]
-      assert_equal "app:around:before, app:around:after", response.headers["X-Around-App"]
     end
   end
 end

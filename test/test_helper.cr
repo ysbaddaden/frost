@@ -7,7 +7,7 @@ module Trail
   VIEWS_PATH = "#{ __DIR__ }/views"
 end
 
-Trail.config.secret_key = SecureRandom.hex(16)
+Trail.config.secret_key = SecureRandom.hex(32)
 
 abstract class ApplicationView < Trail::View
 end

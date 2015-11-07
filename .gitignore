@@ -12,4 +12,5 @@
 /test/sample/bootstrap
 
 # test artefacts
-/logs
+/log
+/.env

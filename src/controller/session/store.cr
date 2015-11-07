@@ -16,6 +16,10 @@ module Trail
           data[key] = value.to_s
         end
 
+        def delete(key)
+          data.delete(key)
+        end
+
         protected def data
           @data ||= {} of String => String
         end
@@ -31,7 +35,7 @@ module Trail
         end
 
         def session_id
-          @session_id ||= if request.cookies[cookie_name]?
+          @session_id ||= if cookie = request.cookies[cookie_name]?
                             cookie.value
                           else
                             generate_session_id

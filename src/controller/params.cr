@@ -4,39 +4,82 @@ module Trail
   class Controller
     alias ParamType = String | Array(ParamType) | Hash(String, ParamType)
 
-    class Params < Hash(String, ParamType)
-      # Parses the Query String and the Body of a HTTP::Request object.
-      def parse(request)
-        parse_urlencoded(request.query)
-        parse_body(request)
-      end
+    module Params
+      #class Error < Exception
+      #end
 
-      def parse_body(request)
-        case request.headers["Content-Type"]?
-        when "application/x-www-form-urlencoded" then parse_urlencoded(request.body)
-        when "multipart/form-data"               then # TODO: parse multipart body
-        when "application/json"                  then # TODO: parse JSON body
-        when "application/xml", "text/xml"       then # TODO: parse XML body (?)
-        end
-      end
+      #class UnexpectedParamError < Error
+      #end
 
-      def parse_urlencoded(query)
-        return self unless query
+      # Parses an application/x-www-form-urlencoded string then sets properties
+      # on the object with casted values.
+      #
+      # ```
+      # def employee_params(employee)
+      #   Params.mapping(employee, {
+      #     name: String,
+      #     email: String,
+      #     salary: Int32,
+      #   })
+      # end
+      #
+      # # new employee:
+      # employee = employee_params(Employee.new)
+      # employee.save
+      #
+      # # update an existing employee:
+      # employee = employee_params(Employee.find(1))
+      # employee.save
+      # ```
+      #
+      # Unknown properties will be skipped, unless `strict` is true, in which
+      # case an `UnexpectedParamError` will be raised.
+      #macro mapping(object, properties, strict = false)
+      #  # TODO: walk and cast nested properties:
+      #  #
+      #  #       [String] => expect an Array of strings
+      #  #       [Int] => expect an Array of integers
+      #  #       "{ name: String }" => expect a Hash with a property name (String)
+      #  #       "{ name: [String] }" => expect a Hash with a property name ([] of String)
+      #  #       "[{ name: String }]" => expect an Array of Hash with a property name ([] of String)
+      #  #       "[{ name: [String] }]" => expect an Array of Hash with a property name ([] of String)
+      #  #       "[{ name: [{ name: String }] }]" => expect an Array of Hash with a property name ([] of String)
+      #  body_params.each do |key, value|
+      #    case key
+      #    {% for name, type in properties %}
+      #    when {{ name.stringify }}
+      #      {{ object.id }}.{{ name.id }} = value as {{ type.id }}
+      #    {% end %}
+      #    else
+      #      raise UnexpectedParamError.new("unexpected param #{ key }") if strict
+      #    end
+      #  end
 
-        HTTP::Params.parse(query) do |key, value|
+      #  {{ object.id }}
+      #end
+
+      # Parses an application/x-www-form-urlencoded string as a
+      # `Hash(String, ParamType)` object.
+      def self.parse(string, params = {} of String => ParamType)
+        return params unless string
+
+        HTTP::Params.parse(string) do |key, value|
           subkeys = key.scan(/\[(.*?)\]/).map { |m| m[1] }
 
+          # shortcut: don't search for nested data
           if subkeys.empty?
-            self[key] = value
+            params[key] = value
             next
           end
 
+          # looking for inner data (eg: x[y][z])
           name = key[0 ... key.index("[").not_nil!]
           subkeys.unshift(name)
 
-          hsh = self
+          hsh = params
           last = subkeys.pop unless subkeys.last == ""
 
+          # TODO: there must be simpler way to fetch inner data
           subkeys.each_with_index do |subkey, index|
             next if subkey == ""
 
@@ -88,7 +131,7 @@ module Trail
           end
         end
 
-        self
+        params
       end
     end
   end

@@ -48,20 +48,12 @@ module Trail
         params.each_with_index do |name, index|
           io << "        params[#{ name }] = URI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
         end
-       #io << "        params[\"controller\"] = #{ controller.inspect }\n"
-       #io << "        params[\"action\"] = #{ action.inspect }\n"
 
         io << "        controller = #{ controller_class }.new(request, params, #{ action.inspect })\n"
         io << "        controller.run_action do\n"
         io << "          controller.#{ action }\n"
         io << "          controller.render unless controller.already_rendered?\n"
         io << "        end\n"
-
-       #io << "        if controller.responds_to?(:#{ action }_with_filters)\n"
-       #io << "          controller.#{ action }_with_filters\n"
-       #io << "        else\n"
-       #io << "          controller.#{ action }\n"
-       #io << "        end\n"
       end
     end
   end

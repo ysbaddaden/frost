@@ -10,7 +10,7 @@
 #
 #        def save
 #          #unless request.cookies[cookie_name]?
-#            set_cookie cookie_name, session_id
+#            set_cookie(cookie_name, session_id)
 #          #end
 #
 #          Session.cache.save(

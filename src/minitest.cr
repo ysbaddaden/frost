@@ -1,5 +1,6 @@
 require "minitest/autorun"
 require "./record/fixtures"
+require "./controller/test"
 
 class Minitest::Test
   include Trail::Record::TransactionalFixtures

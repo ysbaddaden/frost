@@ -1,4 +1,5 @@
 require "http/params"
+require "./session/cookie_store"
 
 module Trail
   class Controller
@@ -28,6 +29,12 @@ module Trail
       # The actual session object. See `Store`.
       def session
         @session ||= session_store.new(request, response, session_options)
+      end
+
+      # Overload to either enable or disable sessions automatically. Defaults to
+      # true.
+      def session_enabled?
+        true
       end
 
       # :nodoc:

@@ -1,6 +1,10 @@
 require "./support/core_ext/http/request"
 require "./support/core_ext/http/response"
-require "./controller/**"
+require "./controller/errors"
+require "./controller/filtering"
+require "./controller/params"
+require "./controller/rendering"
+require "./controller/session"
 
 module Trail
   # Controllers are the logic of the Web Application.
@@ -32,8 +36,7 @@ module Trail
   #
   # Matched params from the URI (eg: `/pages/:id`), the query string params (eg:
   # `a=b&c=d`) and the body params are automatically parsed and available as a
-  # `Params` Hash object where keys are String, and values are of `ParamType`.
-  # For instance, the previous examples would generate:
+  # `Hash(String, ParamType)` object. For example:
   # ```
   # {
   #   "id" => "1",
@@ -78,8 +81,7 @@ module Trail
     # and avoid manipulating the response object directly.
     getter :response
 
-    # Parsed request params (URI, query string and body) as a
-    # `Params` object.
+    # Parsed request params (from the URI, query string and body).
     getter :params
 
     # Returns the current action as a String.
@@ -93,12 +95,6 @@ module Trail
     # Returns the controller name as an underscored String.
     def controller_name
       @controller_name ||= self.class.name.gsub(/Controller\Z/, "").underscore
-    end
-
-    # Overload to either enable or disable sessions automatically. Defaults to
-    # true.
-    def session_enabled?
-      true
     end
 
     # Overload to change the default URL options.
@@ -120,6 +116,33 @@ module Trail
       end
 
       url_options
+    end
+
+    # Overload to rescue an exception raised during an action. The exception
+    # will be raised again if the methods returns false. Does nothing by default.
+    #
+    # Example:
+    #
+    # ```
+    # class ApplicationController < Trail::Controller
+    #   def rescue_from(exception)
+    #     case exception
+    #     when Trail::Record::RecordNotFound
+    #       head 404
+    #     else
+    #       false
+    #     end
+    #   end
+    # end
+    # ```
+    def rescue_from(exception)
+      false
+    end
+
+    def run_action
+      super { yield }
+    rescue exception
+      raise exception if rescue_from(exception) == false
     end
 
     macro inherited

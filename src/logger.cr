@@ -1,6 +1,10 @@
 require "logger"
 
 module Trail
+  DEFAULT_LOGGER_FORMATTER = Logger::Formatter.new do |severity, datetime, _, message, io|
+    io << severity[0] << ", [" << datetime << " #" << Process.pid << "] " << message
+  end
+
   def self.logger
     @@logger ||= begin
                    path = File.join(Trail::ROOT, "log", "#{ Trail::ENVIRONMENT }.log")
@@ -12,6 +16,7 @@ module Trail
 
                    logger = Logger.new(file)
                    logger.level = Logger::DEBUG
+                   logger.formatter = DEFAULT_LOGGER_FORMATTER
                    logger
                  end
   end

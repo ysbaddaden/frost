@@ -21,8 +21,11 @@ module Trail
 
     # :nodoc:
     def dispatch(request)
-      params = Trail::Controller::Params.new
-      params.parse(request)
+      params = Trail::Controller::Params.parse(request.query)
+
+      if request.headers["Content-Type"]? == "application/x-www-form-urlencoded"
+        Trail::Controller::Params.parse(request.body, params)
+      end
 
       if request.method.upcase == "POST"
         if m = params.delete("_method")
@@ -36,7 +39,7 @@ module Trail
     # Dispatches a request to the appropriate controller and action.
     #
     # This method is usually implemented by Mapper.
-    abstract def _dispatch(request)
+    abstract def _dispatch(request, params)
 
     # TODO: render a generic 404 page (production)
     def not_found(request, ex)

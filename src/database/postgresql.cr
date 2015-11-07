@@ -19,21 +19,21 @@ module Trail
 
       def execute(sql)
         log(sql)
-        @conn.exec(sql)
+        conn.exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
 
       def trail_execute(sql)
         log(sql)
-        @conn.trail_exec(sql)
+        conn.trail_exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
 
       def execute(types, sql)
         log(sql)
-        @conn.exec(types, sql)
+        conn.exec(types, sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
@@ -100,14 +100,14 @@ module Trail
       def add_index(table_name, column_names : Tuple, name = nil, unique = false, using = :btree)
         name ||= "index_#{ table_name }_on_#{ column_names.join("_and_") }"
 
-        execute String.build do |sql|
+        execute(String.build do |sql|
           sql << "CREATE"
           sql << " UNIQUE" if unique
           sql << " INDEX " << name
           sql << " ON " << quote(table_name)
           sql << " USING " << using if using
           sql << " (" << column_names.map { |column_name| quote(column_name) }.join(", ") << ")"
-        end
+        end)
       end
 
       # :nodoc:
@@ -149,7 +149,7 @@ module Trail
       end
 
       def quote(identifier)
-        @conn.escape_identifier(identifier.to_s)
+        conn.escape_identifier(identifier.to_s)
       end
 
       def escape(value, skip_functions = false)
@@ -164,7 +164,7 @@ module Trail
           end
         end
 
-        @conn.escape_literal(value.to_s)
+        conn.escape_literal(value.to_s)
       end
 
       private def log(sql)

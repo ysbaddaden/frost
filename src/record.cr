@@ -36,9 +36,9 @@ module Trail
     end
 
     def self.build(attributes : Hash)
-      new.tap do |record|
-        record.attributes = attributes
-      end
+      record = new
+      record.attributes = attributes
+      record
     end
 
     def ==(other)

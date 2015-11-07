@@ -3,8 +3,8 @@ module Trail
     class Error < Exception
     end
 
-    #class ConnectionError < Exception
-    #end
+    class ConnectionError < Exception
+    end
 
     #class RangeError < Error
     #end

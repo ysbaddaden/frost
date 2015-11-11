@@ -14,5 +14,8 @@ module Trail
 
     #class RecordInvalid < Error
     #end
+
+    class MigrationError < Record::Error
+    end
   end
 end

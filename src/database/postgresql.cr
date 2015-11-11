@@ -72,6 +72,11 @@ module Trail
         Table.new(self, name)
       end
 
+      def tables
+        sql = "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+        select_values(sql).map { |row| Table.new(self, row[0]) }
+      end
+
       def primary_key(table_name)
         result = execute(String.build do |sql|
           sql << "SELECT pg_attribute.attname FROM pg_attribute "
@@ -89,8 +94,12 @@ module Trail
 
         yield table
 
-        execute "DROP TABLE IF EXISTS #{ quote(name) }" if force
+        drop_table name if force
         execute table.to_sql
+      end
+
+      def drop_table(name)
+        execute "DROP TABLE IF EXISTS #{ quote(name) }"
       end
 
       def add_index(table_name, column_name, name = nil, unique = false, using = :btree)

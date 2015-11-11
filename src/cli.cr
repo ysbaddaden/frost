@@ -1,7 +1,30 @@
 require "ecr/macros"
 require "colorize"
 
+lib LibC
+  fun chmod(path : Char*, mode : ModeT) : Int
+  fun fchmod(path : Int, mode : ModeT) : Int
+end
+
+# :nodoc:
+class File
+  # :nodoc:
+  def self.chmod(mode, path)
+    if LibC.chmod(path, mode) != 0
+      raise Errno.new("chmod")
+    end
+  end
+
+  # :nodoc:
+  def chmod(mode)
+    if LibC.fchmod(fd, mode) != 0
+      raise Errno.new("fchmod")
+    end
+  end
+end
+
 module Trail
+  # :nodoc:
   module Commands
     module ShellActions
       TEMPLATES_PATH = __DIR__
@@ -26,6 +49,10 @@ module Trail
           log "create", path_name
           File.write(File.join(path, path_name), "")
         end
+      end
+
+      def chmod(mode, *path_names)
+        File.chmod(mode, File.join(path, *path_names))
       end
 
       macro template(template_name, path)
@@ -74,12 +101,19 @@ module Trail
         generate_models
         generate_views
         generate_config
+        generate_bin
         generate_database
         mkdir "log"
         touch "log", ".keep"
         #generate_public
 
         generate_tests
+      end
+
+      def generate_bin
+        mkdir "bin"
+        template "db", File.join("bin", "db")
+        chmod 0o0755, "bin", "db"
       end
 
       def generate_config
@@ -132,6 +166,7 @@ module Trail
     end
   end
 
+  # :nodoc:
   module CLI
     def self.run(args = ARGV)
       case args[0]?

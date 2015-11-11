@@ -30,7 +30,7 @@ module Trail
         def primary_key(name, type = :serial, null = false, limit = nil, default = nil, precision = nil, scale = nil)
           column(
             name,
-            type,
+            type.to_s,
             null: null,
             limit: limit,
             default: default,

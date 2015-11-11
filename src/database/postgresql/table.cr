@@ -12,7 +12,7 @@ module Trail
 
         def columns
           @columns ||= begin
-            sql = "SELECT * FROM information_schema.columns WHERE table_name = '#{ name }' ;"
+            sql = "SELECT * FROM information_schema.columns WHERE table_name = #{ @pg.escape(name) } ;"
             primary_key = @pg.primary_key(name)
 
             @pg.execute(sql).to_hash.map do |row|

@@ -3,8 +3,6 @@ require "../../src/record"
 require "../../src/minitest"
 require "secure_random"
 
-ENV["DATABASE_URL"] ||= "postgres://postgres@/trail_test"
-
 class Post < Trail::Record
   has_many :comments
 

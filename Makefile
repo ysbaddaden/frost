@@ -1,4 +1,4 @@
-test_files := $(wildcard test/*_test.cr) $(wildcard test/**/*_test.cr)
+test_files := $(shell find test -iname "*_test.cr")
 
 ifndef CRYSTAL_BIN
 	CRYSTAL_BIN := $(shell which crystal)
@@ -11,8 +11,8 @@ tasks:
 
 .PHONY: test
 test:
-	$(CRYSTAL_BIN) run test/record/schema.cr
-	$(CRYSTAL_BIN) run $(test_files) -- --verbose
+	bin/env.sh $(CRYSTAL_BIN) run test/record/schema.cr
+	bin/env.sh $(CRYSTAL_BIN) run $(test_files)
 
 .PHONY: doc
 doc:

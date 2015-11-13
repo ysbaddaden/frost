@@ -1,11 +1,11 @@
-require "../associations_test"
+require "../record_test_helper"
 
 module Trail
   class Record
-    class Associations::BelongsToTest < AssociationsTest
+    class Associations::BelongsToTest < Minitest::Test
       def test_association
-        assert_equal Post.find(1), Comment.find("2e4834e0-11c7-40d1-a52f-3b2923d1b5a4").post
-        assert_equal Post.find(3), Comment.find("b6e34677-cabd-474c-82f2-90fa20324003").post
+        assert_equal Post.find(1001), Comment.find("2e4834e0-11c7-40d1-a52f-3b2923d1b5a4").post
+        assert_equal Post.find(1003), Comment.find("b6e34677-cabd-474c-82f2-90fa20324003").post
       end
 
       def test_association_memoization
@@ -19,10 +19,10 @@ module Trail
 
       def test_association_setter
         comment = Comment.find("b6e34677-cabd-474c-82f2-90fa20324003")
-        post = Post.find(1)
+        post = Post.find(1001)
 
         assert_same post, comment.post = post
-        assert_equal 1, comment.post_id
+        assert_equal 1001, comment.post_id
         assert_equal post, comment.post
       end
 

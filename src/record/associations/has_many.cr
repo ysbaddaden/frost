@@ -4,7 +4,7 @@ module Trail
     module Associations
       macro has_many(name, foreign_key = nil)
         {% name = name.id %}
-        {% singular = run("../../support/inflector/singularize", name) %}
+        {% singular = run("../../support/inflector/singularize", name).strip %}
         {% model_name = singular.camelcase.id %}
         {% relation = @type.name.underscore.id %}
         {% foreign_key ||= "#{ relation }_id" %}
@@ -22,7 +22,7 @@ module Trail
           @{{ name }} = records
         end
 
-        # TODO: cast array elements to column type (eg: String?, Int32, ...)
+        # TODO: cast array elements to column type (eg: String, Int32, ...)
         def {{ singular.id }}_ids
           {{ name }}.pluck({{ model_name }}.primary_key)
         end

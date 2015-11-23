@@ -25,7 +25,9 @@ module Trail
       end
 
       def transaction(requires_new = false)
-        Record.connection.transaction(requires_new) { yield }
+        Record.connection do |conn|
+          conn.transaction(requires_new) { yield }
+        end
       end
 
       def save(validate = true)

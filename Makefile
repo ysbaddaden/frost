@@ -1,8 +1,5 @@
+CRYSTAL_BIN ?= $(shell which crystal)
 test_files := $(shell find test -iname "*_test.cr")
-
-ifndef CRYSTAL_BIN
-	CRYSTAL_BIN := $(shell which crystal)
-endif
 
 .PHONY: tasks
 tasks:

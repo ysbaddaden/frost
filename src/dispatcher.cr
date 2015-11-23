@@ -17,6 +17,8 @@ module Trail
       not_found(request, ex)
     rescue ex
       internal_server_error(request, ex)
+    ensure
+      Record.release_connection
     end
 
     # :nodoc:

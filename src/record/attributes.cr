@@ -3,15 +3,13 @@ require "./connection"
 
 module Trail
   class Record
-
-    # TODO: generate Record.json_mapping
-    # TODO: generate Record.create(attr = nil, ...)
-    # TODO: generate Record.update(id, attr = nil, ...)
     class Attributes
       getter :class_name, :table
 
       def initialize(@class_name)
-        @table = Record.connection.table(@class_name.tableize)
+        @table = Record.connection do |conn|
+          conn.table(@class_name.tableize)
+        end
       end
 
       def generate_initialize(io)

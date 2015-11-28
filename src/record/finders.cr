@@ -10,7 +10,7 @@ module Trail
         delegate :{{ method.id }}, :query
       {% end %}
 
-      {% for method in %w(all find find_by find_by! first last to_a) %}
+      {% for method in %w(all find find_by find_by? first first? last last? to_a) %}
         # Delegates to `Trail::Record::Query::Executor#{{ method.id }}`
         delegate :{{ method.id }}, :query
       {% end %}
@@ -33,9 +33,8 @@ module Trail
     end
 
     module Query
-      # TODO: calculations (count, any?, empty?, minimum, maximum, average)
+      # TODO: calculations (minimum, maximum, average)
       # TODO: #sample
-      # TODO: #count, #empty?, #any?
       class Executor(T) < Trail::Query::Builder
         # :nodoc:
         def initialize(@klass : T.class, data = Trail::Query::Data.new)
@@ -94,6 +93,14 @@ module Trail
           end
         end
 
+        def any?
+          size > 0
+        end
+
+        def empty?
+          size == 0
+        end
+
         def all
           self
         end
@@ -139,29 +146,29 @@ module Trail
         # # => SELECT * FROM comments WHERE post_id = 1 AND id = '2' LIMIT 1;
         # ```
         def find(id)
-          find_by!({ @klass.primary_key => id })
+          find_by?({ @klass.primary_key => id }) ||
+            raise RecordNotFound.new("Couldn't find #{ @klass.name } for #{ @klass.primary_key }=#{ id}")
         end
 
-        # Finds a record by attributes. Returns nil if it can't be found.
+        # Finds a record by attributes but raises RecordNotFound if no record
+        # can be found.
+        #
         # ```
         # post = Post.find_by({ blog_id: 1, urlname: "hello-world" })
         # # => SELECT * FROM posts WHERE blog_id = 1 AND urlname = 'hello-world' LIMIT 1;
         # ```
         def find_by(attributes : Hash)
-          where(attributes).first
+          find_by?(attributes) ||
+            raise RecordNotFound.new("Couldn't find #{ @klass.name } for #{ attributes.inspect }")
         end
 
-        # Finds a record by attributes but raises RecordNotFound if it can't be found.
-        def find_by!(attributes : Hash)
-          if record = find_by(attributes)
-            record
-          else
-            raise RecordNotFound.new("No #{ @klass.name } found with #{ attributes.inspect }")
-          end
+        # Same as `#find_by`, but returns nil if no record can be found.
+        def find_by?(attributes : Hash)
+          where(attributes).first?
         end
 
-        # Returns the first record matching the query. Returns nil if no record
-        # can be found.
+        # Returns the first record matching the query. Raises `RecordNotFound`
+        # if no record can be found.
         #
         # ```
         # post = Post.first
@@ -171,6 +178,11 @@ module Trail
         # # => SELECT * FROM posts ORDER BY published_at ASC LIMIT 1;
         # ```
         def first
+          first? || raise RecordNotFound.new("Couldn't find first #{ @klass.name }")
+        end
+
+        # Same as `#first` but Returns nil if no record can be found.
+        def first?
           Record.connection.select(limit(1).to_sql) do |row|
             return @klass.from_pg_result(row)
           end
@@ -178,7 +190,7 @@ module Trail
         end
 
         # Returns the last record matching the query, reversing the ORDER BY
-        # requirements. Returns nil if no record can be found.
+        # requirements. Raises RecordNotFound if no record can be found.
         #
         # ```
         # post = Post.last
@@ -188,13 +200,18 @@ module Trail
         # # => SELECT * FROM posts ORDER BY published_at ASC LIMIT 1;
         # ```
         def last
+          last? || raise RecordNotFound.new("Couldn't find last #{ @klass.name }")
+        end
+
+        # Same as `#last` but returns nil if no record can be found.
+        def last?
           query = dup
 
           if orders = query.data.orders
             orders.each { |col, dir| orders[col] = dir == "ASC" ? "DESC" : "ASC" }
-            query.first
+            query.first?
           else
-            order({ id: :desc }).first
+            order({ id: :desc }).first?
           end
         end
 
@@ -208,11 +225,12 @@ module Trail
         # ```
         #
         # NOTE: the Array elements type is impossible to cast down at compile
-        # time, since the attr_name is only known at runtime. The elements type
-        # is thus the union type of all the possible types that the database
-        # driver can return.
+        #       time, since the attr_name is only known at runtime. The elements
+        #       type is thus the union type of all the possible types that the
+        #       database driver can return.
         #
-        # TODO: accept variadic arguments, so we can pluck many columns at once.
+        # TODO: accept variadic arguments, so we can pluck many columns at once,
+        #       or many a tuple to have a different method signature.
         def pluck(attr_name)
           query = dup
           query.data.selects = [attr_name.to_s]
@@ -239,9 +257,9 @@ module Trail
           Record.connection.execute(query.to_sql(Query::Type::UPDATE))
         end
 
-        #def destroy
-        #  to_a.each { |record| record.destroy }
-        #end
+        def destroy
+          each { |record| record.destroy }
+        end
 
         def dup
           self.class.new(@klass, data.dup)

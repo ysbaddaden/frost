@@ -19,6 +19,42 @@ module Trail
         assert_equal true, first.published
         assert first.created_at.is_a?(Time)
         assert first.updated_at.is_a?(Time)
+
+        assert_raises(RecordNotFound) { Post.find(1209180) }
+      end
+
+      def test_find_by
+        assert_equal posts(:first), Post.find_by({ title: "first" })
+        assert_equal posts(:hello_world), Post.find_by({ title: "hello", published: false })
+        assert_raises(RecordNotFound) { Post.find_by({ title: "hello", published: true }) }
+      end
+
+      def test_find_by?
+        assert_equal posts(:first), Post.find_by?({ title: "first" })
+        assert_equal posts(:hello_world), Post.find_by?({ title: "hello", published: false })
+        assert_nil Post.find_by?({ title: "hello", published: true })
+      end
+
+      def test_first
+        assert_equal posts(:second), Post.order(:created_at, :desc).first
+        assert_equal posts(:hello_world), Post.order(:created_at, :asc).first
+        assert_raises(RecordNotFound) { Post.where({ title: "unknown" }).first }
+      end
+
+      def test_first?
+        assert_equal posts(:hello_world), Post.order(:created_at, :asc).first?
+        assert_nil Post.where({ title: "unknown" }).first?
+      end
+
+      def test_last
+        assert_equal posts(:hello_world), Post.order(:created_at, :desc).last
+        assert_equal posts(:second), Post.order(:created_at, :asc).last
+        assert_raises(RecordNotFound) { Post.where({ title: "unknown" }).last }
+      end
+
+      def test_last?
+        assert_equal posts(:hello_world), Post.order(:created_at, :desc).last?
+        assert_nil Post.where({ title: "unknown" }).last?
       end
 
       def test_to_a

@@ -81,7 +81,7 @@ module Trail
         result = execute(String.build do |sql|
           sql << "SELECT pg_attribute.attname FROM pg_attribute "
           sql << "INNER JOIN pg_constraint ON pg_attribute.attrelid = pg_constraint.conrelid AND pg_attribute.attnum = any(pg_constraint.conkey) "
-          sql << "WHERE pg_constraint.contype = 'p' AND pg_constraint.conrelid = '" << quote(table_name) << "'::regclass ;"
+          sql << "WHERE pg_constraint.contype = 'p' AND pg_constraint.conrelid = " << escape(table_name) << "::regclass ;"
         end)
         if row = result.rows[0]?
           row[0]?
@@ -171,6 +171,8 @@ module Trail
           if skip_functions && value =~ /\(.*\)/
             return value
           end
+        when Nil
+          return "NULL"
         end
 
         conn.escape_literal(value.to_s)

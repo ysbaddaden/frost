@@ -9,15 +9,17 @@ module Trail
               return if self.before_{{ name.id }} == false
             end
 
-            if self.responds_to?(:around_{{ name.id }})
-              self.around_{{ name.id }} { yield }
-            else
-              yield
-            end
+            success = if self.responds_to?(:around_{{ name.id }})
+                        self.around_{{ name.id }} { yield }
+                      else
+                        yield
+                      end
 
             if self.responds_to?(:after_{{ name.id }})
               self.after_{{ name.id }}
             end
+
+            success
           end
         {% end %}
       end

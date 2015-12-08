@@ -43,26 +43,27 @@ module Trail
         io << "def attributes=(attributes : Hash)\n"
 
         table.columns.each do |column|
-          io << "  if value = attributes[#{ column.name.inspect }]?\n"
-
           if column.null?
-            io << "    if value.is_a?(Nil)\n"
+            io << "  if attributes.has_key?(#{ column.name.inspect })\n"
+            io << "    #{ column.name } = attributes[#{ column.name.inspect }] as RecordValue\n"
+            io << "    if #{ column.name }.is_a?(Nil)\n"
             io << "      self.#{ column.name } = nil\n"
             io << "    else\n"
-            io << "      self.#{ column.name } = value as #{ column.to_crystal }\n"
+            io << "      self.#{ column.name } = #{ column.name } as #{ column.to_crystal }\n"
             io << "    end\n"
           else
-            io << "    self.#{ column.name } = value as #{ column.to_crystal }\n"
+            io << "  if #{ column.name } = attributes[#{ column.name.inspect }]?\n"
+            io << "    self.#{ column.name } = (#{ column.name } as RecordValue) as #{ column.to_crystal }\n"
           end
 
-          #io << "    if value.is_a?(#{ column.to_crystal })\n"
-          #io << "      self.#{ column.name } = value\n"
+          #io << "    if #{ column.name }.is_a?(#{ column.to_crystal })\n"
+          #io << "      self.#{ column.name } = #{ column.name }\n"
           #if column.null?
-          #  io << "    elsif value.is_a?(Nil)\n"
+          #  io << "    elsif #{ column.name }.is_a?(Nil)\n"
           #  io << "      self.#{ column.name } = nil\n"
           #end
           #io << "    else\n"
-          #io << "      raise TypeError.new(\"#{ column_name } expects a #{ column.to_crystal } but got a #{ value.class.name }\")\n"
+          #io << "      raise TypeError.new(\"#{ column_name } expects a #{ column.to_crystal } but got a #{ #{ column.name }.class.name }\")\n"
           #io << "    end\n"
 
           if column.default?

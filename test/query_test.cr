@@ -63,8 +63,8 @@ module Trail
         assert_query "SELECT * FROM `pages` WHERE (`pages`.`chapter_id` IN ('1', 2, 'f'))",
           pages.where({ chapter_id: ["1", 2, false] })
 
-        assert_query "SELECT * FROM `chapters` WHERE (book_id IN ('4', '5', '6'))",
-          chapters.where("book_id IN (?)", %w(4 5 6))
+        assert_query "SELECT * FROM `chapters` WHERE (book_id NOT IN ('4', '5', '6'))",
+          chapters.where("book_id NOT IN (?)", %w(4 5 6))
       end
 
       def test_group

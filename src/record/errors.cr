@@ -12,10 +12,35 @@ module Trail
     class RecordNotFound < Error
     end
 
-    #class RecordInvalid < Error
-    #end
+    class RecordInvalid < Error
+      getter :record
 
-    class MigrationError < Record::Error
+      def initialize(@record)
+        errors = record.errors.full_messages.join(", ")
+        super "Invalid #{ record.class.name }: #{ errors }"
+      end
+    end
+
+    class RecordNotSaved < Error
+      getter :record
+
+      def initialize(@record)
+        super "Failed to save #{ record.class.name }"
+      end
+    end
+
+    class RecordNotDestroyed < Error
+      getter :record
+
+      def initialize(@record)
+        super "Failed to destroy #{ record.class.name }"
+      end
+    end
+
+    class MigrationError < Error
+    end
+
+    class DeleteRestrictionError < Error
     end
   end
 end

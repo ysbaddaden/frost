@@ -1,6 +1,8 @@
 module Trail
   module Database
     class Transaction
+      # FIXME: stack isn't thread-safe (is it even fiber-safe?)
+
       @@stack = [] of Transaction
 
       def self.stack

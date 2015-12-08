@@ -20,5 +20,18 @@ Trail::Record.connection do
       t.text    :body,  null: false
       t.timestamps
     end
+
+    #add_index :comments, :post_id
+
+    create_table :users, force: true do |t|
+      t.string :email, null: false
+    end
+
+    create_table :profiles, force: true do |t|
+      t.integer :user_id
+      t.string  :nickname, null: false
+    end
+
+    #add_index :profiles, :user_id
   end
 end

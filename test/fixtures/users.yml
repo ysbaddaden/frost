@@ -1,0 +1,11 @@
+julien:
+  id: 2001
+  email: julien@example.com
+
+ary:
+  id: 2002
+  email: ary@example.com
+
+nobody:
+  id: 2003
+  email: nobody@example.com

@@ -9,9 +9,10 @@ require "./support/core_ext/time"
 
 
 module Trail
-  # TODO: associations (has_many :children, belongs_to :parent)
   # TODO: dirty attributes
   class Record
+    alias RecordValue = PG::PGValue
+
     extend Finders
     include Callbacks
     include Associations
@@ -69,6 +70,7 @@ module Trail
 
     macro inherited
       generate_attributes
+      generate_associations
     end
   end
 end

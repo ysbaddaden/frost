@@ -9,7 +9,8 @@ module Trail
       # :nodoc:
       getter :data
 
-      def initialize(@table_name, @adapter, @data = Data.new)
+      def initialize(@table_name, @adapter, data = nil)
+        @data = data || Data.new
       end
 
       def select(*columns)
@@ -24,7 +25,7 @@ module Trail
 
       {% for name in %w(join where having) %}
         def {{ name.id }}(conditions : String, *params)
-          _{{ name.id }}(conditions, params)
+          dup.{{ name.id }}!(conditions, params)
         end
 
         {% unless name == "join" %}
@@ -32,23 +33,31 @@ module Trail
             if conditions.empty?
               self
             else
-              _{{ name.id }}(flatten_conditions_hash(conditions), nil)
+              dup.{{ name.id }}!(conditions)
             end
           end
         {% end %}
 
-        private def _{{ name.id }}(conditions : String, params)
-          dup do |data|
-            if params
-              conditions = replace_placeholders(conditions, params)
-            end
-
-            if conds = data.{{ name.id }}s
-              conds << conditions
-            else
-              data.{{ name.id }}s = [conditions]
-            end
+        protected def {{ name.id }}!(conditions : Hash)
+          if conditions.empty?
+            self
+          else
+            {{ name.id }}!(flatten_conditions_hash(conditions), nil)
           end
+        end
+
+        protected def {{ name.id }}!(conditions : String, params)
+          if params
+            conditions = replace_placeholders(conditions, params)
+          end
+
+          if conds = data.{{ name.id }}s
+            conds << conditions
+          else
+            data.{{ name.id }}s = [conditions]
+          end
+
+          self
         end
       {% end %}
 

@@ -10,7 +10,7 @@ module Trail
         delegate :{{ method.id }}, :query
       {% end %}
 
-      {% for method in %w(all find find_by find_by? first first? last last? to_a) %}
+      {% for method in %w(all find find_by find_by? first first? last last? to_a exists?) %}
         # Delegates to `Trail::Record::Query::Executor#{{ method.id }}`
         delegate :{{ method.id }}, :query
       {% end %}
@@ -61,6 +61,10 @@ module Trail
                        end
         end
 
+        def loaded?
+          !!@records
+        end
+
         def each
           to_a.each { |record| yield record }
         end
@@ -86,7 +90,7 @@ module Trail
         end
 
         def size
-          if @records
+          if loaded?
             to_a.size
           else
             count
@@ -95,6 +99,10 @@ module Trail
 
         def any?
           size > 0
+        end
+
+        def exists?(id)
+          where({ @klass.primary_key => id }).any?
         end
 
         def empty?

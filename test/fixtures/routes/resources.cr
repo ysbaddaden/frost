@@ -1,6 +1,6 @@
 require "../../../src/routing/mapper"
 
-module Trail::Routing::Mapper
+Trail::Routing.draw do
   resources :posts do
     resources :comments
     resource :user

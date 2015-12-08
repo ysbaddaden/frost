@@ -28,6 +28,11 @@ module Trail::Routing
       end
     end
 
+    module EmptyApp
+      # NOTE: ensures the generated code is valid for a blank project is valid
+      {{ run "../fixtures/routes/empty.cr", "--codegen" }}
+    end
+
     {% for method in %w(options head get post put patch delete) %}
       def test_{{ method.id }}
         response = dispatch({{ method.upcase }}, "/match/{{ method.id }}")

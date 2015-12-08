@@ -1,0 +1,27 @@
+require "http/server"
+require "trail/server/handlers/log_handler"
+require "trail/server/handlers/public_file_handler"
+require "./config/bootstrap"
+
+# FIXME: ?
+class Zlib::Deflate
+  def close; end
+end
+
+begin
+  port = ENV.fetch("PORT", "9292").to_i
+
+  handlers = [
+    Trail::Server::LogHandler.new,
+    HTTP::DeflateHandler.new,
+    Trail::Server::PublicFileHandler.new(File.join(Trail.root, "public"))
+  ]
+  dispatcher = <%= name.camelcase %>::Dispatcher.new
+
+  server = HTTP::Server.new("0.0.0.0", port, handlers) do |request|
+    dispatcher.call(request)
+  end
+
+  puts "Listening on http://0.0.0.0:#{ port }"
+  server.listen
+end

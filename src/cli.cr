@@ -1,5 +1,6 @@
 require "ecr/macros"
 require "colorize"
+require "secure_random"
 
 lib LibC
   fun chmod(path : Char*, mode : ModeT) : Int
@@ -92,7 +93,7 @@ module Trail
         mkdir
 
         template "Makefile", "Makefile"
-        template "application", "#{ name }.cr"
+        template "main", "#{ name }.cr"
         template "shard", "shard.yml"
         template "gitignore", ".gitignore"
 
@@ -105,7 +106,7 @@ module Trail
         generate_database
         mkdir "log"
         touch "log", ".keep"
-        #generate_public
+        generate_public
 
         generate_tests
       end
@@ -119,6 +120,8 @@ module Trail
       def generate_config
         mkdir "config"
         template "routes", File.join("config", "routes.cr")
+        template "environment", File.join("config", "environment.cr")
+        template "application", File.join("config", "application.cr")
         template "bootstrap", File.join("config", "bootstrap.cr")
       end
 
@@ -129,7 +132,10 @@ module Trail
 
       def generate_database
         mkdir "db"
+        mkdir "db", "migrations"
+        touch "db", "migrations", ".keep"
         template "schema", File.join("db", "schema.cr")
+        template "database", File.join("config", "database.yml.example")
       end
 
       def generate_models
@@ -143,13 +149,13 @@ module Trail
         template "layouts_view", File.join("app", "views", "layouts_view.cr")
       end
 
-      #def generate_public
-      #  mkdir "public"
-      #  %w(stylesheets javascripts images).each do |name|
-      #    mkdir "public", name
-      #    touch "public", name, ".keep"
-      #  end
-      #end
+      def generate_public
+        mkdir "public"
+        %w(stylesheets javascripts images).each do |name|
+          mkdir "public", name
+          touch "public", name, ".keep"
+        end
+      end
 
       def generate_tests
         mkdir "test"

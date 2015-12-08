@@ -1,5 +1,5 @@
 name: trail
-version: 0.0.0
+version: 0.1.0
 
 authors:
   - Julien Portalier <julien@portalier.com>
@@ -15,4 +15,5 @@ dependencies:
 development_dependencies:
   minitest:
     github: ysbaddaden/minitest.cr
-    version: ">= 0.1.5"
+    branch: master
+    version: "> 0.1.5"

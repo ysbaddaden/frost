@@ -1,67 +1,59 @@
-ifndef CRYSTAL_BIN
-	CRYSTAL_BIN := $(shell which crystal)
+CRYSTAL_BIN ?= $(shell which crystal)
+SOURCES := <%= name %>.cr $(shell find app libs -type f)
+
+ifdef RELEASE
+	CRFLAGS := $(CRFLAGS) --release
 endif
 
-ifndef TRAIL_ENV
-	TRAIL_ENV := development
-endif
-
-ifndef DATABASE_URL
-	DATABASE_URL := postgres://postgres@/<%= name %>_$(TRAIL_ENV)
-endif
-
-ENV := TRAIL_ENV="$(TRAIL_ENV)" DATABASE_URL="$(DATABASE_URL)"
+.PHONY: tasks doc routes notes test
+.PHONY: db db_migrate db_up db_down db_redo db_load db_dump
 
 
-all: db
-	$(ENV) $(CRYSTAL_BIN) build ./<%= name %>.cr
+all: db_migrate bin/<%= name %>
 
-release: db
-	$(ENV) $(CRYSTAL_BIN) build --release ./<%= name %>.cr
+run: all
+	bin/<%= name %>
+
+bin/<%= name %>: $(SOURCES)
+	$(CRYSTAL_BIN) build $(CRFLAGS) <%= name %>.cr -o bin/<%= name %>
 
 db:
-	$(ENV) $(CRYSTAL_BIN) run db/schema.cr
+	$(CRYSTAL_BIN) run bin/db
 
+db_migrate:
+	$(CRYSTAL_BIN) run bin/db -- migrate
 
-.PHONY: tasks
+db_up:
+	$(CRYSTAL_BIN) run bin/db -- up VERSION=$(VERSION)
+
+db_down:
+	$(CRYSTAL_BIN) run bin/db -- down VERSION=$(VERSION)
+
+db_redo:
+	$(CRYSTAL_BIN) run bin/db -- redo STEP=$(STEP)
+
+db_load:
+	$(CRYSTAL_BIN) run bin/db -- load
+
+db_dump:
+	$(CRYSTAL_BIN) run bin/db -- dump
+
 tasks:
 	@echo "Available tasks:"
 	@grep --color=never -e "^[a-z]\+:" Makefile | sed s/://g
 
+doc: db_migrate
+	$(CRYSTAL_BIN) docs <%= name %>.cr
 
-.PHONY: doc
-doc: db
-	$(ENV) $(CRYSTAL_BIN) docs ./<%= name %>.cr
-
-
-.PHONY: routes
 routes:
 	$(CRYSTAL_BIN) config/routes.cr
 
-
 src_files := $(wildcard ./*.cr) $(wildcard app/*.cr) $(wildcard app/**/*.cr) $(wildcard config/*.cr) $(wildcard config/**/*.cr)
-
-.PHONY: notes
 notes:
 	@grep -oT -E '#\s+(NOTE|TODO|OPTIMIZE|FIXME).+' $(src_files) |\
 		sed 's/:#\s*//g' |\
 		awk -F'\t' '{print $$2" ("$$1")"}' | cut -b 2-
 
-
 test_files := $(wildcard test/*_test.cr) $(wildcard test/**/*_test.cr) $(wildcard test/**/**/*_test.cr)
-
-.PHONY: test
-test: db
-	$(ENV) $(CRYSTAL_BIN) run $(test_files) -- --verbose
-
-
-#fixtures_files := $(wildcard test/fixtures/*.cr) $(wildcard test/fixtures/**/*.cr)
-#lines := $(shell cat $(src_files) | grep -v "^$$" | wc -l )
-#tests := $(shell cat $(fixtures_files) $(test_files) | grep -v '^$$' | wc -l )
-
-#.PHONY: stats
-#stats:
-#	@echo " code: $(lines)"
-#	@echo "tests: $(tests)"
-#	@echo -n "ratio: `echo 'scale=6; 1.0 / $(lines) * $(tests)' | bc -q`"
-#	@echo " (code-to-test)"
+test:
+	$(CRYSTAL_BIN) run $(test_files) -- --verbose

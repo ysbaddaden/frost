@@ -1,6 +1,6 @@
 require "../../../src/routing/mapper"
 
-module Trail::Routing::Mapper
+Trail::Routing.draw do
   get "/success", "pages#success"
   get "/failure", "pages#failure"
 end

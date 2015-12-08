@@ -1,13 +1,14 @@
-require "http/server"
-require "./config/bootstrap"
+require "../app/views/application_view"
+require "../app/views/layouts_view"
 
-# server
-dispatcher = <%= name.camelcase %>::Dispatcher.new
+require "../app/controllers/application_controller"
+require "../app/controllers/**"
+require "../app/models/**"
 
-server = HTTP::Server.new(9292) do |request|
-  dispatcher.call(request)
+module <%= name.camelcase %>
+  {{ run "./routes.cr", "--codegen" }}
 end
 
-puts "Listening on http://0.0.0.0:9292"
-server.listen
-
+abstract class Trail::Controller
+  include <%= name.camelcase %>::NamedRoutes
+end

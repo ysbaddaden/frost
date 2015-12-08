@@ -125,7 +125,7 @@ module Trail
             return Configuration.from(url)
           end
 
-          path = File.join(Dir.working_directory, "config", "database.yml")
+          path = File.join(Dir.current, "config", "database.yml")
           if File.exists?(path)
             return Configuration.from_yaml(File.read(path))
           end

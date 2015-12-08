@@ -34,9 +34,7 @@ module Trail
       end
 
       def route_name
-        if route_name = @route_name
-          route_name as String
-        end
+        @route_name as String?
       end
 
       def to_crystal_s(io : IO)

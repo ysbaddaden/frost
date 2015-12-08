@@ -12,7 +12,11 @@ module Trail
       end
 
       def self.all
-        @@all ||= {{ @type.subclasses }}.map(&.new).sort! { |a, b| a.version <=> b.version }
+        @@all ||= {% if @type.subclasses.size == 0 %}
+                    [] of Migration
+                  {% else %}
+                    {{ @type.subclasses }}.map(&.new).sort! { |a, b| a.version <=> b.version }
+                  {% end %}
       end
 
       macro set_version(file)

@@ -70,7 +70,7 @@ module Trail
               return if {{ name }}._saving?
 
               if {{ name }}.save
-                self.{{ foreign_key }} = {{ name }}.id
+                self.{{ foreign_key }} = {{ name }}.id.not_nil!
               end
             end
           end

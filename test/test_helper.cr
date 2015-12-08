@@ -2,12 +2,15 @@ require "minitest/autorun"
 require "../src/trail"
 
 module Trail
-  ROOT = "#{ __DIR__ }/.."
-  ENVIRONMENT = "test"
   VIEWS_PATH = "#{ __DIR__ }/views"
-end
 
-Trail.config.secret_key = SecureRandom.hex(32)
+  self.root = File.expand_path("..", __DIR__)
+  self.environment = ENV.fetch("TRAIL_ENV", "test")
+
+  module Config
+    self.secret_key = SecureRandom.hex(32)
+  end
+end
 
 abstract class ApplicationView < Trail::View
 end

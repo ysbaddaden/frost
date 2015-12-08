@@ -175,7 +175,7 @@ module Trail
             if {{ name }} = @{{ name }}
               {{ name }}.each do |record|
                 next if record._saving?
-                record.{{ foreign_key }} = id
+                record.{{ foreign_key }} = id.not_nil!
                 record.save
               end
             end

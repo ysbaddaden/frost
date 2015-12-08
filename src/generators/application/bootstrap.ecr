@@ -1,27 +1,3 @@
 require "trail"
-
-# configuration
-module Trail
-  ROOT = File.expand_path("..", __DIR__)
-  ENVIRONMENT = ENV["TRAIL_ENV"] || "development"
-
-  # :nodoc:
-  VIEWS_PATH = "#{ __DIR__ }/../app/views"
-end
-
-# application
-require "../app/views/application_view"
-require "../app/views/layouts_view"
-
-require "../app/controllers/application_controller"
-require "../app/controllers/**"
-require "../app/models/**"
-
-# routes
-module <%= name.camelcase %>
-  {{ run "./routes.cr", "--codegen" }}
-end
-
-abstract class Trail::Controller
-  include <%= name.camelcase %>::NamedRoutes
-end
+require "./environment"
+require "./application"

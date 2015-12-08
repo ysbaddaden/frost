@@ -1,0 +1,16 @@
+module Trail
+  # :nodoc:
+  VIEWS_PATH = "#{ __DIR__ }/../app/views"
+
+  self.root = File.expand_path("..", __DIR__)
+  self.environment = ENV.fetch("TRAIL_ENV", "development")
+
+  module Config
+    case Trail.environment
+    when "development", "test"
+      self.secret_key = ENV.fetch("SECRET_KEY", <%= SecureRandom.hex(32).inspect %>)
+    else
+      self.secret_key = ENV["SECRET_KEY"]
+    end
+  end
+end

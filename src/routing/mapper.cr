@@ -218,46 +218,57 @@ module Trail
 
         io << "class Dispatcher < Trail::Dispatcher\n"
         io << "  def _dispatch(request, params)\n"
-        io << "    case request.method.upcase\n"
-        aggregate.each do |method, routes|
-          io << "    when " << method.upcase.inspect << "\n"
-          io << "      case request.path\n"
-          routes.each { |route| route.to_crystal_s(io) }
-          io << "      end\n"
-        end
-        io << "    end\n\n"
 
-        io << "    if controller\n"
-        io << "      controller.response\n"
-        io << "    else\n"
-        io << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
-        io << "    end\n"
+        if aggregate.any?
+          io << "    case request.method.upcase\n"
+          aggregate.each do |method, routes|
+            io << "    when " << method.upcase.inspect << "\n"
+            io << "      case request.path\n"
+            routes.each { |route| route.to_crystal_s(io) }
+            io << "      end\n"
+          end
+          io << "    end\n\n"
+
+          io << "    if controller\n"
+          io << "      controller.response\n"
+          io << "    else\n"
+          io << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
+          io << "    end\n"
+        else
+          io << "    raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
+        end
+
         io << "  end\n"
         io << "end\n\n"
 
         io << "module NamedRoutes\n"
 
-        routes
-          .select { |route| route.route_name }
-          .uniq { |route| route.route_name }
-          .each do |route|
-            name = route.route_name
-            builder = UrlBuilder.new(route.path)
+        # NOTE: .not_nil! is required in .uniq otherwise an empty routes array
+        #       will result in the run macro segfaulting (while compiling from
+        #       cli passes)
+        if routes.any?
+          routes
+            .select { |route| route.route_name }
+            .uniq { |route| route.route_name.not_nil! }
+            .each do |route|
+              name = route.route_name
+              builder = UrlBuilder.new(route.path)
 
-            io << "  def #{ name }_path(#{ builder.to_args })\n"
-            builder.required_params.each do |name|
-              io << "    if #{ name }.responds_to?(:to_param); #{ name } = #{ name }.to_param; end\n"
-            end
-            io << "    " << builder.to_path
-            io << "  end\n\n"
+              io << "  def #{ name }_path(#{ builder.to_args })\n"
+              builder.required_params.each do |name|
+                io << "    if #{ name }.responds_to?(:to_param); #{ name } = #{ name }.to_param; end\n"
+              end
+              io << "    " << builder.to_path
+              io << "  end\n\n"
 
-            io << "  def #{ name }_url(#{ builder.to_args(url: true) })\n"
-            builder.required_params.each do |name|
-              io << "    if #{ name }.responds_to?(:to_param); #{ name } = #{ name }.to_param; end\n"
+              io << "  def #{ name }_url(#{ builder.to_args(url: true) })\n"
+              builder.required_params.each do |name|
+                io << "    if #{ name }.responds_to?(:to_param); #{ name } = #{ name }.to_param; end\n"
+              end
+              io << builder.to_url << "\n"
+              io << "  end\n\n"
             end
-            io << builder.to_url << "\n"
-            io << "  end\n\n"
-          end
+        end
 
         io << "end\n\n"
       end
@@ -305,7 +316,9 @@ module Trail
       end
     end
 
-    at_exit do
+    def self.draw
+      with Mapper yield
+
       if ARGV.any? { |arg| arg == "--codegen" }
         Mapper.to_crystal_s(STDOUT)
       else

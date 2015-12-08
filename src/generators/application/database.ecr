@@ -1,0 +1,29 @@
+# Copy as config/database.yml then configure to connect so Trail can connect to
+# your database server.
+#
+# Please note that only PostgreSQL is supported at the moment.
+
+development:
+  adapter: postgres
+  database: <%= name %>_development
+  username: postgres
+  password:
+
+test:
+  adapter: postgres
+  database: <%= name %>_test
+  username: postgres
+  password:
+
+# WARNING: never check in your database credentials! You should either generate
+# this file on deployment or set the DATABASE_URL environment variable, which
+# will always take precedence over this file. For example:
+#
+# export DATABASE_URL="postgres://user:password@db.example.net:5672/<%= name %>?pool=5&timeout=2.0"
+production:
+  adapter: postgres
+  database: <%= name %>
+  username: postgres
+  password:
+  pool: 5
+  timeout: 2.0

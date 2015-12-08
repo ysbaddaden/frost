@@ -7,7 +7,7 @@ module Trail
 
   def self.logger
     @@logger ||= begin
-                   path = File.join(Trail::ROOT, "log", "#{ Trail::ENVIRONMENT }.log")
+                   path = File.join(Trail.root, "log", "#{ Trail.environment }.log")
                    dir_path = File.dirname(path)
                    Dir.mkdir(dir_path) unless Dir.exists?(dir_path)
 

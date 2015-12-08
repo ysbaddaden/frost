@@ -1,23 +1,9 @@
 module Trail
   module Database
     class Transaction
-      # FIXME: stack isn't thread-safe (is it even fiber-safe?)
+      private getter :stack
 
-      @@stack = [] of Transaction
-
-      def self.stack
-        @@stack
-      end
-
-      def self.any?
-        stack.any?
-      end
-
-      def self.current
-        stack.last
-      end
-
-      def initialize(@conn)
+      def initialize(@conn, @stack)
         @committed = @rolledback = false
         @count = stack.size
         stack << self
@@ -81,10 +67,6 @@ module Trail
 
       private def savepoint
         "trail_record_#{ @count }"
-      end
-
-      private def stack
-        self.class.stack
       end
     end
   end

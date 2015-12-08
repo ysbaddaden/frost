@@ -121,11 +121,11 @@ module Trail
 
       # :nodoc:
       def transaction
-        Transaction.new(self).tap(&.begin)
+        Transaction.new(self, @transactions).tap(&.begin)
       end
 
       def transaction(requires_new = false)
-        if Transaction.any? && !requires_new
+        if @transactions.any? && !requires_new
           return yield
         end
 

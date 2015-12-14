@@ -1,7 +1,7 @@
 require "../support/core_ext/file"
 require "./ecr"
 
-module Trail
+module Frost
   class View
     # :nodoc:
     class PrepareViews
@@ -65,7 +65,7 @@ module Trail
           str << "  end\n\n"
         end
 
-        str << "  raise Trail::View::MissingTemplate.new(#{ views_path.inspect }, action, format)\n"
+        str << "  raise Frost::View::MissingTemplate.new(#{ views_path.inspect }, action, format)\n"
         str << "end\n\n"
       end
 

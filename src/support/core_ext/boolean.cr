@@ -1,6 +1,6 @@
 require "../blank"
 
-module Trail
+module Frost
   module Support
     module CoreExt
       module Bool
@@ -15,6 +15,6 @@ end
 
 # :nodoc:
 struct Bool
-  include Trail::Support::Blank
-  include Trail::Support::CoreExt::Bool
+  include Frost::Support::Blank
+  include Frost::Support::CoreExt::Bool
 end

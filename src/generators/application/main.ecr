@@ -1,6 +1,6 @@
 require "http/server"
-require "trail/server/handlers/log_handler"
-require "trail/server/handlers/public_file_handler"
+require "frost/server/handlers/log_handler"
+require "frost/server/handlers/public_file_handler"
 require "./config/bootstrap"
 
 # FIXME: ?
@@ -12,9 +12,9 @@ begin
   port = ENV.fetch("PORT", "9292").to_i
 
   handlers = [
-    Trail::Server::LogHandler.new,
+    Frost::Server::LogHandler.new,
     HTTP::DeflateHandler.new,
-    Trail::Server::PublicFileHandler.new(File.join(Trail.root, "public"))
+    Frost::Server::PublicFileHandler.new(File.join(Frost.root, "public"))
   ]
   dispatcher = <%= name.camelcase %>::Dispatcher.new
 

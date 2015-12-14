@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Record
     module Associations
       macro has_one(name, foreign_key = nil, dependent = nil, inverse_of = nil, autosave = true)

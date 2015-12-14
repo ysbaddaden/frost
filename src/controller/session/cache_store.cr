@@ -1,4 +1,4 @@
-#module Trail
+#module Frost
 #  class Controller
 #    module Session
 #      class CacheStore < Store

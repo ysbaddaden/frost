@@ -1,8 +1,8 @@
 require "../../src/record"
 
-#ENV["DATABASE_URL"] ||= "postgres://postgres@/trail_test"
+#ENV["DATABASE_URL"] ||= "postgres://postgres@/frost_test"
 
-Trail::Record.connection do
+Frost::Record.connection do
   transaction do
     enable_extension "uuid-ossp"
 

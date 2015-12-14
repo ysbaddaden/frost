@@ -24,7 +24,7 @@ class File
   end
 end
 
-module Trail
+module Frost
   # :nodoc:
   module Commands
     module ShellActions
@@ -179,11 +179,11 @@ module Trail
       when "new"
         Commands::ApplicationGenerator.run(args[1])
       else
-        STDERR.puts "Usage: trail new <project>"
+        STDERR.puts "Usage: frost new <project>"
         STDERR.flush
       end
     end
   end
 end
 
-Trail::CLI.run
+Frost::CLI.run

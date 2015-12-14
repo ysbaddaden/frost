@@ -1,6 +1,6 @@
 require "../support/core_ext/string"
 
-module Trail
+module Frost
   module Routing
     # TODO: "as" argument
     module Resources

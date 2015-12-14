@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Controller
     module Assertions
       def assert_response(status_code, message = nil)

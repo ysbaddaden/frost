@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Record
     class Error < Exception
     end

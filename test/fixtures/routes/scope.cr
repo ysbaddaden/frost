@@ -1,6 +1,6 @@
 require "../../../src/routing/mapper"
 
-Trail::Routing.draw do
+Frost::Routing.draw do
   scope path: "scoop" do
     get "/posts", "posts#index"
   end

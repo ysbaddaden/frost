@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class View
     module UrlHelper
       # Formats an anchor HTML tag.

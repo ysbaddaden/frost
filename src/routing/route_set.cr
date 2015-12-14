@@ -1,6 +1,6 @@
 require "./route"
 
-module Trail
+module Frost
   module Routing
     # :nodoc:
     class RouteSet < Array(Route)

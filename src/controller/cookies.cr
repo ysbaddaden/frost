@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Controller
     class Cookies
       def initialize(@request, @response)

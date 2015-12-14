@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Routing
     # TODO: defaults
     module Scope

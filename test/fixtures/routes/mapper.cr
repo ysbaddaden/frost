@@ -1,6 +1,6 @@
 require "../../../src/routing/mapper"
 
-Trail::Routing.draw do
+Frost::Routing.draw do
   {% for method in %w(options head get post put patch delete) %}
     {{ method.id }} "/match/{{ method.id }}", "mapper#match"
   {% end %}

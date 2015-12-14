@@ -1,22 +1,22 @@
 require "../test_helper"
 require "http/request"
 
-module Trail::Routing
+module Frost::Routing
   class ScopeTest < Minitest::Test
     module App
-      class PostsController < Trail::Controller
+      class PostsController < Frost::Controller
         def index
           render text: "posts#index"
         end
       end
 
-      class Scoop::ThingsController < Trail::Controller
+      class Scoop::ThingsController < Frost::Controller
         def index
           render text: "scoop/things#index"
         end
       end
 
-      class Admin::AuthorsController < Trail::Controller
+      class Admin::AuthorsController < Frost::Controller
         def index
           render text: "admin/authors#index"
         end

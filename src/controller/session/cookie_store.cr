@@ -2,7 +2,7 @@ require "./store"
 require "../../support/message_encryptor"
 require "../../support/message_verifier"
 
-module Trail
+module Frost
   class Controller
     module Session
       class CookieStore < Store
@@ -19,11 +19,11 @@ module Trail
         end
 
         protected def encryptor
-          @@encryptor ||= Support::MessageEncryptor.new(Trail.config.secret_key)
+          @@encryptor ||= Support::MessageEncryptor.new(Frost.config.secret_key)
         end
 
         protected def verifier
-          @@verifier ||= Support::MessageVerifier.new(Trail.config.secret_key)
+          @@verifier ||= Support::MessageVerifier.new(Frost.config.secret_key)
         end
       end
     end

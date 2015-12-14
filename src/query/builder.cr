@@ -1,7 +1,7 @@
 require "./formatter"
 require "./data"
 
-module Trail
+module Frost
   module Query
     class Builder
       include Formatter

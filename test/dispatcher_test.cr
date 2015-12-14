@@ -1,9 +1,9 @@
 require "./test_helper"
 
-module Trail
+module Frost
   class DispatcherTest < Minitest::Test
     module App
-      class PagesController < Trail::Controller
+      class PagesController < Frost::Controller
         def success
           render text: "OK"
         end

@@ -1,7 +1,7 @@
 require "http/params"
 require "./session/cookie_store"
 
-module Trail
+module Frost
   class Controller
     # User sessions.
     #
@@ -50,7 +50,7 @@ module Trail
       end
 
       #def self.cache
-      #  Trail.cache
+      #  Frost.cache
       #end
 
       # Serializes the session object using `HTTP::Params`. Overload to change

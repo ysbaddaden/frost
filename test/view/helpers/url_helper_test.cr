@@ -1,10 +1,10 @@
 require "../../test_helper"
 
-class Trail::View::UrlHelperTest < Minitest::Test
-  include Trail::View::CaptureHelper
-  include Trail::View::TagHelper
-  include Trail::View::FormTagHelper
-  include Trail::View::UrlHelper
+class Frost::View::UrlHelperTest < Minitest::Test
+  include Frost::View::CaptureHelper
+  include Frost::View::TagHelper
+  include Frost::View::FormTagHelper
+  include Frost::View::UrlHelper
 
   def test_link_to
     assert_equal %(<a href="/">somewhere</a>), link_to("somewhere", "/")

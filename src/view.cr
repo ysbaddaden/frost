@@ -1,7 +1,7 @@
 require "./view/errors"
 require "./view/helpers/*"
 
-module Trail
+module Frost
   DEFAULT_FORMAT = "html"
 
   # TODO: render partial (include the partial into the processed template)
@@ -24,7 +24,7 @@ module Trail
 
     # :nodoc:
     macro generate_render_methods
-      {{ run "./view/prepare.cr", Trail::VIEWS_PATH, @type.name }}
+      {{ run "./view/prepare.cr", Frost::VIEWS_PATH, @type.name }}
     end
 
     macro inherited

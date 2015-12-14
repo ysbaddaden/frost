@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Config
     macro attribute(name, type)
       def self.{{ name.id }}

@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Record
     module Associations
       # :nodoc:

@@ -1,11 +1,11 @@
 require "../test_helper"
 require "http/request"
 
-module Trail::Routing
+module Frost::Routing
   # TODO: test named routes
   class ResourcesTest < Minitest::Test
     module App
-      class PostsController < Trail::Controller
+      class PostsController < Frost::Controller
         {% for action in %w(index show new edit create update replace destroy
                             search publish) %}
           def {{ action.id }}
@@ -15,7 +15,7 @@ module Trail::Routing
         {% end %}
       end
 
-      class CommentsController < Trail::Controller
+      class CommentsController < Frost::Controller
         {% for action in %w(index show new edit create update replace destroy) %}
           def {{ action.id }}
             args = params.map { |k, v| "#{k}:#{v}" }.compact
@@ -24,7 +24,7 @@ module Trail::Routing
         {% end %}
       end
 
-      class UsersController < Trail::Controller
+      class UsersController < Frost::Controller
         {% for action in %w(show new edit create update replace destroy
                             posts) %}
           def {{ action.id }}
@@ -34,40 +34,40 @@ module Trail::Routing
         {% end %}
       end
 
-      class Rs1sController < Trail::Controller
+      class Rs1sController < Frost::Controller
         def index; head 200; end
       end
 
-      class Rs2sController < Trail::Controller
+      class Rs2sController < Frost::Controller
         def show; head 200; end
       end
 
-      class Rs3sController < Trail::Controller
+      class Rs3sController < Frost::Controller
         def new; head 200; end
         def edit; head 200; end
       end
 
-      class Rs4sController < Trail::Controller
+      class Rs4sController < Frost::Controller
         def create; head 200; end
         def update; head 200; end
         def replace; head 200; end
         def destroy; head 200; end
       end
 
-      class R1sController < Trail::Controller
+      class R1sController < Frost::Controller
         def replace; head 200; end
       end
 
-      class R2sController < Trail::Controller
+      class R2sController < Frost::Controller
         def show; head 200; end
       end
 
-      class R3sController < Trail::Controller
+      class R3sController < Frost::Controller
         def new; head 200; end
         def edit; head 200; end
       end
 
-      class R4sController < Trail::Controller
+      class R4sController < Frost::Controller
         def create; head 200; end
         def update; head 200; end
         def destroy; head 200; end

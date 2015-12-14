@@ -18,7 +18,7 @@ end
 
 N = 100_000
 
-module Trail::Routing
+module Frost::Routing
   class MapperBench < Minitest::Test
     def test_match
       root = HTTP::Request.new("GET", "/")

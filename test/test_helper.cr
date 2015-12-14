@@ -1,18 +1,18 @@
 require "minitest/autorun"
-require "../src/trail"
+require "../src/frost"
 
-module Trail
+module Frost
   VIEWS_PATH = "#{ __DIR__ }/views"
 
   self.root = File.expand_path("..", __DIR__)
-  self.environment = ENV.fetch("TRAIL_ENV", "test")
+  self.environment = ENV.fetch("FROST_ENV", "test")
 
   module Config
     self.secret_key = SecureRandom.hex(32)
   end
 end
 
-abstract class ApplicationView < Trail::View
+abstract class ApplicationView < Frost::View
 end
 
 class LayoutsView < ApplicationView

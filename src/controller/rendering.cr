@@ -1,7 +1,7 @@
 require "../view"
 require "../support/mime"
 
-module Trail
+module Frost
   class Controller
     # TODO: render template
     module Rendering

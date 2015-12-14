@@ -1,7 +1,7 @@
 require "./column"
 require "./oid"
 
-module Trail
+module Frost
   module Database
     class PostgreSQL
       class TableDefinition

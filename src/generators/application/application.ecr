@@ -9,6 +9,6 @@ module <%= name.camelcase %>
   {{ run "./routes.cr", "--codegen" }}
 end
 
-abstract class Trail::Controller
+abstract class Frost::Controller
   include <%= name.camelcase %>::NamedRoutes
 end

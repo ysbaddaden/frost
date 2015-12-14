@@ -3,7 +3,7 @@ require "crypto/subtle"
 require "openssl/hmac"
 require "./slice"
 
-module Trail
+module Frost
   module Support
     # Adapted from ActiveSupport::MessageVerifier
     #

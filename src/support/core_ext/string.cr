@@ -1,7 +1,7 @@
 require "../blank"
 require "../inflector"
 
-module Trail
+module Frost
   module Support
     module CoreExt
       # Port of ActiveSupport String Inflections
@@ -42,7 +42,7 @@ module Trail
         #
         # ```
         # "Admin::Post".demodulize  # => "Post"
-        # "Trail::Support::Inflector".demodulize  # => "Inflector"
+        # "Frost::Support::Inflector".demodulize  # => "Inflector"
         # ```
         def demodulize
           if idx = rindex("::")
@@ -80,16 +80,16 @@ module Trail
 
         # Pluralizes the last word of a string.
         #
-        # See `Trail::Support::Inflector.pluralize`
+        # See `Frost::Support::Inflector.pluralize`
         def pluralize
-          Trail::Support::Inflector.pluralize(self)
+          Frost::Support::Inflector.pluralize(self)
         end
 
         # Singularizes the last word of a string.
         #
-        # See `Trail::Support::Inflector.singularize`
+        # See `Frost::Support::Inflector.singularize`
         def singularize
-          Trail::Support::Inflector.singularize(self)
+          Frost::Support::Inflector.singularize(self)
         end
 
         # Underscores a string then pluralizes the last word.
@@ -120,7 +120,7 @@ module Trail
 
         # Replaces any accented characters for their non accented counterparts.
         def transliterate
-          gsub(Trail::Support::Inflector::TRANSLITERATE_MAPPING)
+          gsub(Frost::Support::Inflector::TRANSLITERATE_MAPPING)
         end
       end
     end
@@ -129,6 +129,6 @@ end
 
 # :nodoc:
 class String
-  include Trail::Support::Blank
-  include Trail::Support::CoreExt::String
+  include Frost::Support::Blank
+  include Frost::Support::CoreExt::String
 end

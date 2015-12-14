@@ -1,8 +1,8 @@
 require "./test_helper"
 
-module Trail
+module Frost
   class ControllerTest < Minitest::Test
-    class AppController < Trail::Controller
+    class AppController < Frost::Controller
       def before_action
         response.headers["X-Before-App"] = "app:before"
       end

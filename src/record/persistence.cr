@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Record
     module Persistence
       # TODO: after_commit & after_rollback callbacks

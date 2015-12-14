@@ -3,7 +3,7 @@ require "./record/fixtures"
 require "./controller/test"
 
 class Minitest::Test
-  include Trail::Record::TransactionalFixtures
+  include Frost::Record::TransactionalFixtures
 
   def before_setup
     super
@@ -12,7 +12,7 @@ class Minitest::Test
       preload_fixtures
     end
 
-    @transaction = Trail::Record.connection.transaction
+    @transaction = Frost::Record.connection.transaction
   end
 
   def after_teardown

@@ -1,6 +1,6 @@
 require "html"
 
-module Trail
+module Frost
   class View
     module TagHelper
       # Formats a HTML tag whose contents is a block.

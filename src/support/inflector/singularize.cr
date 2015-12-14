@@ -1,2 +1,2 @@
 require "../inflector"
-puts Trail::Support::Inflector.singularize(ARGV[0])
+puts Frost::Support::Inflector.singularize(ARGV[0])

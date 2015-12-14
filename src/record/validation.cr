@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Record
     # Record Validations
     #
@@ -10,7 +10,7 @@ module Trail
     #
     # Example:
     # ```
-    # class Post < Trail::Record
+    # class Post < Frost::Record
     #   def validate
     #     if title.blank?
     #       errors.add(:title, "Title is required")

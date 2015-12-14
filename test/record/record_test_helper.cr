@@ -26,7 +26,7 @@ module TestRecordCallbacks
   {% end %}
 end
 
-class Post < Trail::Record
+class Post < Frost::Record
   include TestRecordCallbacks
 
   ifdef test_dependent_destroy
@@ -54,7 +54,7 @@ class Post < Trail::Record
   end
 end
 
-class Comment < Trail::Record
+class Comment < Frost::Record
   include TestRecordCallbacks
 
   belongs_to :post
@@ -66,7 +66,7 @@ class Comment < Trail::Record
   end
 end
 
-class User < Trail::Record
+class User < Frost::Record
   include TestRecordCallbacks
 
   ifdef test_dependent_destroy
@@ -86,7 +86,7 @@ class User < Trail::Record
   end
 end
 
-class Profile < Trail::Record
+class Profile < Frost::Record
   include TestRecordCallbacks
 
   ifdef test_dependent_destroy

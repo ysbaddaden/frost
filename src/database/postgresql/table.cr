@@ -1,6 +1,6 @@
 require "./column"
 
-module Trail
+module Frost
   module Database
     class PostgreSQL
       class Table

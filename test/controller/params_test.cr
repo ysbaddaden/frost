@@ -1,6 +1,6 @@
 require "../test_helper"
 
-module Trail
+module Frost
   class Controller
     class ParamsTest < Minitest::Test
       def test_parse_query_string_for_strings

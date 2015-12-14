@@ -1,7 +1,7 @@
 require "../test_helper"
 require "../../src/support/core_ext/**"
 
-module Trail::Support
+module Frost::Support
   class StringTest < Minitest::Test
     class Test
     end

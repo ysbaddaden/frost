@@ -1,7 +1,7 @@
 require "./connection"
 require "./migration"
 
-module Trail
+module Frost
   class Record
     module Schema
       # NOTE: DEPRECATED (use dump_structure and load_structure instead)

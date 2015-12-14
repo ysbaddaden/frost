@@ -1,7 +1,7 @@
 require "../support/core_ext/string"
 require "./connection"
 
-module Trail
+module Frost
   class Record
     class Attributes
       getter :class_name, :table
@@ -77,7 +77,7 @@ module Trail
       end
 
       def generate_from_pg_result(io)
-        io << "def self.from_pg_result(row : PG::TrailResult::Row)\n"
+        io << "def self.from_pg_result(row : PG::FrostResult::Row)\n"
         io << "  record = new\n"
         io << "  record.new_record = false\n\n"
 

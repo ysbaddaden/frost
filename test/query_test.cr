@@ -1,7 +1,7 @@
 require "./test_helper"
 require "../src/query/builder"
 
-module Trail
+module Frost
   class Record
     class Query::BuilderTest < Minitest::Test
       def test_select

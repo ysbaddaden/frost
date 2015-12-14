@@ -1,17 +1,17 @@
 require "../query/builder"
 
-module Trail
+module Frost
   class Record
     # TODO: pluck(attr_name)
     # TODO: reload
     module Finders
       {% for method in %w(select where group having order reorder limit) %}
-        # Delegates to `Trail::Record::Query::Builder#{{ method.id }}`
+        # Delegates to `Frost::Record::Query::Builder#{{ method.id }}`
         delegate :{{ method.id }}, :query
       {% end %}
 
       {% for method in %w(all find find_by find_by? first first? last last? to_a exists?) %}
-        # Delegates to `Trail::Record::Query::Executor#{{ method.id }}`
+        # Delegates to `Frost::Record::Query::Executor#{{ method.id }}`
         delegate :{{ method.id }}, :query
       {% end %}
 
@@ -35,9 +35,9 @@ module Trail
     module Query
       # TODO: calculations (minimum, maximum, average)
       # TODO: #sample
-      class Executor(T) < Trail::Query::Builder
+      class Executor(T) < Frost::Query::Builder
         # :nodoc:
-        def initialize(@klass : T.class, data = Trail::Query::Data.new)
+        def initialize(@klass : T.class, data = Frost::Query::Data.new)
           super(@klass.table_name, Record.connection, data)
         end
 

@@ -1,7 +1,7 @@
-ENV["TRAIL_ENV"] ||= "test"
+ENV["FROST_ENV"] ||= "test"
 
 require "../config/bootstrap"
-require "trail/minitest"
+require "frost/minitest"
 
 class Minitest::Test
   fixtures "#{ __DIR__ }/fixtures"
@@ -9,6 +9,6 @@ end
 
 #class ApplicationController
 #  def session_store
-#    Trail::Controller::Session::TestStore
+#    Frost::Controller::Session::TestStore
 #  end
 #end

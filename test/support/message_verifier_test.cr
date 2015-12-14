@@ -2,7 +2,7 @@ require "minitest/autorun"
 require "secure_random"
 require "../../src/support/message_verifier"
 
-module Trail::Support
+module Frost::Support
   class MessageVerifierTest < Minitest::Test
     def key
       @key ||= SecureRandom.hex(16)

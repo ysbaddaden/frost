@@ -8,7 +8,7 @@ require "../support/core_ext/string"
 require "../database/postgresql"
 require "./errors"
 
-module Trail
+module Frost
   class Record
     module Connection
       struct Configuration
@@ -37,8 +37,8 @@ module Trail
         end
 
         def self.from_yaml(string)
-          # FIXME: centralize trail environment
-          environment = ENV.fetch("TRAIL_ENV", "development")
+          # FIXME: centralize frost environment
+          environment = ENV.fetch("FROST_ENV", "development")
 
           unless (hsh = YAML.load(string)).is_a?(Hash)
             raise ConnectionError.new("Invalid 'database.yml'")

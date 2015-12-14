@@ -1,6 +1,6 @@
 require "./routing/errors"
 
-module Trail
+module Frost
   # Dispatcher connects the mapped routed (see `Routing`) and controller
   # actions (see `Controller`). This is an abstract class and the actual class
   # will be implemented by `Routing::Mapper`.
@@ -13,7 +13,7 @@ module Trail
     # `#internal_server_error` methods.
     def call(request)
       dispatch(request)
-    rescue ex : Trail::Routing::RoutingError
+    rescue ex : Frost::Routing::RoutingError
       not_found(request, ex)
     rescue ex
       internal_server_error(request, ex)
@@ -23,10 +23,10 @@ module Trail
 
     # :nodoc:
     def dispatch(request)
-      params = Trail::Controller::Params.parse(request.query)
+      params = Frost::Controller::Params.parse(request.query)
 
       if request.headers["Content-Type"]? == "application/x-www-form-urlencoded"
-        Trail::Controller::Params.parse(request.body, params)
+        Frost::Controller::Params.parse(request.body, params)
       end
 
       if request.method.upcase == "POST"

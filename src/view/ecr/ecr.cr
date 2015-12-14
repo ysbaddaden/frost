@@ -1,6 +1,6 @@
 require "ecr"
 
-module Trail
+module Frost
   class View
     class ECR
       include ::ECR

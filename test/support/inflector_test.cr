@@ -1,7 +1,7 @@
 require "../test_helper"
 require "../../src/support/inflector"
 
-module Trail::Support
+module Frost::Support
   class InflectorTest < Minitest::Test
     SINGULAR_TO_PLURAL = {
       "search"      => "searches",

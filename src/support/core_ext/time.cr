@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Support
     module CoreExt
       module Time
@@ -22,6 +22,6 @@ end
 
 # :nodoc:
 struct Time
-  include Trail::Support::CoreExt::Time
-  extend Trail::Support::CoreExt::Time::ClassMethods
+  include Frost::Support::CoreExt::Time
+  extend Frost::Support::CoreExt::Time::ClassMethods
 end

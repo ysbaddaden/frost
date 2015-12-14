@@ -5,7 +5,7 @@ require "./transaction"
 require "./postgresql/table"
 require "./postgresql/table_definition"
 
-module Trail
+module Frost
   module Database
     class PostgreSQL
       getter :conn
@@ -24,9 +24,9 @@ module Trail
         raise StatementInvalid.new(ex.message)
       end
 
-      def trail_execute(sql)
+      def frost_execute(sql)
         log(sql)
-        conn.trail_exec(sql)
+        conn.frost_exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
@@ -47,7 +47,7 @@ module Trail
       end
 
       def select(sql)
-        result = trail_execute(sql)
+        result = frost_execute(sql)
         result.each { |row| yield row }
       end
 
@@ -179,7 +179,7 @@ module Trail
       end
 
       private def log(sql)
-        if t = Trail
+        if t = Frost
           if t.responds_to?(:logger)
             t.logger.debug(sql)
           end

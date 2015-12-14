@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Support
     # Port of Rack::Mime
     #
@@ -622,10 +622,10 @@ module Trail
       # Returns the Mime Type for a given format or file extname.
       #
       # ```
-      # Trail::Support::Mime.mime_type("json") # => "application/json"
-      # Trail::Support::Mime.mime_type(".jpg") # => "image/jpeg"
-      # Trail::Support::Mime.mime_type("unknown") # => "application/octet-stream"
-      # Trail::Support::Mime.mime_type("unknown", "text/plain") # => "text/plain"
+      # Frost::Support::Mime.mime_type("json") # => "application/json"
+      # Frost::Support::Mime.mime_type(".jpg") # => "image/jpeg"
+      # Frost::Support::Mime.mime_type("unknown") # => "application/octet-stream"
+      # Frost::Support::Mime.mime_type("unknown", "text/plain") # => "text/plain"
       # ```
       def self.mime_type(format, fallback = DEFAULT_MIME_TYPE)
         format = format[1 .. -1] if format.starts_with?('.')

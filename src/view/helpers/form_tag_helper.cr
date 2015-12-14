@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class View
     module FormTagHelper
       # TODO: mix arguments into attributes hash (?)

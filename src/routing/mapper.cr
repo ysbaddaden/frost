@@ -3,7 +3,7 @@ require "./resources"
 require "./scope"
 require "./url_builder"
 
-module Trail
+module Frost
   # See `Routing::Mapper` for documentation.
   module Routing
     # HTTP Requests route generator.
@@ -15,7 +15,7 @@ module Trail
     #
     # ```
     # # config/routes.cr
-    # class Trail::Routing::Mapper
+    # class Frost::Routing::Mapper
     #   get "/", "pages#landing"
     #   resources :posts
     # end
@@ -132,7 +132,7 @@ module Trail
     #
     # ### Resources
     #
-    # In order to achieve a full REST API, Trail provides the `#resource` and
+    # In order to achieve a full REST API, Frost provides the `#resource` and
     # `#resources` helpers to generate many routes at once:
     #
     # ```
@@ -216,7 +216,7 @@ module Trail
           end
         end
 
-        io << "class Dispatcher < Trail::Dispatcher\n"
+        io << "class Dispatcher < Frost::Dispatcher\n"
         io << "  def _dispatch(request, params)\n"
 
         if aggregate.any?
@@ -232,10 +232,10 @@ module Trail
           io << "    if controller\n"
           io << "      controller.response\n"
           io << "    else\n"
-          io << "      raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
+          io << "      raise Frost::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
           io << "    end\n"
         else
-          io << "    raise Trail::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
+          io << "    raise Frost::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
         end
 
         io << "  end\n"

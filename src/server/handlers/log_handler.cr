@@ -1,12 +1,12 @@
 require "http/server"
 
-module Trail::Server
+module Frost::Server
   class LogHandler < HTTP::Handler
     def call(request)
       time = Time.now
       call_next(request).tap do |response|
         elapsed = elapsed_text(Time.now - time)
-        Trail.logger.info "#{ request.method } #{ request.path.inspect } #{ response.status_code } (#{ elapsed })"
+        Frost.logger.info "#{ request.method } #{ request.path.inspect } #{ response.status_code } (#{ elapsed })"
       end
     end
 

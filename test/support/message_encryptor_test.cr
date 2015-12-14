@@ -1,7 +1,7 @@
 require "minitest/autorun"
 require "../../src/support/message_encryptor"
 
-module Trail::Support
+module Frost::Support
   class MessageEncryptorTest < Minitest::Test
     def key
       @key ||= begin

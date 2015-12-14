@@ -12,31 +12,31 @@ at_exit do
 
   case action = ARGV[0]?
   when "migrate"
-    Trail::Record::Migration.all.each(&.execute("up"))
-    Trail::Record::Schema.dump_structure(filename)
+    Frost::Record::Migration.all.each(&.execute("up"))
+    Frost::Record::Schema.dump_structure(filename)
 
   when "up", "down"
     unless version = ENV["VERSION"]?
       STDERR.puts "ERROR: you must specify a VERSION"
       exit
     end
-    Trail::Record::Migration.find(version).execute(action)
-    Trail::Record::Schema.dump_structure(filename)
+    Frost::Record::Migration.find(version).execute(action)
+    Frost::Record::Schema.dump_structure(filename)
 
   when "redo"
     step = ENV.fetch("STEP", "1").to_i
 
-    Trail::Record::Migration.all[-step .. -1].tap do |migrations|
+    Frost::Record::Migration.all[-step .. -1].tap do |migrations|
       migrations.reverse_each(&.execute("down"))
       migrations.each(&.execute("up"))
     end
-    Trail::Record::Schema.dump_structure(filename)
+    Frost::Record::Schema.dump_structure(filename)
 
   when "load"
-    Trail::Record::Schema.load_structure(filename)
+    Frost::Record::Schema.load_structure(filename)
 
   when "dump"
-    Trail::Record::Schema.dump_structure(filename)
+    Frost::Record::Schema.dump_structure(filename)
 
   else
     STDERR.puts "Available commands:"

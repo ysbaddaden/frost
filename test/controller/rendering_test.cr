@@ -1,6 +1,6 @@
 require "../test_helper"
 
-class RenderController < Trail::Controller
+class RenderController < Frost::Controller
   def not_found
     head 404
   end
@@ -35,7 +35,7 @@ class RenderController < Trail::Controller
   end
 end
 
-module Trail
+module Frost
   class Controller
     class RenderingTest < Minitest::Test
       macro run(action_name, format = nil)

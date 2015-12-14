@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class Record
     # :nodoc:
     module SchemaMigration
@@ -11,7 +11,7 @@ module Trail
       end
 
       def self.pending_versions
-        Trail::Record.migrations.map(&.version) - versions
+        Frost::Record.migrations.map(&.version) - versions
       end
 
       def self.pending?

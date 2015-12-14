@@ -1,6 +1,6 @@
 require "./store"
 
-module Trail
+module Frost
   class Controller
     module Session
       # :nodoc:

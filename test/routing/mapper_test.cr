@@ -1,12 +1,12 @@
 require "../test_helper"
 require "http/request"
 
-module Trail::Routing
+module Frost::Routing
   # TODO: test params
   # TODO: test route precedence
   class MapperTest < Minitest::Test
     module App
-      class MapperController < Trail::Controller
+      class MapperController < Frost::Controller
         def match
           render text: "OK: #{ request.method }"
         end

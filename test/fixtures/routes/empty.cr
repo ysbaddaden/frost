@@ -1,4 +1,4 @@
 require "../../../src/routing/mapper"
 
-Trail::Routing.draw do
+Frost::Routing.draw do
 end

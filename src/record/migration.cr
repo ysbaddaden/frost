@@ -2,7 +2,7 @@ require "./connection"
 require "./errors"
 require "./migration/schema_migration"
 
-module Trail
+module Frost
   class Record
     class Migration
       def self.find(version)

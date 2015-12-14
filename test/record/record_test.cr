@@ -1,6 +1,6 @@
 require "./record_test_helper"
 
-module Trail
+module Frost
   class RecordTest < Minitest::Test
     def test_table_name
       assert_equal "posts", Post.table_name

@@ -1,7 +1,7 @@
 require "yaml"
 require "./errors"
 
-module Trail
+module Frost
   class Record
     class FixtureError < Error
     end

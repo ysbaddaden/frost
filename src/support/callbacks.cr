@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Support
     # NOTE: no longer work on Crystal > 0.7.5 (inherited hook is ran before
     #       evaluating the class body, so no longer can collect callbacks and

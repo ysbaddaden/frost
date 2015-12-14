@@ -1,7 +1,7 @@
 require "http/server"
 require "openssl/digest"
 
-module Trail::Server
+module Frost::Server
   class PublicFileHandler < HTTP::Handler
     # TODO: set cache-control headers (would need digests)
     # OPTIMIZE: cache & serve already deflated files
@@ -34,7 +34,7 @@ module Trail::Server
     end
 
     private def mime_type(path)
-      Trail::Support::Mime.mime_type(File.extname(path))
+      Frost::Support::Mime.mime_type(File.extname(path))
     end
 
     private def digest(contents)

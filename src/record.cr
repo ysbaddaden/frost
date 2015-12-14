@@ -8,7 +8,7 @@ require "./record/validation"
 require "./support/core_ext/time"
 
 
-module Trail
+module Frost
   # TODO: dirty attributes
   class Record
     alias RecordValue = PG::PGValue

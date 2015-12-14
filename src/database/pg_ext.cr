@@ -1,5 +1,5 @@
 module PG
-  class TrailResult
+  class FrostResult
     struct Row
       def initialize(@result, @row)
       end
@@ -51,12 +51,12 @@ module PG
   end
 
   class Connection
-    def trail_exec(query : String)
-      trail_exec(query, [] of PG::PGValue)
+    def frost_exec(query : String)
+      frost_exec(query, [] of PG::PGValue)
     end
 
-    def trail_exec(query : String, params)
-      TrailResult.new(libpq_exec(query, params))
+    def frost_exec(query : String, params)
+      FrostResult.new(libpq_exec(query, params))
     end
   end
 end

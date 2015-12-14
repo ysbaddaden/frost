@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Database
     class PostgreSQL
       module OID

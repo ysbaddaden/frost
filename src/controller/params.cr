@@ -1,6 +1,6 @@
 require "http/params"
 
-module Trail
+module Frost
   class Controller
     alias ParamType = String | Array(ParamType) | Hash(String, ParamType)
 

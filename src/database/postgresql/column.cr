@@ -1,7 +1,7 @@
 require "json"
 require "./oid"
 
-module Trail
+module Frost
   module Database
     class PostgreSQL
       class Column

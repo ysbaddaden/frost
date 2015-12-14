@@ -1,6 +1,6 @@
 require "../record_test_helper"
 
-module Trail
+module Frost
   class Record
     class Associations::HasOneTest < Minitest::Test
       def setup

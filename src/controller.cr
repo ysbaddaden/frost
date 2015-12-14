@@ -6,7 +6,7 @@ require "./controller/params"
 require "./controller/rendering"
 require "./controller/session"
 
-module Trail
+module Frost
   # Controllers are the logic of the Web Application.
   #
   # ### Routes
@@ -124,10 +124,10 @@ module Trail
     # Example:
     #
     # ```
-    # class ApplicationController < Trail::Controller
+    # class ApplicationController < Frost::Controller
     #   def rescue_from(exception)
     #     case exception
-    #     when Trail::Record::RecordNotFound
+    #     when Frost::Record::RecordNotFound
     #       head 404
     #     else
     #       false

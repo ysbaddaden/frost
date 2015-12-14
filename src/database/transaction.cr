@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Database
     class Transaction
       private getter :stack
@@ -66,7 +66,7 @@ module Trail
       end
 
       private def savepoint
-        "trail_record_#{ @count }"
+        "frost_record_#{ @count }"
       end
     end
   end

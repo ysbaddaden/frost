@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Support
     # Port of ActiveSupport::Inflector
     #

@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Query
     enum Type
       SELECT

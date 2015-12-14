@@ -1,9 +1,9 @@
 require "../../test_helper"
 
-class Trail::View::FormTagHelperTest < Minitest::Test
-  include Trail::View::CaptureHelper
-  include Trail::View::TagHelper
-  include Trail::View::FormTagHelper
+class Frost::View::FormTagHelperTest < Minitest::Test
+  include Frost::View::CaptureHelper
+  include Frost::View::TagHelper
+  include Frost::View::FormTagHelper
 
   def test_button_tag
     assert_equal %(<button>msg</button>), button_tag("msg")

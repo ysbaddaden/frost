@@ -3,7 +3,7 @@ require "openssl/cipher"
 require "secure_random"
 require "./slice"
 
-module Trail
+module Frost
   module Support
     # Adapted from ActiveSupport::MessageEncryptor
     #

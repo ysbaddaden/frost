@@ -1,7 +1,7 @@
 require "../../test_helper"
 require "../../../src/support/core_ext/string"
 
-module Trail::Support
+module Frost::Support
   class StringTest < Minitest::Test
     def test_foreign_key
       assert_equal "message_id", "Message".foreign_key
@@ -11,7 +11,7 @@ module Trail::Support
     def test_demodulize
       assert_equal "Message", "Message".demodulize
       assert_equal "Post", "Admin::Post".demodulize
-      assert_equal "Inflector", "Trail:Support::Inflector".demodulize
+      assert_equal "Inflector", "Frost:Support::Inflector".demodulize
     end
 
     def test_dasherize

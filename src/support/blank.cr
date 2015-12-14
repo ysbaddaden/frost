@@ -1,4 +1,4 @@
-module Trail
+module Frost
   module Support
     module Blank
       # Always returns false. This method is meant to be overloaded by classes

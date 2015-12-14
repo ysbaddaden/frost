@@ -1,6 +1,6 @@
 require "../../support/core_ext/http/cookies"
 
-module Trail
+module Frost
   class Controller
     module Session
       module HashObject

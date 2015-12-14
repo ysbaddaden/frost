@@ -2,7 +2,7 @@ require "../support/core_ext/http/headers"
 require "./assertions"
 require "./session/test_store"
 
-module Trail
+module Frost
   class Controller
     module Session
       def session_store

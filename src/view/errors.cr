@@ -1,4 +1,4 @@
-module Trail
+module Frost
   class View
     class Error < Exception
     end

@@ -1,6 +1,6 @@
 require "../finders"
 
-module Trail
+module Frost
   class Record
     module Associations
       class HasManyCollection(T) < Query::Executor(T)
@@ -129,7 +129,7 @@ module Trail
         def {{ name }}=(records : Array(T) | HasManyCollection(T) | Query::Executor(T))
           transaction do
             removed = {{ name }}
-              .where("#{ Trail::Record.connection.quote(T.primary_key) } NOT IN (?)", records.map(&.id).compact)
+              .where("#{ Frost::Record.connection.quote(T.primary_key) } NOT IN (?)", records.map(&.id).compact)
 
             {% if dependent == :delete_all %}
               removed.delete_all

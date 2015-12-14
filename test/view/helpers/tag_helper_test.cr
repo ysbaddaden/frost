@@ -1,9 +1,9 @@
 require "../../test_helper"
 require "../../../src/view/ecr"
 
-class Trail::View::TagHelperTest < Minitest::Test
-  include Trail::View::CaptureHelper
-  include Trail::View::TagHelper
+class Frost::View::TagHelperTest < Minitest::Test
+  include Frost::View::CaptureHelper
+  include Frost::View::TagHelper
 
   def test_tag
     assert_equal "<br/>", tag(:br)

@@ -1,9 +1,9 @@
 require "../../test_helper"
 require "../../../src/view/ecr/ecr"
 
-class Trail::View::CaptureHelperTest < Minitest::Test
-  include Trail::View::CaptureHelper
-  include Trail::View::TagHelper
+class Frost::View::CaptureHelperTest < Minitest::Test
+  include Frost::View::CaptureHelper
+  include Frost::View::TagHelper
 
   def test_capture
     assert_equal "test1", capture { "test1" }

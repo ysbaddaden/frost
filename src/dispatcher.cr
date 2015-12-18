@@ -16,6 +16,7 @@ module Frost
     rescue ex : Frost::Routing::RoutingError
       not_found(request, ex)
     rescue ex
+      Frost.logger.error { "#{ ex.class.name }: #{ ex.message }" }
       internal_server_error(request, ex)
     ensure
       Record.release_connection

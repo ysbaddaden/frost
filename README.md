@@ -5,7 +5,18 @@ inspired by Ruby on Rails (ie. implements most of its API).
 
 Frost is to Ruby on Rails what Crystal is to Ruby: similar API, developer
 hapiness and productivity, but enhanced with static typing (mostly hidden) and
-raw performance.
+incredible performance.
+
+
+## STATUS: DEVELOPER PREVIEW
+
+**WARNING**: Frost is in _developer preview_, and must be considered alpha
+software until further notice. features may be added, dropped, tweaked, or
+changed dramatically at any time. Please experiment with Frost, contribute to
+Frost, let's make it incerdiable, but build software out of it at your own risk!
+You've been warned :-)
+
+Frost won't hit stable until the Crystal programming language is stable anyway.
 
 
 ## INSTALL
@@ -28,15 +39,15 @@ is supported at the moment.
 
 If you don't have a PostgreSQL database, you may create one with the following
 commands. Please adapt to your setup. Linux distributions usually have a
-`postgres` user
+`postgres` user, so:
 
 ```
 $ sudo -u postgres createdb myapp_development
 $ sudo -u postgres createdb myapp_test
 ```
 
-You may have authorized your login user as a PostgreSQL user for instance
-(default on OS X) so you may just:
+You may have authorized your login user as a PostgreSQL user (default on OS X)
+so you may just:
 
 ```
 $ createdb myapp_development
@@ -74,10 +85,15 @@ Application Logic:
 - design views in `app/views`;
 - write tests in `test/controllers`.
 
-
-
+See [Getting Started With Frost] for an example application.
 
 
 ## License
 
 Distributed under the MIT License.
+
+
+## Authors
+
+- The Ruby on Rails Team that modeled an awesome framework.
+- Julien Portalier (@ysbaddaden) for bringing it to Crystal.

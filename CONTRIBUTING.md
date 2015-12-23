@@ -38,6 +38,17 @@ multiple times. Do not hesitate to open a pull request early on, we'll may be
 able to help you sooner.
 
 
+## Getting Started
+
+1. Fork and clone the [repository](https://github.com/ysbaddaden/frost).
+2. Create a PostgreSQL database for running the Frost::Record tests (eg:
+  `createdb frost_test`)
+3. copy `.env.example` as `.env` and personnalise the `DATABASE_URL` so it
+   points to the database you just created (eg: `postgres://postgres@/frost_test`
+   or `postgres://julien:secret@localhost/frost_test`).
+4. Run the test suite: `make test` and be sure that every test is passing.
+5. You're ready to contribute.
+
 ## Contributor Obligations
 
 ### License

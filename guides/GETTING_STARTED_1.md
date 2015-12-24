@@ -1,4 +1,4 @@
-# Getting Started With Frost
+# Getting Started With Frost [Day 1]
 
 What to do after bootstrapping your application? Let's make a read-only blog!
 
@@ -131,24 +131,7 @@ http://localhost:9292/ and see what happens.
 
 ## Views
 
-Let's render our list of read-only posts:
-
-```ecr
-<!-- app/views/posts/index.html.ecr -->
-
-<ul>
-  <% posts.each do |post| %>
-    <li>
-      <%= link_to post_url(post) do %>
-        <%= post.created_at %>: <%= post.title %>
-      <% end %>
-    </li>
-  <% end %>
-</ul>
-
-```
-
-And render a single post:
+Let's render a single post:
 
 ```ecr
 <!-- app/views/posts/show.html.ecr -->
@@ -163,6 +146,54 @@ And render a single post:
 
   <p><%= link_to "permalink", post_url(post) %></p>
 </article>
+```
+
+We render our list of read-only posts:
+
+```ecr
+<!-- app/views/posts/index.html.ecr -->
+
+<ul>
+  <% posts.each do |post| %>
+    <li>
+      <%= link_to post_url(post) do %>
+        <%= post.created_at %>: <%= post.title %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+```
+
+Oh, and let's add a RSS alternative to our list of posts. We first create a new
+layout:
+
+```ecr
+<!-- app/views/layouts/application.rss.ecr -->
+<rss version="2.0">
+  <channel>
+    <title>My Blog</title>
+    <link><%= root_url %></link>
+    <lastBuildDate><%= Time.now %></lastBuildDate>
+
+    <%= yield %>
+  </channel>
+</rss>
+```
+
+And our alternative view:
+
+```ecr
+<!-- app/views/posts/index.rss.ecr -->
+
+<% posts.limit(2).each do |post| %>
+  <item>
+    <title><%= post.title %></title>
+    <link><%= post_url(post) %></link>
+    <description><%= post.body %></description>
+    <pubDate><%= post.updated_at %></pubDate>
+    <guid isPermaLink="true"><%= post_url(post) %></guid>
+  </item>
+<% end %>
 ```
 
 
@@ -193,35 +224,27 @@ class PostsControllerTest < Frost::Controller::Test
   def test_index
     get "/posts"
     assert_response 200
+    assert_select "li a", text: posts(:second).title
+    assert_select "li a", text: posts(:first).title
+    assert_select "li a", text: posts(:hello).title
+  end
 
-    assert_equal [
-      "#{ posts(:second).created_at }: #{ posts(:second).title) }",
-      "#{ posts(:first).created_at }: #{ posts(:first).title) }",
-      "#{ posts(:hello).created_at }: #{ posts(:hello).title) }",
-    ], nodes("//li/a").map(&.text.try(&.strip))
+  def test_index_rss
+    get "/posts.rss"
+    assert_response 200
+    assert_select "item", count: 2
   end
 
   def test_show
     get "/posts/#{ posts(:first) }"
     assert_response 200
-    assert_equal posts(:first).title, node("//article/h1").text
-    assert_equal posts(:first).tbody, node("//article/div").text
-  end
-
-  private def nodes(search)
-    XML.parse_html(response.body).xpath_nodes(search)
-  end
-
-  private def node(search)
-    XML.parse_html(response.body).xpath_nodes(search).first
+    assert_select, "article h1", text: posts(:first).title
+    assert_select, "article div", text: posts(:first).body
   end
 end
 ```
-
-Sorry, no `assert_select` or wrapper around XML yet (working on it)
 
 
 ## Integration Tests
 
 Sorry, not yet (working on it)
-

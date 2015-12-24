@@ -16,7 +16,7 @@ changed dramatically at any time. Please experiment with Frost, contribute to
 Frost, let's make it incerdiable, but build software out of it at your own risk!
 You've been warned :-)
 
-Frost won't hit stable until the Crystal programming language is stable anyway.
+Frost likely won't hit stable until the Crystal programming language is stable.
 
 
 ## INSTALL
@@ -30,44 +30,6 @@ $ crystal frost/src/cli.cr -- new myapp
 $ cd myapp
 $ crystal deps install
 ```
-
-### Database
-
-Configure your database by creating the `config/database.yml` file. See
-`config/database.yml.example` for an example. Please note that only PostgreSQL
-is supported at the moment.
-
-If you don't have a PostgreSQL database, you may create one with the following
-commands. Please adapt to your setup. Linux distributions usually have a
-`postgres` user, so:
-
-```
-$ sudo -u postgres createdb myapp_development
-$ sudo -u postgres createdb myapp_test
-```
-
-You may have authorized your login user as a PostgreSQL user (default on OS X)
-so you may just:
-
-```
-$ createdb myapp_development
-$ createdb myapp_test
-```
-
-### Server
-
-You should now be capable to compile and start your application:
-
-```
-$ make run
-crystal run bin/db -- migrate
-crystal build  myapp.cr -o bin/myapp
-bin/myapp
-Listening on http://0.0.0.0:9292
-```
-
-Trying to access <https://localhost:9292> should greet you with a
-`No Such Route: GET "/"` message. Congrats, it worked!
 
 
 ## Getting Started
@@ -85,12 +47,14 @@ Application Logic:
 - design views in `app/views`;
 - write tests in `test/controllers`.
 
-See [Getting Started With Frost] for an example application.
+See [Getting Started With Frost](https://github.com/ysbaddaden/frost/blob/master/guides/GETTING_STARTED.md)
+for an example.
 
 
 ## License
 
 Distributed under the MIT License.
+See [MIT-LICENSE](https://github.com/ysbaddaden/frost/blob/master/MIT-LICENSE)
 
 
 ## Authors

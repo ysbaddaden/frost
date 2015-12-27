@@ -13,7 +13,7 @@ Let's make a read-only blog!
 We start by writing a migration to create our `posts` table (notice that the up
 and down are blocks):
 
-```
+```crystal
 # db/migrations/000001_create_posts.cr
 
 class CreatePosts < Frost::Record::Migration
@@ -33,13 +33,13 @@ end
 
 We may now migrate our database:
 
-```
+```crystal
 $ make db_migrate
 ```
 
 And create our model with a scope:
 
-```
+```crystal
 # app/models/post.cr
 
 class Post < Frost::Record
@@ -73,7 +73,7 @@ second:
 
 Then write a unit test:
 
-```
+```crystal
 # test/models/post_test.cr
 require "../test_helper"
 
@@ -94,7 +94,7 @@ creating or deleting data in a test!
 Let's write a route to access our posts, and add a redirection from `/` to our
 list of posts:
 
-```
+```crystal
 # config/routes.cr
 require "frost/routing/mapper"
 
@@ -106,7 +106,7 @@ end
 
 We create our redirection:
 
-```
+```crystal
 # app/controllers/pages_controller.cr
 
 class PagesController < ApplicationController
@@ -118,7 +118,7 @@ end
 
 We write down our resource controller:
 
-```
+```crystal
 # app/controllers/posts_controller.cr
 
 class PostsController < ApplicationController
@@ -222,7 +222,7 @@ fail to find an `index.xml.ecr` template.
 
 Let's write a test for the redirection:
 
-```
+```crystal
 # test/controllers/pages_controller_test.cr
 require "../test_helper"
 
@@ -236,7 +236,7 @@ end
 
 Let's test our resource:
 
-```
+```crystal
 # test/controllers/posts_controller_test.cr
 require "../test_helper"
 require "xml"

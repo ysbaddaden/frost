@@ -5,7 +5,6 @@
     <title>{{ page.title }}</title>
     <link rel="stylesheet" href="/frost/stylesheets/application.css"/>
     <link rel="stylesheet" href="/frost/stylesheets/github.css"/>
-    <link rel="stylesheet" href="/frost/stylesheets/pygments.css"/>
   </head>
   <body>
 
@@ -45,13 +44,6 @@
     </footer>
 
     <script src="/frost/javascripts/highlight.js"></script>
-    <script>
-      Array.prototype.forEach.call(document.querySelectorAll("pre code[data-lang='text']"), function (block) {
-        if (/^\$ /.test(block.innerHTML)) return;
-        block.className = "language-crystal";
-        block.setAttribute("data-lang", "crystal");
-        hljs.highlightBlock(block);
-      });
-    </script>
+    <script>hljs.initHighlightingOnLoad();</script>
   </body>
 </html>

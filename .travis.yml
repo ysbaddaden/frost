@@ -1,0 +1,37 @@
+language: c
+
+os:
+  - linux
+  - osx
+addons:
+  postgresql: 9.3
+
+before_install: |
+  case $TRAVIS_OS_NAME in
+  linux)
+    sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 09617FD37CC06B54
+    echo "deb http://dist.crystal-lang.org/apt crystal main" | sudo tee /etc/apt/sources.list.d/crystal.list
+    sudo apt-get update
+    ;;
+  esac
+
+install: |
+  case $TRAVIS_OS_NAME in
+  linux)
+    sudo apt-get install crystal
+    ;;
+  osx)
+    brew update
+    brew install crystal-lang
+    pg_ctl -w start --pgdata /usr/local/var/postgres
+    createuser -s postgres
+    ;;
+  esac
+  psql -c 'create database frost_test;' -U postgres
+
+before_script: |
+  crystal deps install
+  cp .env.example .env
+
+script:
+  - make test

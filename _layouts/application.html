@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="/frost/stylesheets/application.css"/>
+    <link rel="stylesheet" href="/frost/stylesheets/github.css"/>
+    <link rel="stylesheet" href="/frost/stylesheets/pygments.css"/>
+  </head>
+  <body>
+
+    <section class="row" id="main">
+      <aside class="small-3 columns" id="sidebar">
+        <p>
+          <strong>Frost</strong><br/>
+          <small>Full featured Web framework for Crystal</small>
+        </p>
+
+        <nav>
+          <ul class="side-nav">
+            <li class="divider"></li>
+            <li><a href="/frost/">Overview</a></li>
+            <li><a href="/frost/guides/GETTING_STARTED.html">Getting Started</a></li>
+            <li class="divider"></li>
+            <li><a href="http://docrystal.org/github.com/ysbaddaden/frost">Documentation</a></li>
+            <li><a href="https://github.com/ysbaddaden/frost">View on Github</a></li>
+            <li class="divider"></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <div class="small-9 columns">
+        <div class="row">
+          <article class="large-12 columns" id="article">
+            {{ content }}
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer id="footer">
+      <p>
+        Frost is copyright &copy; Julien Portalier
+      </p>
+    </footer>
+
+    <script src="/frost/javascripts/highlight.js"></script>
+    <script>
+      Array.prototype.forEach.call(document.querySelectorAll("pre code[data-lang='text']"), function (block) {
+        if (/^\$ /.test(block.innerHTML)) return;
+        block.className = "language-crystal";
+        block.setAttribute("data-lang", "crystal");
+        hljs.highlightBlock(block);
+      });
+    </script>
+  </body>
+</html>

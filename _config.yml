@@ -1,0 +1,5 @@
+safe: true
+lsi: false
+markdown: redcarpet
+pygments: false   # github pages
+highlighter: null # jekyll

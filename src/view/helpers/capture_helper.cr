@@ -29,6 +29,22 @@ module Frost
         buffer
       end
 
+      # Appends the string to the current buffer. This happens automatically in
+      # ECR templates, but may be necessary in pure-crystal helpers to capture
+      # more than the last returned string in a `#capture` block. The following
+      # example example returns `"foobar"` but would only return `"bar"` without
+      # the calls to concat:
+      #
+      # ```
+      # capture do
+      #   concat "foo"
+      #   concat "bar"
+      # end
+      # ```
+      def concat(html)
+        __buf__ << html
+      end
+
       protected def __buf__
         output_buffers.last
       end

@@ -3,6 +3,8 @@ require "html"
 module Frost
   class View
     module TagHelper
+      alias AttributeValue = String | Int32 | Float32 | Int64 | Float64 | Bool | Array(String)
+
       # Formats a HTML tag whose contents is a block.
       # ```
       # content_tag(:div) { "data" }  # => <div>data</div>
@@ -58,11 +60,6 @@ module Frost
           when Bool
             io << " " << attr_name if value
 
-          when Tuple
-            io << " " << attr_name << "=\""
-            HTML.escape(value.join(" "), io)
-            io << "\""
-
           when Array
             io << " " << attr_name << "=\""
             HTML.escape(value.join(" "), io)
@@ -74,6 +71,18 @@ module Frost
             io << "\""
           end
         end
+      end
+
+      protected def to_typed_attributes_hash(attributes)
+        if attributes.is_a?(Hash(Symbol, AttributeValue))
+          return attributes
+        end
+
+        attrs = {} of Symbol => AttributeValue
+        if attributes
+          attrs.merge!(attributes)
+        end
+        attrs
       end
     end
   end

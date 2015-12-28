@@ -9,11 +9,15 @@ module Frost
         end
 
         def to_i
-          epoch
+          (to_utc.ticks - ::Time::UnixEpoch) / ::Time::Span::TicksPerSecond
         end
 
         def to_f
-          epoch_ms / 1000.0
+          (to_utc.ticks - ::Time::UnixEpoch) / ::Time::Span::TicksPerMillisecond / 1000.0
+        end
+
+        def iso8601
+          to_s("%FT%T%:z")
         end
       end
     end

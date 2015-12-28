@@ -10,9 +10,9 @@ module Frost
       # # => <a href="http://crystal-lang.org" class="external">Crystal</a>
       # ```
       def link_to(title, url, attributes = nil)
-        attributes ||= {} of Symbol => String
-        attributes[:href] = url.to_s
-        content_tag(:a, title, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:href] = url.to_s
+        content_tag(:a, title, attrs)
       end
 
       # Formats an anchor HTML tag.

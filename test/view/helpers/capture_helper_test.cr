@@ -22,4 +22,11 @@ class Frost::View::CaptureHelperTest < Minitest::Test
     assert_match "<div>\n  <br/>\n</div>", output
     assert_match "<outer>\n  <inner>\n    <nested>\n      contents\n    </nested>\n  </inner>\n</outer>", output
   end
+
+  def test_concat
+    assert_equal("foobar", capture do
+      concat "foo"
+      concat "bar"
+    end)
+  end
 end

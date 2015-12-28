@@ -1,17 +1,16 @@
 module Frost
   class View
     module FormTagHelper
-      # TODO: mix arguments into attributes hash (?)
       def form_tag(url, method = "post", multipart = false, enforce_utf8 = true, attributes = nil)
-        attributes ||= {} of Symbol => String
+        attrs = to_typed_attributes_hash(attributes)
 
-        attributes[:method] = (method == "post" || method == "get") ? method : "post"
-        attributes[:action] = url
-        attributes[:enctype] = "multipart/form-data" if multipart
+        attrs[:method] = (method == "post" || method == "get") ? method : "post"
+        attrs[:action] = url
+        attrs[:enctype] = "multipart/form-data" if multipart
 
-        content_tag(:form, attributes) do
+        content_tag(:form, attrs) do
           String.build do |io|
-            io << hidden_field_tag(:_method, method) unless attributes[:method] == method
+            io << hidden_field_tag(:_method, method) unless attrs[:method] == method
             io << utf8_enforcer_tag if enforce_utf8
             io << capture { yield }
           end
@@ -34,18 +33,24 @@ module Frost
         input_tag(:color, name, value, attributes)
       end
 
-      # TODO: format timestamps, Date & Time values
       def date_field_tag(name, value = nil, attributes = nil)
+        if value.is_a?(Number)
+          value = Time.at(value)
+        end
         input_tag(:date, name, value, attributes)
       end
 
-      # TODO: format timestamps, Date & Time values
       def datetime_field_tag(name, value = nil, attributes = nil)
+        if value.is_a?(Number)
+          value = Time.at(value)
+        end
         input_tag(:datetime, name, value, attributes)
       end
 
-      # TODO: format timestamps, Date & Time values
       def datetime_local_field_tag(name, value = nil, attributes = nil)
+        if value.is_a?(Number)
+          value = Time.at(value)
+        end
         input_tag("datetime-local", name, value, attributes)
       end
 
@@ -62,15 +67,21 @@ module Frost
       end
 
       def label_tag(name, content : String, attributes = nil)
-        content_tag(:label, content, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:for] ||= name
+        content_tag(:label, content, attrs)
       end
 
       def label_tag(name, attributes = nil)
-        content_tag(:label, name.titleize, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:for] ||= name
+        content_tag(:label, name.titleize, attrs)
       end
 
       def label_tag(name, attributes = nil)
-        content_tag(:label, capture { yield }, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:for] ||= name
+        content_tag(:label, capture { yield }, attrs)
       end
 
       def month_field_tag(name, value = nil, attributes = nil)
@@ -98,16 +109,16 @@ module Frost
       end
 
       def select_tag(name, options : String, attributes = nil)
-        attributes ||= {} of Symbol => String
-        attributes[:name] = name.to_s
-        content_tag(:select, options, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:name] = name.to_s
+        content_tag(:select, options, attrs)
       end
 
       def select_tag(name, attributes = nil)
         select_tag(name, capture { yield }, attributes)
       end
 
-      def submit_tag(value = "Save changes", name = nil, attributes = nil)
+      def submit_tag(value = "Save changes", name = "commit", attributes = nil)
         input_tag(:submit, name, value, attributes)
       end
 
@@ -121,17 +132,22 @@ module Frost
       end
 
       def text_area_tag(name, content = nil, attributes = nil)
-        attributes ||= {} of Symbol => String
-        attributes[:name] = name.to_s
-        content_tag(:textarea, content, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:name] = name.to_s
+        content_tag(:textarea, content, attrs)
       end
 
       def text_field_tag(name, value = nil, attributes = nil)
         input_tag(:text, name, value, attributes)
       end
 
-      # TODO: format timestamps & Time values
       def time_field_tag(name, value = nil, attributes = nil)
+        if value.is_a?(Number)
+          value = Time.epoch(value)
+        end
+        if value.is_a?(Time)
+          value = value.to_s("%T")
+        end
         input_tag(:time, name, value, attributes)
       end
 
@@ -148,11 +164,17 @@ module Frost
       end
 
       private def input_tag(type, name, value = nil, attributes = nil)
-        attributes ||= {} of Symbol => String
-        attributes[:type] = type.to_s
-        attributes[:name] = name.to_s
-        attributes[:value] = value.to_s if value
-        tag(:input, attributes)
+        attrs = to_typed_attributes_hash(attributes)
+        attrs[:type] = type.to_s
+        attrs[:name] = name.to_s
+
+        if value.is_a?(Time)
+          attrs[:value] = value.iso8601
+        elsif value
+          attrs[:value] = value.to_s
+        end
+
+        tag(:input, attrs)
       end
     end
   end

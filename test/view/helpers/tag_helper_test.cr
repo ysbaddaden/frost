@@ -8,7 +8,6 @@ class Frost::View::TagHelperTest < Minitest::Test
   def test_tag
     assert_equal "<br/>", tag(:br)
     assert_equal %(<hr class="pretty-line" id="mark"/>), tag(:hr, { class: "pretty-line", id: "mark" })
-    assert_equal %(<hr class="pretty tuple line"/>), tag(:hr, { class: {"pretty", "tuple", "line"} })
     assert_equal %(<hr class="pretty array"/>), tag(:hr, { class: ["pretty", "array"] })
     assert_equal %(<input disabled type="text"/>), tag(:input, { type: "text", disabled: true })
     assert_equal %(<input type="text"/>), tag(:input, { type: "text", disabled: false })

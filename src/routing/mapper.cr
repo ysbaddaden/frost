@@ -1,4 +1,4 @@
-require "./route_set"
+require "./route"
 require "./resources"
 require "./scope"
 require "./url_builder"
@@ -165,8 +165,6 @@ module Frost
       # :nodoc:
       METHOD_NAMES = %w(options head get post put patch delete)
 
-      @@routes = RouteSet.new
-
       {% for method in METHOD_NAMES %}
         # Delegates to `match path, action, via: :{{ method.id }}`
         def self.{{ method.id }}(path, action = nil, as = nil)
@@ -201,7 +199,12 @@ module Frost
           controller = "#{ current_scope[:name] }/#{ controller }"
         end
 
-        routes.push path.to_s, controller.not_nil!, action, via, as
+        unless via.responds_to?(:each)
+          via = [via]
+        end
+        via.each do |method|
+          routes << Route.new(method.to_s, path.to_s, controller.not_nil!, action, as)
+        end
       end
 
       # :nodoc:
@@ -243,13 +246,10 @@ module Frost
 
         io << "module NamedRoutes\n"
 
-        # NOTE: .not_nil! is required in .uniq otherwise an empty routes array
-        #       will result in the run macro segfaulting (while compiling from
-        #       cli passes)
         if routes.any?
           routes
             .select { |route| route.route_name }
-            .uniq { |route| route.route_name.not_nil! }
+            .uniq { |route| route.route_name }
             .each do |route|
               name = route.route_name
               builder = UrlBuilder.new(route.path)
@@ -274,26 +274,14 @@ module Frost
       end
 
       def self.pretty_print(io : IO)
-        lines = Array(Array(String)).new(routes.size)
-
-        routes.each do |route|
-          lines << [
-            route.route_name.to_s,
-            route.method.upcase,
-            route.path,
-            "#{ route.controller }##{ route.action }",
+        lines = routes.map do |route|
+          [
+            route.route_name.to_s as String,
+            route.method.upcase as String,
+            route.path as String,
+            "#{ route.controller }##{ route.action }" as String,
           ]
         end
-
-        # FIXME: using map results in "expected block to return Array(String), not NoReturn"
-        #lines = routes.map do |route|
-        #  [
-        #    route.route_name.to_s as String,
-        #    route.method.upcase as String,
-        #    route.path as String,
-        #    "#{ route.controller }##{ route.action }" as String,
-        #  ]
-        #end
 
         sizes = lines.inject([0, 0, 0, 0]) do |acc, line|
           line.each_with_index do |arg, i|
@@ -312,7 +300,17 @@ module Frost
       end
 
       private def self.routes
-        @@routes
+        @@routes ||= begin
+                       routes = Array(Route).new
+
+                       # FIXME: fixes https://github.com/ysbaddaden/frost/issues/1#issuecomment-167912888
+                       #        by forcing the compiler to know about the Route instance
+                       #        variable types, when no routes have been defined.
+                       routes << Route.new("GET", "/", "controller", "action", nil)
+                       routes.clear
+
+                       routes
+                     end
       end
     end
 

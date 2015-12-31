@@ -7,6 +7,12 @@ class Minitest::Test
   fixtures "#{ __DIR__ }/fixtures"
 end
 
+class Frost::Controller::Test
+  def dispatcher
+    @dispatcher ||= <%= name.camelcase %>::Dispatcher.new
+  end
+end
+
 #class ApplicationController
 #  def session_store
 #    Frost::Controller::Session::TestStore

@@ -3,6 +3,7 @@ require "xml"
 module Frost
   class Controller
     module Assertions
+      # :nodoc:
       def after_teardown
         @__xml_parsed_response_body = nil
         __assert_select_cache.clear

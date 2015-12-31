@@ -11,6 +11,8 @@ module Frost
             data = encryptor.decrypt(verifier.verify(cookie.value))
             @data = Session.unserialize(data)
           end
+        rescue Frost::Support::MessageEncryptor::InvalidMessage, Frost::Support::MessageVerifier::InvalidSignature
+          @data = Session.unserialize("")
         end
 
         def save

@@ -3,9 +3,10 @@ module Frost
     module FormTagHelper
       def form_tag(url, method = "post", multipart = false, enforce_utf8 = true, attributes = nil)
         attrs = to_typed_attributes_hash(attributes)
+        method = method.to_s
 
         attrs[:method] = (method == "post" || method == "get") ? method : "post"
-        attrs[:action] = url
+        attrs[:action] = url.to_s
         attrs[:enctype] = "multipart/form-data" if multipart
 
         content_tag(:form, attrs) do
@@ -68,19 +69,19 @@ module Frost
 
       def label_tag(name, content : String, attributes = nil)
         attrs = to_typed_attributes_hash(attributes)
-        attrs[:for] ||= name
+        attrs[:for] ||= name.to_s
         content_tag(:label, content, attrs)
       end
 
       def label_tag(name, attributes = nil)
         attrs = to_typed_attributes_hash(attributes)
-        attrs[:for] ||= name
+        attrs[:for] ||= name.to_s
         content_tag(:label, name.titleize, attrs)
       end
 
       def label_tag(name, attributes = nil)
         attrs = to_typed_attributes_hash(attributes)
-        attrs[:for] ||= name
+        attrs[:for] ||= name.to_s
         content_tag(:label, capture { yield }, attrs)
       end
 

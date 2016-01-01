@@ -59,6 +59,10 @@ module Frost
           set_cookie(cookie_name, "", expires: Time.at(0))
         end
 
+        def inspect(io)
+          @data.inspect(io)
+        end
+
         protected getter :request, :response, :options
 
         protected def set_cookie(name, value, expires = nil)

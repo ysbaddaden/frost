@@ -17,5 +17,14 @@ module Frost::Support
       signed_message = verifier.sign(message)
       assert_equal message, verifier.verify(signed_message)
     end
+
+    def test_invalid_signature
+      message = "my special message--iv"
+      signed_message = MessageVerifier.new(SecureRandom.hex(16)).sign(message)
+
+      assert_raises(MessageVerifier::InvalidSignature) do
+        verifier.verify(signed_message)
+      end
+    end
   end
 end

@@ -34,7 +34,7 @@ module Frost
       def verify(signed_data)
         data, signature = signed_data.split("--", 2)
 
-        if Crypto::Subtle.constant_time_compare(signature.to_slice, generate(data).to_slice)
+        if Crypto::Subtle.constant_time_compare(signature.to_slice, generate(data).to_slice) == 1
           Base64.decode_string(data)
         else
           raise InvalidSignature.new

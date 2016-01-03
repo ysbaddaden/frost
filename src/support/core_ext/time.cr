@@ -19,6 +19,10 @@ module Frost
         def iso8601
           to_s("%FT%T%:z")
         end
+
+        def rfc822
+          to_s("%a, %d %b %Y %H:%M:%S %z")
+        end
       end
     end
   end

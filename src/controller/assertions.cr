@@ -146,12 +146,15 @@ module Frost
       protected def parse_xml_response_body
         content_type = response.headers["Content-Type"]
 
-        if content_type.to_s !~ /^(text\/html|text\/xml)\b/
-          raise ArgumentError.new("Expected response to be text/html or text/xml but was #{ content_type }")
-        end
-
         # FIXME: to_s is required to avoid a segfault
-        XML.parse_html(response.body.to_s)
+        case content_type
+        when /html/
+          XML.parse_html(response.body.to_s)
+        when /xml/
+          XML.parse(response.body.to_s)
+        else
+          raise ArgumentError.new("Expected response to be HTML or XML #{ content_type }")
+        end
       end
     end
   end

@@ -147,6 +147,7 @@ module Frost
         mkdir "app", "views"
         template "application_view", File.join("app", "views", "application_view.cr")
         template "layouts_view", File.join("app", "views", "layouts_view.cr")
+        template "layout", File.join("app", "views", "layouts/application.html.ecr")
       end
 
       def generate_public

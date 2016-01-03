@@ -10,6 +10,8 @@ We start by writing a migration to create our `posts` table:
 # db/migrations/000001_create_posts.cr
 
 class CreatePosts < Frost::Record::Migration
+  set_version {{ __FILE__ }}
+
   up do
     create_table :posts do |t|
       t.string :title
@@ -37,7 +39,7 @@ And create our model with a scope:
 
 class Post < Frost::Record
   def self.latest
-    order("created_at DESC")
+    order({ created_at: :desc })
   end
 end
 ```
@@ -50,17 +52,17 @@ We populate some fixtures:
 # test/fixtures/posts.yml
 hello:
   title: hello
-  body: ...
+  body: hello world
   created_at: 2015-12-01
 
 first:
   title: first
-  body: ...
+  body: this is my first post
   created_at: 2015-12-02
 
 second:
   title: second
-  body: ...
+  body: this is my second post
   created_at: 2015-12-03
 ```
 
@@ -72,13 +74,21 @@ require "../test_helper"
 
 class PostTest < Minitest::Test
   def test_latest
-    assert_equal [posts(:second), posts(:first), posts(:hello)], Post.latest
+    assert_equal [posts(:second), posts(:first), posts(:hello)], Post.latest.to_a
   end
 end
 ```
 
-Each single test runs in a transaction that will rollback, so don't worry about
-creating or deleting data in a test!
+We can now run our test, but before that we must migrate the test database
+(sorry, the test database isn't rebuilt automatically, yet):
+
+```
+$ make db_migrate FROST_ENV=test
+$ make test
+```
+
+Note that each test runs in a transaction that will rollback, so don't worry
+about creating or deleting data in a test!
 
 
 ## Controller
@@ -156,7 +166,7 @@ We render our list of read-only posts:
 <ul>
   <% posts.each do |post| %>
     <li>
-      <%= link_to post_url(post) do %>
+      <%= link_to(post_url(post)) do %>
         <%= post.created_at %>: <%= post.title %>
       <% end %>
     </li>
@@ -173,7 +183,7 @@ layout:
   <channel>
     <title>My Blog</title>
     <link><%= root_url %></link>
-    <lastBuildDate><%= Time.now %></lastBuildDate>
+    <lastBuildDate><%= Time.now.rfc822 %></lastBuildDate>
 
     <%= yield %>
   </channel>
@@ -190,7 +200,7 @@ And our alternative view:
     <title><%= post.title %></title>
     <link><%= post_url(post) %></link>
     <description><%= post.body %></description>
-    <pubDate><%= post.updated_at %></pubDate>
+    <pubDate><%= post.created_at.try(&.rfc822) %></pubDate>
     <guid isPermaLink="true"><%= post_url(post) %></guid>
   </item>
 <% end %>
@@ -208,7 +218,7 @@ require "../test_helper"
 class PagesControllerTest < Frost::Controller::Test
   def test_landing
     get "/"
-    assert_redirected_to "/posts"
+    assert_redirected_to "http://test.host/posts"
   end
 end
 ```
@@ -218,15 +228,14 @@ Let's test our resource:
 ```crystal
 # test/controllers/posts_controller_test.cr
 require "../test_helper"
-require "xml"
 
 class PostsControllerTest < Frost::Controller::Test
   def test_index
     get "/posts"
     assert_response 200
-    assert_select "li a", text: posts(:second).title
-    assert_select "li a", text: posts(:first).title
-    assert_select "li a", text: posts(:hello).title
+    assert_select "li a", text: /second/
+    assert_select "li a", text: /first/
+    assert_select "li a", text: /hello/
   end
 
   def test_index_rss
@@ -238,8 +247,8 @@ class PostsControllerTest < Frost::Controller::Test
   def test_show
     get "/posts/#{ posts(:first) }"
     assert_response 200
-    assert_select, "article h1", text: posts(:first).title
-    assert_select, "article div", text: posts(:first).body
+    assert_select "article h1", text: /first/
+    assert_select "article div", text: /this is my first post/
   end
 end
 ```

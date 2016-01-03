@@ -4,9 +4,11 @@ module Frost
     class Route
       FIND_PARAM_NAME = /[*:]([\w\d_]+)/
 
-      property :path, :method, :controller, :action
+      property :path, :method, :controller, :action, :route_name
 
-      def initialize(@method, @path, @controller, @action, @route_name = nil)
+      def initialize(@method : String, @path : String, @controller : String, @action : String, @route_name = nil : String?)
+        # FIXME: types are defined to avoid a compiler bug with an empty route set
+        #        see https://github.com/ysbaddaden/frost/issues/1#issuecomment-167912888
       end
 
       def controller_class
@@ -31,10 +33,6 @@ module Frost
           .gsub(/_RPAREN_/, ")?")
 
          "/\\A#{ matcher }\\/?\\Z/"
-      end
-
-      def route_name
-        @route_name as String?
       end
 
       def to_crystal_s(io : IO)

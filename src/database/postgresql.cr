@@ -1,5 +1,4 @@
 require "pg"
-require "./pg_ext"
 require "./errors"
 require "./transaction"
 require "./postgresql/table"
@@ -24,13 +23,6 @@ module Frost
         raise StatementInvalid.new(ex.message)
       end
 
-      def frost_execute(sql)
-        log(sql)
-        conn.frost_exec(sql)
-      rescue ex : PG::ResultError
-        raise StatementInvalid.new(ex.message)
-      end
-
       def execute(types, sql)
         log(sql)
         conn.exec(types, sql)
@@ -47,7 +39,7 @@ module Frost
       end
 
       def select(sql)
-        result = frost_execute(sql)
+        result = execute(sql)
         result.each { |row| yield row }
       end
 

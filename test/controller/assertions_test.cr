@@ -48,6 +48,8 @@ class Frost::Controller::AssertionsTest < Minitest::Test
     assert_equal "//div[ contains(@me, \"you\") ]", css_to_xpath("div[me*='you']")
     assert_equal "//div[ starts-with(@me, \"you\") ]", css_to_xpath("div[me^='you']")
     assert_equal "//div[ substring(@me, string-length(@me) - 2) = \"you\" ]", css_to_xpath("div[me$='you']")
+
+    assert_equal "//input[ @name = \"user[name]\" ][ @type = \"text\" ]", css_to_xpath("input[name='user[name]'][type=text]")
   end
 
   def test_css_to_xpath_nth_first_and_last_child

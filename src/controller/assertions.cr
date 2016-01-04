@@ -80,7 +80,30 @@ module Frost
           when ">"  then "/"
           when "+"  then "/following-sibling::*[1]/self::"
           else
-            constraints = segment.split(/(\.[^.#[:]+|#[^.#[:]+|:[^.#[:]+|\[[^\]]+])/).reject(&.empty?)
+            reader = Char::Reader.new(segment)
+            constraints = [] of String
+            in_string = false
+            a = 0
+
+            reader.each_with_index do |chr, i|
+              case chr
+              when '\''
+                in_string = !in_string
+              when '.', '#', ':', '['
+                unless in_string
+                  constraints << segment[a ... i]
+                  a = i
+                end
+              when ']'
+                unless in_string
+                  constraints << segment[a .. i]
+                  a = i + 1
+                end
+              end
+            end
+            constraints << segment[a .. -1]
+
+            constraints.reject!(&.empty?)
             constraints.unshift("*") if constraints.first =~ /^\.|#|:|\[/
             constraints.map { |c| css_constraint_to_xpath(c) }.join
           end
@@ -96,7 +119,13 @@ module Frost
         when /^#(.+)$/
           "[ @id = #{ $1.inspect } ]"
 
-        when /^\[(.+?)([~\|\*!\^\$]?)=['"](.+)['"]\]$/
+        when /^\[(.+?)([~\|\*!\^\$]?)="(.+)"\]$/
+          css_attribute_to_xpath($1, $2, $3)
+
+        when /^\[(.+?)([~\|\*!\^\$]?)='(.+)'\]$/
+          css_attribute_to_xpath($1, $2, $3)
+
+        when /^\[(.+?)([~\|\*!\^\$]?)=(.+)\]$/
           css_attribute_to_xpath($1, $2, $3)
 
         when /^\[(.+)\]$/

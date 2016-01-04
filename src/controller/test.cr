@@ -104,15 +104,7 @@ module Frost
           request = HTTP::Request.new({{ method.upcase }}, path, headers: HTTP::Headers.from(headers))
           request.headers["Host"] ||= url.host || "test.host"
 
-          if @session
-            Session::TestStore.new(request).set_data(session)
-          end
-
-          if userinfo
-            request.headers["Authorization"] = "Basic #{Base64.encode(userinfo)}"
-          end
-
-          @response = dispatcher.call(request)
+          execute_request(request, userinfo)
         end
       {% end %}
 
@@ -127,15 +119,7 @@ module Frost
           request.headers["Host"] ||= url.host || "test.host"
           request.headers["Content-Type"] ||= "application/x-www-form-urlencoded"
 
-          if @session
-            Session::TestStore.new(request).set_data(session)
-          end
-
-          if userinfo
-            request.headers["Authorization"] = "Basic #{Base64.encode(userinfo)}"
-          end
-
-          @response = dispatcher.call(request)
+          execute_request(request, userinfo)
         end
 
         # TODO: encode Hash params as application/x-www-form-urlencoded
@@ -147,8 +131,22 @@ module Frost
         #
         #  {{ method.id }}(path, body, headers)
         #end
-
       {% end %}
+
+      private def execute_request(request, userinfo)
+        if @session
+          Session::TestStore.new(request).set_data(session)
+        end
+
+        if userinfo
+          request.headers["Authorization"] = "Basic #{Base64.encode(userinfo)}"
+        end
+
+        @response = dispatcher.call(request)
+        @session = Session::TestStore.new(response).read
+
+        nil
+      end
     end
   end
 end

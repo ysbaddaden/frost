@@ -5,6 +5,7 @@ require "./record/finders"
 require "./record/associations"
 require "./record/persistence"
 require "./record/validation"
+require "./record/serialization"
 require "./support/core_ext/time"
 
 
@@ -18,6 +19,7 @@ module Frost
     include Associations
     include Persistence
     include Validation
+    include Serialization
 
     def self.table_name
       @@table_name ||= name.tableize

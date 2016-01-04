@@ -65,6 +65,14 @@ module Frost
           !!@records
         end
 
+        def to_json
+          to_a.to_json
+        end
+
+        def to_json(io)
+          to_a.to_json(io)
+        end
+
         def each
           to_a.each { |record| yield record }
         end

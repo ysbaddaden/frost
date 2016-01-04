@@ -23,6 +23,14 @@ module Frost
         def rfc822
           to_s("%a, %d %b %Y %H:%M:%S %z")
         end
+
+        def to_json
+          to_utc.to_s("%FT%T.%LZ")
+        end
+
+        def to_json(io)
+          io << '"' << to_json << '"'
+        end
       end
     end
   end

@@ -77,7 +77,7 @@ module Frost
       end
 
       def generate_from_pg_result(io)
-        io << "def self.from_pg_result(row : PG::FrostResult::Row)\n"
+        io << "def self.from_pg_result(row : PG::Result::Row)\n"
         io << "  record = new\n"
         io << "  record.new_record = false\n\n"
 

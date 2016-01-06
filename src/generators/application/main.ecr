@@ -2,6 +2,7 @@ require "http/server"
 require "frost/server/handlers/log_handler"
 require "frost/server/handlers/public_file_handler"
 require "frost/server/handlers/deflate_handler"
+require "frost/server/handlers/https_everywhere_handler"
 require "./config/bootstrap"
 
 host = "localhost"
@@ -25,6 +26,7 @@ end
 begin
   handlers = [
     Frost::Server::LogHandler.new,
+    Frost::Server::HttpsEverywhereHandler.new(308),
     HTTP::DeflateHandler.new,
     Frost::Server::PublicFileHandler.new(File.join(Frost.root, "public"))
   ]

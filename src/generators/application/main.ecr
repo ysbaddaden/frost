@@ -1,16 +1,28 @@
 require "http/server"
 require "frost/server/handlers/log_handler"
 require "frost/server/handlers/public_file_handler"
+require "frost/server/handlers/deflate_handler"
 require "./config/bootstrap"
 
-# FIXME: ?
-class Zlib::Deflate
-  def close; end
+host = "localhost"
+port = 9292
+
+opts = OptionParser.new
+opts.on("-b HOST", "--bind=HOST", "Bind to host (defaults to #{ host })") { |value| host = value }
+opts.on("-p PORT", "--port=PORT", "Bind to port (defaults to #{ port })") { |value| port = value.to_i }
+opts.on("-h", "--help", "Show this help") { puts opts; exit }
+
+begin
+  opts.parse(ARGV)
+rescue ex : OptionParser::InvalidOption
+  STDERR.puts ex.message
+  STDERR.puts
+  STDERR.puts "Available options:"
+  STDERR.puts opts
+  exit
 end
 
 begin
-  port = ENV.fetch("PORT", "9292").to_i
-
   handlers = [
     Frost::Server::LogHandler.new,
     HTTP::DeflateHandler.new,
@@ -18,10 +30,10 @@ begin
   ]
   dispatcher = <%= name.camelcase %>::Dispatcher.new
 
-  server = HTTP::Server.new("0.0.0.0", port, handlers) do |request|
+  server = HTTP::Server.new(host, port, handlers) do |request|
     dispatcher.call(request)
   end
 
-  puts "Listening on http://0.0.0.0:#{ port }"
+  puts "Listening on http://#{ host }:#{ port }"
   server.listen
 end

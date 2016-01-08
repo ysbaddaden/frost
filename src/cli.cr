@@ -56,10 +56,14 @@ module Frost
         File.chmod(mode, File.join(path, *path_names))
       end
 
-      macro template(template_name, path)
-        contents = String.build do |__buf__|
-          embed_ecr {{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }}, "__buf__"
-        end
+      macro template(template_name, path, render = true)
+        {% if render %}
+          contents = String.build do |__buf__|
+            embed_ecr {{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }}, "__buf__"
+          end
+        {% else %}
+          contents = File.read({{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }})
+        {% end %}
 
         if File.exists?(File.join(path, {{ path }}))
           if File.read(File.join(path, {{ path }})).strip == contents.strip
@@ -147,7 +151,8 @@ module Frost
         mkdir "app", "views"
         template "application_view", File.join("app", "views", "application_view.cr")
         template "layouts_view", File.join("app", "views", "layouts_view.cr")
-        template "layout", File.join("app", "views", "layouts/application.html.ecr")
+        mkdir "app", "views", "layouts"
+        template "layout", File.join("app", "views", "layouts/application.html.ecr"), false
       end
 
       def generate_public

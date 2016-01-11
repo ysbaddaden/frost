@@ -3,7 +3,7 @@ struct HTTP::Headers
     headers = new
 
     if other
-      headers.merge!(other)
+      other.each { |key, value| headers[key] = value.to_s }
     end
 
     headers

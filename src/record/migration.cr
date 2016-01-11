@@ -3,7 +3,7 @@ require "./errors"
 require "./migration/schema_migration"
 
 module Frost
-  class Record
+  abstract class Record
     class Migration
       def self.find(version)
         migration = all.find { |m| m.version == version }

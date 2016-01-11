@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     module Persistence
       # TODO: after_commit & after_rollback callbacks
       # TODO: freeze attributes when record is deleted or destroyed

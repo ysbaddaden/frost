@@ -1,5 +1,5 @@
 module Frost
-  class View
+  abstract class View
     module CaptureHelper
       # Captures the string returns by yielding the block or anything written to
       # a new output buffer.

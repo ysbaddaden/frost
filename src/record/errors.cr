@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     class Error < Exception
     end
 

@@ -1,7 +1,7 @@
 require "./store"
 
 module Frost
-  class Controller
+  abstract class Controller
     module Session
       # :nodoc:
       class TestStore < Store

@@ -1,7 +1,7 @@
 require "ecr"
 
 module Frost
-  class View
+  abstract class View
     class ECR
       include ::ECR
 

@@ -1,5 +1,5 @@
 module Frost
-  class View
+  abstract class View
     class Error < Exception
     end
 

@@ -1,5 +1,5 @@
 module Frost
-  class View
+  abstract class View
     module UrlHelper
       # Formats an anchor HTML tag.
       # ```

@@ -1,7 +1,7 @@
 require "json"
 
 module Frost
-  class Record
+  abstract class Record
     module Serialization
       def serializable_hash
         Hash.zip(self.class.attribute_names.to_a, to_tuple.to_a)

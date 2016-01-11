@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     module Callbacks
 
       macro define_model_callbacks(*names)

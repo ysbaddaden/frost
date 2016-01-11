@@ -1,7 +1,7 @@
 require "../query/builder"
 
 module Frost
-  class Record
+  abstract class Record
     # TODO: pluck(attr_name)
     # TODO: reload
     module Finders

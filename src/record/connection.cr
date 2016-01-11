@@ -9,7 +9,7 @@ require "../database/postgresql"
 require "./errors"
 
 module Frost
-  class Record
+  abstract class Record
     module Connection
       struct Configuration
         DEFAULT_POOL = 5

@@ -1,7 +1,7 @@
 require "../../support/core_ext/http/cookies"
 
 module Frost
-  class Controller
+  abstract class Controller
     module Session
       module HashObject
         def [](key)

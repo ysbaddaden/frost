@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     # Record Validations
     #
     # The `#valid?` method will invoke the `#validate` method, which does

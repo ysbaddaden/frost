@@ -1,5 +1,5 @@
 module Frost
-  class View
+  abstract class View
     module FormTagHelper
       def form_tag(url, method = "post", multipart = false, enforce_utf8 = true, attributes = nil)
         attrs = to_typed_attributes_hash(attributes)

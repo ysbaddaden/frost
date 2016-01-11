@@ -1,5 +1,5 @@
 module Frost
-  class Controller
+  abstract class Controller
     # A controller may define the `before_action` and `after_action` methods to
     # execute code around all its actions.
     #

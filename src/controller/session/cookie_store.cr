@@ -3,7 +3,7 @@ require "../../support/message_encryptor"
 require "../../support/message_verifier"
 
 module Frost
-  class Controller
+  abstract class Controller
     module Session
       class CookieStore < Store
         def read

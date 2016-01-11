@@ -2,7 +2,7 @@ require "../support/core_ext/string"
 require "./connection"
 
 module Frost
-  class Record
+  abstract class Record
     class Attributes
       getter :class_name, :table
 

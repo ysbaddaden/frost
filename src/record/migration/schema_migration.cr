@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     # :nodoc:
     module SchemaMigration
       QUERY = "SELECT version FROM schema_migrations ;"

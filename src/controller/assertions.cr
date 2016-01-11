@@ -1,7 +1,7 @@
 require "xml"
 
 module Frost
-  class Controller
+  abstract class Controller
     module Assertions
       # :nodoc:
       def after_teardown

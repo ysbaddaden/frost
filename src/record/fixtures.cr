@@ -2,7 +2,7 @@ require "yaml"
 require "./errors"
 
 module Frost
-  class Record
+  abstract class Record
     class FixtureError < Error
     end
 

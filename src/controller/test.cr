@@ -3,7 +3,7 @@ require "./assertions"
 require "./session/test_store"
 
 module Frost
-  class Controller
+  abstract class Controller
     module Session
       def session_store
         TestStore

@@ -67,7 +67,7 @@ module Frost
   #
   # See `Session` and `Session::Store` for more information.
   #
-  class Controller
+  abstract class Controller
     # TODO: CSRF protection
 
     include Filtering

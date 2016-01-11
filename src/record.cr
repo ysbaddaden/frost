@@ -11,7 +11,7 @@ require "./support/core_ext/time"
 
 module Frost
   # TODO: dirty attributes
-  class Record
+  abstract class Record
     alias RecordValue = PG::PGValue
 
     extend Finders

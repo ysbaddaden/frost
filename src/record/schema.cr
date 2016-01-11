@@ -2,7 +2,7 @@ require "./connection"
 require "./migration"
 
 module Frost
-  class Record
+  abstract class Record
     module Schema
       # NOTE: DEPRECATED (use dump_structure and load_structure instead)
       def self.load

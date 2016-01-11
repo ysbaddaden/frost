@@ -1,5 +1,5 @@
 #module Frost
-#  class Controller
+#  abstract class Controller
 #    module Session
 #      class CacheStore < Store
 #        def read

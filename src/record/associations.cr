@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     module Associations
       # :nodoc:
       macro generate_associations

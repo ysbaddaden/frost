@@ -1,7 +1,7 @@
 require "../finders"
 
 module Frost
-  class Record
+  abstract class Record
     module Associations
       class HasManyCollection(T) < Query::Executor(T)
         # TODO: generate specific collection classes in has_many macro (+ yield

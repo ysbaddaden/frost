@@ -2,7 +2,7 @@ require "../view"
 require "../support/mime"
 
 module Frost
-  class Controller
+  abstract class Controller
     # TODO: render template
     module Rendering
       # Sets the HTTP status code and skips rendering.

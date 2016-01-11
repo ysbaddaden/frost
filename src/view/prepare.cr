@@ -2,7 +2,7 @@ require "../support/core_ext/file"
 require "./ecr"
 
 module Frost
-  class View
+  abstract class View
     # :nodoc:
     class PrepareViews
       getter :views_path

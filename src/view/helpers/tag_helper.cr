@@ -1,7 +1,7 @@
 require "html"
 
 module Frost
-  class View
+  abstract class View
     module TagHelper
       alias AttributeValue = String | Int32 | Float32 | Int64 | Float64 | Bool | Array(String)
 

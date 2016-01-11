@@ -1,5 +1,5 @@
 module Frost
-  class Record
+  abstract class Record
     module Associations
       macro belongs_to(name, foreign_key = nil, dependent = nil, autosave = true)
         {% name = name.id %}

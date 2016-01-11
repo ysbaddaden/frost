@@ -1,5 +1,5 @@
 module Frost
-  class Controller
+  abstract class Controller
     class Error < Exception
     end
 

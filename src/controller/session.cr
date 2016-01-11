@@ -2,7 +2,7 @@ require "http/params"
 require "./session/cookie_store"
 
 module Frost
-  class Controller
+  abstract class Controller
     # User sessions.
     #
     # Sessions are automatically created, read and saved. You may disable them

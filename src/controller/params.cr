@@ -1,7 +1,7 @@
 require "http/params"
 
 module Frost
-  class Controller
+  abstract class Controller
     alias ParamType = String | Array(ParamType) | Hash(String, ParamType)
 
     module Params

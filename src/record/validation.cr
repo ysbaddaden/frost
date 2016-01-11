@@ -82,6 +82,13 @@ module Frost
       def errors
         @errors ||= Errors.new(self)
       end
+
+      # Validation helper that returns true if the column value is unique.
+      macro validate_uniqueness_of(attr_name)
+        %test = self.class.where({ {{ attr_name }} => {{ attr_name.id }} })
+        %test = %test.where("#{ self.class.primary_key } <> ?", id) if id
+        !%test.any?
+      end
     end
   end
 end

@@ -48,6 +48,16 @@ module Frost
         assert post.errors.any?
         refute post.new_record?
       end
+
+      def test_validate_uniqueness_of
+        julien = User.new(email: "julien@example.com")
+        refute julien.valid?
+        assert_equal ["Email conflict"], julien.errors[:email]
+
+        mary = User.new(email: "mary@example.com")
+        assert mary.valid?
+        assert_nil mary.errors[:email]?
+      end
     end
   end
 end

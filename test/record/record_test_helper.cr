@@ -83,6 +83,7 @@ class User < Frost::Record
 
   def validate
     errors.add(:email, "Email is required") if email.blank?
+    errors.add(:email, "Email conflict") unless validate_uniqueness_of(:email)
   end
 end
 
@@ -99,6 +100,7 @@ class Profile < Frost::Record
 
   def validate
     errors.add(:nickname, "Nickname is required") if nickname.blank?
+    errors.add(:nickname, "Nickname conflict") unless validate_uniqueness_of(:nickname)
   end
 end
 

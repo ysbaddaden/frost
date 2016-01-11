@@ -3,7 +3,7 @@ require "html"
 module Frost
   abstract class View
     module TagHelper
-      alias AttributeValue = String | Int32 | Float32 | Int64 | Float64 | Bool | Array(String)
+      alias AttributeValue = String | Int32 | Float32 | Int64 | Float64 | Bool | Nil | Array(String?) | Array(String)
 
       # Formats a HTML tag whose contents is a block.
       # ```

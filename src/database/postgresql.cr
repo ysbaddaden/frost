@@ -4,6 +4,26 @@ require "./transaction"
 require "./postgresql/table"
 require "./postgresql/table_definition"
 
+# :nodoc:
+module PG
+  # :nodoc:
+  lib LibPQ
+    fun reset = PQreset(conn : PGconn) : Void
+  end
+
+  # :nodoc:
+  class Connection
+    def reset
+      LibPQ.reset(conn_ptr)
+      unless LibPQ.status(conn_ptr) == LibPQ::ConnStatusType::CONNECTION_OK
+        error = ConnectionError.new(@conn_ptr)
+        finish
+        raise error
+      end
+    end
+  end
+end
+
 module Frost
   module Database
     class PostgreSQL
@@ -17,13 +37,36 @@ module Frost
       end
 
       def execute(sql)
+        __retry_on_connection_error { __execute(sql) }
+      end
+
+      def execute(types, sql)
+        __retry_on_connection_error { __execute(types, sql) }
+      end
+
+      private def __retry_on_connection_error
+        yield
+      rescue ex : PG::Error
+        if ex.message == "Connection not open"
+          begin
+            conn.reset
+          rescue err : PG::ConnectionError
+            raise ConnectionError.new(err.message)
+          end
+          yield
+        else
+          raise ex
+        end
+      end
+
+      private def __execute(sql)
         log(sql)
         conn.exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
 
-      def execute(types, sql)
+      private def __execute(types, sql)
         log(sql)
         conn.exec(types, sql)
       rescue ex : PG::ResultError

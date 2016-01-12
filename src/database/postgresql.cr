@@ -37,37 +37,35 @@ module Frost
       end
 
       def execute(sql)
+        log(sql)
         __retry_on_connection_error { __execute(sql) }
       end
 
       def execute(types, sql)
+        log(sql)
         __retry_on_connection_error { __execute(types, sql) }
       end
 
       private def __retry_on_connection_error
         yield
       rescue ex : PG::Error
-        if ex.message == "Connection not open"
-          begin
-            conn.reset
-          rescue err : PG::ConnectionError
-            raise ConnectionError.new(err.message)
-          end
-          yield
-        else
-          raise ex
+        begin
+          log("Rescued PG::Error: #{ex.message}")
+          conn.reset
+        rescue err : PG::ConnectionError
+          raise ConnectionError.new(err.message)
         end
+
+        yield
       end
 
       private def __execute(sql)
-        log(sql)
         conn.exec(sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)
       end
 
       private def __execute(types, sql)
-        log(sql)
         conn.exec(types, sql)
       rescue ex : PG::ResultError
         raise StatementInvalid.new(ex.message)

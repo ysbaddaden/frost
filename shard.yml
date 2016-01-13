@@ -1,5 +1,6 @@
 name: frost
-version: 0.1.0
+version: 0.2.0
+description: Full featured Web framework (MVC)
 
 authors:
   - Julien Portalier <julien@portalier.com>
@@ -17,3 +18,5 @@ development_dependencies:
   minitest:
     github: ysbaddaden/minitest.cr
     version: ">= 0.2.0"
+
+license: MIT

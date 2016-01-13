@@ -11,7 +11,7 @@ module Frost::Server
     end
 
     def call(request)
-      path = @publicdir + request.path
+      path = local_path(request)
       return call_next(request) unless public_file?(path)
 
       contents = File.read(path)
@@ -27,6 +27,12 @@ module Frost::Server
       else
         HTTP::Response.new(200, contents, headers)
       end
+    end
+
+    private def local_path(request)
+      path = URI.unescape(request.path)
+      expanded_path = File.expand_path(path, "/")
+      File.join(@publicdir, expanded_path)
     end
 
     private def public_file?(path)

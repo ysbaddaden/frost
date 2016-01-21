@@ -3,7 +3,7 @@ require "openssl/digest"
 
 module Frost::Server
   class PublicFileHandler < HTTP::Handler
-    # TODO: set cache-control headers (would need digests)
+    # TODO: set cache-control headers
     # OPTIMIZE: cache & serve already deflated files
     # OPTIMIZE: memoize etags
 
@@ -12,6 +12,7 @@ module Frost::Server
 
     def call(request)
       path = local_path(request)
+      return HTTP::Response.new(400) if path.includes?('\0') # protect against file traversal
       return call_next(request) unless public_file?(path)
 
       contents = File.read(path)
@@ -31,7 +32,7 @@ module Frost::Server
 
     private def local_path(request)
       path = URI.unescape(request.path)
-      expanded_path = File.expand_path(path, "/")
+      expanded_path = File.expand_path(path, "/") # protect against directory traversal
       File.join(@publicdir, expanded_path)
     end
 

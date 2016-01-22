@@ -10,13 +10,15 @@ incredible performance.
 
 ## STATUS: DEVELOPER PREVIEW
 
-**WARNING**: Frost is in _developer preview_, and must be considered alpha
-software until further notice. features may be added, dropped, tweaked, or
-changed dramatically at any time. Please experiment with Frost, contribute to
-Frost, let's make it incerdiable, but build software out of it at your own risk!
-You've been warned :-)
+Frost is in _developer preview_, and must be considered alpha software until
+further notice. Features may be added, dropped, tweaked, or changed at any
+time. Please experiment with Frost, contribute to Frost, let's make it
+incredible, but build software with it at your own risk!
 
-Frost likely won't hit stable until the Crystal programming language is stable.
+TLDR: using Frost is like using Crystal. It's great, but be prepared to fix
+your software on a regular basis.
+
+You've been warned :-)
 
 
 ## INSTALL
@@ -49,6 +51,27 @@ Application Logic:
 
 See [Getting Started With Frost](https://github.com/ysbaddaden/frost/blob/master/guides/GETTING_STARTED.md)
 for an example.
+
+
+## Requirements
+
+Since Crystal introduces changes on a regular basis, Frost may not compile
+with the version of Crystal you are using.
+
+The Frost master branch should follow changes in Crystal's master branch,
+and thus require the Crystal master branch.
+
+Frost releases should always be usable with the latest Crystal release. In
+some cases it may require the previous Crystal release. In this case,
+switching to the Frost master branch should fix the compilation errors
+until a new Frost release is made.
+
+
+## Contribute
+
+Thanks for considering to contribute! Please see
+[CONTRIBUTES](https://github.com/ysbaddaden/frost/blob/master/CONTRIBUTES.md)
+to get started.
 
 
 ## License

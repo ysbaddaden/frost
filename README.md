@@ -70,7 +70,7 @@ until a new Frost release is made.
 ## Contribute
 
 Thanks for considering to contribute! Please see
-[CONTRIBUTES](https://github.com/ysbaddaden/frost/blob/master/CONTRIBUTES.md)
+[CONTRIBUTING](https://github.com/ysbaddaden/frost/blob/master/CONTRIBUTING.md)
 to get started.
 
 

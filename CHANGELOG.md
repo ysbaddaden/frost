@@ -1,5 +1,13 @@
 # The Frost Changelog
 
+## v0.2.1 - 2016-01-22
+
+Security Fixes:
+- File traversal vulnerability in PublicFileHandler
+
+Fixes:
+- Application generator failed to compile
+
 ## v0.2.0 - 2016-01-13
 
 Security Fixes:

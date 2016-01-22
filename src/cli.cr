@@ -33,44 +33,52 @@ module Frost
       def mkdir(*path_names)
         path_name = File.join(*path_names)
 
-        if Dir.exists?(File.join(path, path_name))
+        if Dir.exists?(File.join(app_path, path_name))
           log "exist", path_name, :blue
         else
           log "create", path_name
-          Dir.mkdir(File.join(path, path_name))
+          Dir.mkdir(File.join(app_path, path_name))
         end
       end
 
       def touch(*path_names)
         path_name = File.join(*path_names)
 
-        if File.exists?(File.join(path, path_name))
+        if File.exists?(File.join(app_path, path_name))
           log "exist", path_name, :blue
         else
           log "create", path_name
-          File.write(File.join(path, path_name), "")
+          File.write(File.join(app_path, path_name), "")
         end
       end
 
       def chmod(mode, *path_names)
-        File.chmod(mode, File.join(path, *path_names))
+        File.chmod(mode, File.join(app_path, *path_names))
+      end
+
+      def write(path, contents)
+        if File.exists?(File.join(app_path, path))
+          if File.read(File.join(app_path, path)).strip == contents.strip
+            log "identical", path, :blue
+          else
+            log "conflict", path, :red
+          end
+        else
+          log "create", path
+          File.write(File.join(app_path, path), contents)
+        end
+      end
+
+      macro copy(template_name, path)
+        %contents = File.read(File.join({{ TEMPLATES_PATH }}, "{{ template_name.id }}.ecr"))
+        write {{ path }}, %contents
       end
 
       macro template(template_name, path)
-        contents = String.build do |__buf__|
+        %contents = String.build do |__buf__|
           embed_ecr {{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }}, "__buf__"
         end
-
-        if File.exists?(File.join(path, {{ path }}))
-          if File.read(File.join(path, {{ path }})).strip == contents.strip
-            log "identical", {{ path }}, :blue
-          else
-            log "conflict", {{ path }}, :red
-          end
-        else
-          log "create", {{ path }}
-          File.write(File.join(path, {{ path }}), contents)
-        end
+        write {{ path }}, %contents
       end
 
       def log(action, detail, color = :green)
@@ -83,10 +91,10 @@ module Frost
       TEMPLATES_PATH = "#{ __DIR__ }/generators/application"
 
       include ShellActions
-      getter :name, :path, :templates_path
+      getter :name, :app_path, :templates_path
 
-      def initialize(@path)
-        @name = File.basename(path)
+      def initialize(@app_path)
+        @name = File.basename(app_path)
       end
 
       def run
@@ -145,9 +153,10 @@ module Frost
 
       def generate_views
         mkdir "app", "views"
+        mkdir "app", "views", "layouts"
         template "application_view", File.join("app", "views", "application_view.cr")
         template "layouts_view", File.join("app", "views", "layouts_view.cr")
-        template "layout", File.join("app", "views", "layouts/application.html.ecr")
+        copy "layout", File.join("app", "views", "layouts", "application.html.ecr")
       end
 
       def generate_public
@@ -167,8 +176,8 @@ module Frost
         template "test_helper", File.join("test", "test_helper.cr")
       end
 
-      def self.run(path)
-        new(path).run
+      def self.run(app_path)
+        new(app_path).run
       end
     end
   end

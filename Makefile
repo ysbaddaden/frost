@@ -9,12 +9,13 @@ tasks:
 	@grep --color=never -e "^[a-z]\+:" Makefile | sed s/://g
 
 test:
-	bin/env.sh $(CRYSTAL_BIN) run test/record/schema.cr
-	bin/env.sh $(CRYSTAL_BIN) run $(test_files)
-	bin/env.sh $(CRYSTAL_BIN) run -D test_dependent_delete $(record_test_files)
-	bin/env.sh $(CRYSTAL_BIN) run -D test_dependent_destroy $(record_test_files)
-	bin/env.sh $(CRYSTAL_BIN) run -D test_dependent_nullify $(record_test_files)
-	bin/env.sh $(CRYSTAL_BIN) run -D test_dependent_exception $(record_test_files)
+	bin/env.sh $(CRYSTAL_BIN) run $(CRFLAGS) test/record/schema.cr
+	bin/env.sh $(CRYSTAL_BIN) run $(CRFLAGS) $(test_files)
+	bin/env.sh $(CRYSTAL_BIN) run $(CRFLAGS) -D test_dependent_delete $(record_test_files)
+	bin/env.sh $(CRYSTAL_BIN) run $(CRFLAGS) -D test_dependent_destroy $(record_test_files)
+	bin/env.sh $(CRYSTAL_BIN) run $(CRFLAGS) -D test_dependent_nullify $(record_test_files)
+	bin/env.sh $(CRYSTAL_BIN) run $(CRFLAGS) -D test_dependent_exception $(record_test_files)
+	mkdir -p tmp && cd tmp && $(CRYSTAL_BIN) ../src/cli.cr -- new myapp
 
 doc:
 	$(CRYSTAL_BIN) docs src/*.cr src/routing/mapper.cr src/support/callbacks.cr src/record.cr

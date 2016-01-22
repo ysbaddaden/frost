@@ -81,12 +81,12 @@ module Frost
           to_a.each_with_index { |record, index| yield record, index }
         end
 
-        def inject
-          to_a.inject { |acc, record| yield acc, record }
+        def reduce
+          to_a.reduce { |acc, record| yield acc, record }
         end
 
-        def inject(memo)
-          to_a.inject(memo) { |acc, record| yield acc, record }
+        def reduce(memo)
+          to_a.reduce(memo) { |acc, record| yield acc, record }
         end
 
         def map

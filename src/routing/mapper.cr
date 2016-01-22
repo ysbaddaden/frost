@@ -283,7 +283,7 @@ module Frost
           ]
         end
 
-        sizes = lines.inject([0, 0, 0, 0]) do |acc, line|
+        sizes = lines.reduce([0, 0, 0, 0]) do |acc, line|
           line.each_with_index do |arg, i|
             acc[i] = arg.size if arg.size > acc[i]
           end

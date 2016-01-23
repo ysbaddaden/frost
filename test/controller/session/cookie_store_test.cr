@@ -54,18 +54,14 @@ module Frost::Controller::Session
     end
 
     private def new_session(cookie = nil)
-      response = HTTP::Response.new(200)
       request = HTTP::Request.new("GET", "/")
-
-      if cookie
-        request.headers["Set-Cookie"] = cookie.to_set_cookie_header
-      end
+      request.headers["Set-Cookie"] = cookie.to_set_cookie_header if cookie
+      response = HTTP::Server::Response.new(MemoryIO.new)
 
       session = CookieStore.new(request, response, {
         cookie_name: "_session",
         expire_after: 20.minutes,
       })
-
       {response, session}
     end
 

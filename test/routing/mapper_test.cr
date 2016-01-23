@@ -1,10 +1,9 @@
-require "../test_helper"
-require "http/request"
+require "./test_helper"
 
 module Frost::Routing
   # TODO: test params
   # TODO: test route precedence
-  class MapperTest < Minitest::Test
+  class MapperTest < RoutingTest
     module App
       class MapperController < Frost::Controller
         def match
@@ -65,10 +64,8 @@ module Frost::Routing
     end
 
     def test_named_routes
-      request = HTTP::Request.new("GET", "/")
-      request.headers["Host"] = "example.com"
-      request.headers["X-Forwarded-Proto"] = "https"
-      controller = App::MapperController.new(request, {} of String => String, "")
+      ctx = context_for("GET", "/", { "Host" => "example.com", "X-Forwarded-Proto" => "https" })
+      controller = App::MapperController.new(ctx, {} of String => String, "")
 
       assert_equal "/", controller.root_path
       assert_equal "https://example.com/", controller.root_url
@@ -78,9 +75,8 @@ module Frost::Routing
     end
 
     def test_named_route_params
-      request = HTTP::Request.new("GET", "/")
-      request.headers["Host"] = "test.host"
-      controller = App::MapperController.new(request, {} of String => String, "")
+      ctx = context_for("GET", "/", { "Host" => "test.host" })
+      controller = App::MapperController.new(ctx, {} of String => String, "")
 
       assert_equal "/posts/123", controller.post_path(123)
       assert_equal "/posts/123/comments/456", controller.post_comment_path(123, 456)
@@ -105,16 +101,6 @@ module Frost::Routing
       response = dispatch("GET", "/posts/search/?q=lorem")
       assert_equal 200, response.status_code
       assert_match "SEARCH: q:lorem", response.body
-    end
-
-    def dispatch(method, url, headers = nil, body = nil)
-      request = HTTP::Request.new(method, url, body: body)
-
-      headers.each do |key, value|
-        request.headers[key] = value
-      end if headers
-
-      dispatcher.dispatch(request)
     end
 
     def dispatcher

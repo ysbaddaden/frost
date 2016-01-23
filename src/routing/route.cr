@@ -45,7 +45,7 @@ module Frost
           io << "        params[#{ name }] = URI.unescape($#{ index + 1}) if $#{ index + 1 }?\n"
         end
 
-        io << "        controller = #{ controller_class }.new(request, params, #{ action.inspect })\n"
+        io << "        controller = #{ controller_class }.new(context, params, #{ action.inspect })\n"
         io << "        controller.run_action do\n"
         io << "          controller.#{ action }\n"
         io << "          controller.render unless controller.already_rendered?\n"

@@ -1,4 +1,5 @@
 require "../test_helper"
+require "http/server/context"
 
 module Frost
   class ControllerTest < Minitest::Test
@@ -33,40 +34,45 @@ module Frost
       {} of String => String
     end
 
-    macro execute(action, cookie = nil)
+    macro run(action, cookie = nil)
       %request = HTTP::Request.new("GET", "/")
       {% if cookie %}
         %request.cookies << {{ cookie }}
       {% end %}
-      %controller = AppController.new(%request, {} of String => String, {{ action }})
+
+      %response = HTTP::Server::Response.new(MemoryIO.new)
+      %context = HTTP::Server::Context.new(%request, %response)
+
+      %controller = AppController.new(%context, {} of String => String, {{ action }})
       %controller.run_action { %controller.{{ action.id }} }
-      %controller.response
+
+      %context.response
     end
 
     def test_session_lifetime
       # new session
-      response = execute("create")
+      response = run("create")
       assert cookie = response.cookies["_session"]
 
-      response = execute("read", cookie)
+      response = run("read", cookie)
       assert cookie = response.cookies["_session"]
       assert_equal "0", response.body
 
-      response = execute("read", cookie)
+      response = run("read", cookie)
       assert cookie = response.cookies["_session"]
       assert_equal "1", response.body
 
       # new session
-      response = execute("destroy", cookie)
+      response = run("destroy", cookie)
       assert cookie = response.cookies["_session"]
 
-      response = execute("read", cookie)
+      response = run("read", cookie)
       assert cookie = response.cookies["_session"]
       assert_empty response.body
     end
 
     def test_session_enabled
-      response = execute("no_session")
+      response = run("no_session")
       refute response.cookies["_session"]?
     end
   end

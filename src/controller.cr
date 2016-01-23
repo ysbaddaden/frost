@@ -1,5 +1,5 @@
 require "./support/core_ext/http/request"
-require "./support/core_ext/http/response"
+require "./support/core_ext/http/server/response"
 require "./controller/errors"
 require "./controller/filtering"
 require "./controller/params"
@@ -88,8 +88,8 @@ module Frost
     getter :action_name
 
     # :nodoc:
-    def initialize(@request, @params, @action_name)
-      @response = HTTP::Response.new(200, "")
+    def initialize(context, @params, @action_name)
+      @request, @response = context.request, context.response
     end
 
     # Returns the controller name as an underscored String.
@@ -141,6 +141,7 @@ module Frost
 
     def run_action
       super { yield }
+      nil
     rescue exception
       raise exception if rescue_from(exception) == false
     end

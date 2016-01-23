@@ -11,8 +11,9 @@ module Frost
           CACHE.clear
         end
 
-        def self.new(request)
-          new(request, HTTP::Response.new(200), { cookie_name: "_session" })
+        def self.new(request, response = nil)
+          response ||= HTTP::Server::Response.new(MemoryIO.new)
+          new(request, response, { cookie_name: "_session" })
         end
 
         def set_data(data)

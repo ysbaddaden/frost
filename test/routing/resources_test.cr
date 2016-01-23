@@ -1,9 +1,8 @@
-require "../test_helper"
-require "http/request"
+require "./test_helper"
 
 module Frost::Routing
   # TODO: test named routes
-  class ResourcesTest < Minitest::Test
+  class ResourcesTest < RoutingTest
     module App
       class PostsController < Frost::Controller
         {% for action in %w(index show new edit create update replace destroy
@@ -25,8 +24,7 @@ module Frost::Routing
       end
 
       class UsersController < Frost::Controller
-        {% for action in %w(show new edit create update replace destroy
-                            posts) %}
+        {% for action in %w(show new edit create update replace destroy posts) %}
           def {{ action.id }}
             args = params.map { |k, v| "#{k}:#{v}" }.compact
             render text: "#{request.method}: users\#{{ action.id }} (#{ args.join(", ") })"
@@ -230,12 +228,8 @@ module Frost::Routing
         dispatch("GET", "/posts/search").body
     end
 
-    def dispatch(method, url)
-      app.dispatch(HTTP::Request.new(method, url))
-    end
-
-    def app
-      @app ||= App::Dispatcher.new
+    def dispatcher
+      @dispatcher ||= App::Dispatcher.new
     end
   end
 end

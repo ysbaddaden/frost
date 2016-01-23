@@ -1,8 +1,7 @@
-require "../test_helper"
-require "http/request"
+require "./test_helper"
 
 module Frost::Routing
-  class ScopeTest < Minitest::Test
+  class ScopeTest < RoutingTest
     module App
       class PostsController < Frost::Controller
         def index
@@ -40,12 +39,8 @@ module Frost::Routing
         dispatch("GET", "/admin/authors").body
     end
 
-    def dispatch(method, url)
-      dispatcher.dispatch(HTTP::Request.new(method, url))
-    end
-
     def dispatcher
-      @app ||= App::Dispatcher.new
+      @dispatcher ||= App::Dispatcher.new
     end
   end
 end

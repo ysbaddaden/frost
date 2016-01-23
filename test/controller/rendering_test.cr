@@ -1,4 +1,5 @@
 require "../test_helper"
+require "http/server/context"
 
 class RenderController < Frost::Controller
   def not_found
@@ -40,16 +41,20 @@ module Frost
     class RenderingTest < Minitest::Test
       macro run(action_name, format = nil)
         %request = HTTP::Request.new("GET", "/render/{{ action_name.id }}")
+        %response = HTTP::Server::Response.new(MemoryIO.new)
+        %context = HTTP::Server::Context.new(%request, %response)
 
         %params = {} of String => ParamType
-        {% if format %} %params["format"] = {{ format }} {% end %}
+        {% if format %}
+          %params["format"] = {{ format }}
+        {% end %}
 
-        %controller = RenderController.new(%request, %params, {{ action_name }})
+        %controller = RenderController.new(%context, %params, {{ action_name }})
         %controller.run_action do
           %controller.{{ action_name.id }}
         end
 
-        %controller.response
+        %context.response
       end
 
       def test_head

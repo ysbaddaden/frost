@@ -1,3 +1,4 @@
+require "http/server/context"
 require "./test_helper"
 
 module Frost
@@ -35,7 +36,15 @@ module Frost
     end
 
     def call(method, url)
-      dispatcher.call(HTTP::Request.new(method, url))
+      request = HTTP::Request.new(method, url)
+      response = HTTP::Server::Response.new(io = MemoryIO.new)
+      context = HTTP::Server::Context.new(request, response)
+
+      dispatcher.call(context)
+      response.flush
+
+      io.rewind
+      HTTP::Client::Response.from_io(io)
     end
 
     def dispatcher

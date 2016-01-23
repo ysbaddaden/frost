@@ -1,3 +1,4 @@
+require "http/server/context"
 require "../support/core_ext/http/headers"
 require "./assertions"
 require "./session/test_store"
@@ -24,7 +25,7 @@ module Frost
     # delete "/users/1"
     # ```
     #
-    # After making a request, you may test the `#response` HTTP::Response
+    # After making a request, you may test the `#response` HTTP::Client::Response
     # object. See `Assertions` for some helpers.
     #
     # ## Host
@@ -134,15 +135,18 @@ module Frost
       {% end %}
 
       private def execute_request(request, userinfo)
+        @response = HTTP::Server::Response.new(MemoryIO.new)
+        context = HTTP::Server::Context.new(request, response)
+
         if @session
-          Session::TestStore.new(request).set_data(session)
+          Session::TestStore.new(request, response).set_data(session)
         end
 
         if userinfo
           request.headers["Authorization"] = "Basic #{Base64.encode(userinfo)}"
         end
 
-        @response = dispatcher.call(request)
+        dispatcher.call(context)
         @session = Session::TestStore.new(response).read
 
         nil

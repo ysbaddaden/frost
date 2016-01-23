@@ -1,7 +1,7 @@
 require "http/server"
 require "openssl/digest"
 
-module Frost::Server
+abstract class Frost::Server
   class PublicFileHandler < HTTP::Handler
     # TODO: set cache-control headers
     # OPTIMIZE: cache & serve already deflated files
@@ -10,29 +10,42 @@ module Frost::Server
     def initialize(@publicdir)
     end
 
-    def call(request)
-      path = local_path(request)
-      return HTTP::Response.new(400) if path.includes?('\0') # protect against file traversal
-      return call_next(request) unless public_file?(path)
+    def call(ctx)
+      path = local_path(ctx.request)
+
+      if path.includes?('\0')
+        # protect against file traversal
+        ctx.response.status_code = 400
+        return
+      end
+
+      unless public_file?(path)
+        return call_next(ctx)
+      end
 
       contents = File.read(path)
       etag = digest(contents)
+      response = ctx.response
 
-      headers = HTTP::Headers{
-        "Content-Type": mime_type(path),
-        "Etag": etag,
-      }
+      response.headers["Content-Type"] = mime_type(path)
+      response.headers["Etag"] = etag
 
-      if request.headers["If-None-Match"]? == etag
-        HTTP::Response.new(304, nil, headers)
+      if ctx.request.headers["If-None-Match"]? == etag
+        response.status_code = 304
       else
-        HTTP::Response.new(200, contents, headers)
+        response.status_code = 200
+        response << contents
       end
+
+      nil
     end
 
-    private def local_path(request)
-      path = URI.unescape(request.path)
-      expanded_path = File.expand_path(path, "/") # protect against directory traversal
+    private def local_path(ctx)
+      path = URI.unescape(ctx.path)
+
+      # protect against directory traversal
+      expanded_path = File.expand_path(path, "/")
+
       File.join(@publicdir, expanded_path)
     end
 

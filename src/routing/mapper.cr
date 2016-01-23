@@ -220,7 +220,8 @@ module Frost
         end
 
         io << "class Dispatcher < Frost::Dispatcher\n"
-        io << "  def _dispatch(request, params)\n"
+        io << "  def _dispatch(context, params)\n"
+        io << "    request = context.request\n"
 
         if aggregate.any?
           io << "    case request.method.upcase\n"
@@ -233,7 +234,7 @@ module Frost
           io << "    end\n\n"
 
           io << "    if controller\n"
-          io << "      controller.response\n"
+          io << "      context\n"
           io << "    else\n"
           io << "      raise Frost::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
           io << "    end\n"

@@ -11,19 +11,26 @@ module Frost
     # rendered, otherwise a 500 Internal Server Error page is rendered. You
     # may customize the rendered pages by overloading the `#not_found` and
     # `#internal_server_error` methods.
-    def call(request)
-      dispatch(request)
-    rescue ex : Frost::Routing::RoutingError
-      not_found(request, ex)
-    rescue ex
-      Frost.logger.error { "#{ ex.class.name }: #{ ex.message }" }
-      internal_server_error(request, ex)
+    def call(context)
+      begin
+        dispatch(context)
+      rescue ex : Frost::Routing::RoutingError
+        not_found(context, ex)
+      rescue ex
+        Frost.logger.error { "#{ ex.class.name }: #{ ex.message }" }
+        internal_server_error(context, ex)
+      end
+
+      context.response.flush
+
+      nil
     ensure
       Record.release_connection
     end
 
     # :nodoc:
-    def dispatch(request)
+    def dispatch(context)
+      request = context.request
       params = Frost::Controller::Params.parse(request.query)
 
       if request.headers["Content-Type"]? == "application/x-www-form-urlencoded"
@@ -36,26 +43,28 @@ module Frost
         end
       end
 
-      _dispatch(request, params)
+      _dispatch(context, params)
     end
 
     # Dispatches a request to the appropriate controller and action.
     #
     # This method is usually implemented by Mapper.
-    abstract def _dispatch(request, params)
+    abstract def _dispatch(context, params)
 
     # TODO: render a generic 404 page (production)
-    def not_found(request, ex)
-      response = HTTP::Response.new(404, "#{ ex.message }\n")
-      response.headers["Content-Type"] = "text/plain"
-      response
+    def not_found(context, ex)
+      response = context.response
+      response.status_code = 404
+      response.content_type = "text/plain"
+      response.body = "#{ ex.message }\n"
     end
 
     # TODO: render a generic 500 page (production)
-    def internal_server_error(request, ex)
-      response = HTTP::Response.new(500, "#{ ex.class.name }: #{ ex.message }\n#{ ex.backtrace.join("\n") }")
-      response.headers["Content-Type"] = "text/plain"
-      response
+    def internal_server_error(context, ex)
+      response = context.response
+      response.status_code = 500
+      response.content_type = "text/plain"
+      response.body = "#{ ex.class.name }: #{ ex.message }\n#{ ex.backtrace.join("\n") }"
     end
   end
 end

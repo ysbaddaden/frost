@@ -3,6 +3,7 @@ require "frost/server/handlers/log_handler"
 require "frost/server/handlers/public_file_handler"
 require "frost/server/handlers/deflate_handler"
 require "frost/server/handlers/https_everywhere_handler"
+require "option_parser"
 require "./config/bootstrap"
 
 host = "localhost"
@@ -32,8 +33,8 @@ begin
   ]
   dispatcher = <%= name.camelcase %>::Dispatcher.new
 
-  server = HTTP::Server.new(host, port, handlers) do |request|
-    dispatcher.call(request)
+  server = HTTP::Server.new(host, port, handlers) do |context|
+    dispatcher.call(context)
   end
 
   puts "Listening on http://#{ host }:#{ port }"

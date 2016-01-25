@@ -25,8 +25,8 @@ abstract class Frost::Server
     end
 
     def redirect_to_https(ctx)
-      ctx.response.headers["Location"] =
-        "https://#{ ctx.request.headers["Host"] }#{ ctx.request.resource }"
+      ctx.response.status_code = status_code
+      ctx.response.headers["Location"] = "https://#{ ctx.request.headers["Host"] }#{ ctx.request.resource }"
       nil
     end
   end

@@ -6,8 +6,8 @@ module Frost::Routing
   abstract class RoutingTest < Minitest::Test
     def dispatch(method, url, headers = nil, body = nil)
       ctx = context_for(method, url, headers, body)
-      dispatcher.dispatch(ctx)
-      ctx.response
+      controller = dispatcher.dispatch(ctx)
+      controller.response
     end
 
     def context_for(method, url, headers = nil, body = nil)

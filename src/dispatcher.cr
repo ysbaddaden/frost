@@ -56,7 +56,7 @@ module Frost
       response = context.response
       response.status_code = 404
       response.content_type = "text/plain"
-      response.body = "#{ ex.message }\n"
+      response << "#{ ex.message }\n"
     end
 
     # TODO: render a generic 500 page (production)
@@ -64,7 +64,7 @@ module Frost
       response = context.response
       response.status_code = 500
       response.content_type = "text/plain"
-      response.body = "#{ ex.class.name }: #{ ex.message }\n#{ ex.backtrace.join("\n") }"
+      response << "#{ ex.class.name }: #{ ex.message }\n#{ ex.backtrace.join("\n") }"
     end
   end
 end

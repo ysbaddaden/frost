@@ -37,14 +37,14 @@ module Frost
 
       # run action
       controller.run_action { controller.index }
-      ctx.response.flush
+      controller.response.close
 
       # parse response
       io.rewind
       response = HTTP::Client::Response.from_io(io)
 
       # rendered body (altered in after filter)
-      assert_equal 25, response.headers["Content-Length"].to_i
+      assert_nil response.headers["Content-Length"]?
       assert_equal "index (with after filter)", response.body
 
       # executed before filters

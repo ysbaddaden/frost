@@ -40,32 +40,4 @@ class HTTP::Server::Response
   def cookies
     @cookies ||= Cookies.new(self)
   end
-
-  def body
-    @body || ""
-  end
-
-  def body?
-    @body
-  end
-
-  def body=(str)
-    self.content_length = str.bytesize
-    @body = str
-    #self << str
-    #flush
-  end
-
-  def flush
-    if (body = @body) && !@flushed_body
-      self << body
-      @flushed_body = true
-    end
-    @output.flush
-  end
-
-  def close
-    flush
-    @output.close
-  end
 end

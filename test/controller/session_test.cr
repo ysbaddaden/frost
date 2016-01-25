@@ -46,7 +46,7 @@ module Frost
       %controller = AppController.new(%context, {} of String => String, {{ action }})
       %controller.run_action { %controller.{{ action.id }} }
 
-      %context.response
+      %controller.response
     end
 
     def test_session_lifetime

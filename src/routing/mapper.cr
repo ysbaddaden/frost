@@ -234,7 +234,7 @@ module Frost
           io << "    end\n\n"
 
           io << "    if controller\n"
-          io << "      context\n"
+          io << "      controller\n"
           io << "    else\n"
           io << "      raise Frost::Routing::RoutingError.new(\"No route for \#{ request.method.upcase } \#{ request.path.inspect }\")\n"
           io << "    end\n"

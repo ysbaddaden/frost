@@ -41,7 +41,7 @@ module Frost
       context = HTTP::Server::Context.new(request, response)
 
       dispatcher.call(context)
-      response.flush
+      response.close
 
       io.rewind
       HTTP::Client::Response.from_io(io)

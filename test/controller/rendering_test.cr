@@ -54,7 +54,7 @@ module Frost
           %controller.{{ action_name.id }}
         end
 
-        %context.response
+        %controller.response
       end
 
       def test_head

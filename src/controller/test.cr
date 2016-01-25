@@ -135,20 +135,22 @@ module Frost
       {% end %}
 
       private def execute_request(request, userinfo)
-        @response = HTTP::Server::Response.new(MemoryIO.new)
-        context = HTTP::Server::Context.new(request, response)
+        http_io = MemoryIO.new
+        http_response = HTTP::Server::Response.new(http_io)
+        context = HTTP::Server::Context.new(request, http_response)
 
         if @session
-          Session::TestStore.new(request, response).set_data(session)
+          Session::TestStore.new(request, context.response).set_data(session)
         end
 
         if userinfo
           request.headers["Authorization"] = "Basic #{Base64.encode(userinfo)}"
         end
 
-        dispatcher.call(context)
-        @session = Session::TestStore.new(response).read
+        controller = dispatcher.dispatch(context)
+        @response = controller.response
 
+        @session = Session::TestStore.new(controller.response).read
         nil
       end
     end

@@ -30,6 +30,42 @@ module Frost
         link_to(capture { yield }, url, attributes)
       end
 
+      # Formats an anchor HTML tag if +test+ if true, otherwise prints the
+      # anchor title only.
+      def link_to_if(test, title, url, attributes = nil)
+        if test
+          link_to(title, url, attributes)
+        else
+          title
+        end
+      end
+
+      def link_to_if(test, url, attributes = nil)
+        if test
+          link_to(url, attributes) { yield }
+        else
+          yield
+        end
+      end
+
+      # Formats an anchor HTML tag unless +test+ if true, otherwise prints the
+      # anchor title only.
+      def link_to_unless(test, title, url, attributes = nil)
+        if test
+          title
+        else
+          link_to(title, url, attributes)
+        end
+      end
+
+      def link_to_unless(test, url, attributes = nil)
+        if test
+          yield
+        else
+          link_to(url, attributes) { yield }
+        end
+      end
+
       # Formats a single button HTML form.
       # ```
       # button_to "remove", tag_path("name"), method: "delete", attributes: { "class" => "btn-danger" }

@@ -13,6 +13,28 @@ class Frost::View::UrlHelperTest < Minitest::Test
     assert_equal %(<a class="edit" href="/user/edit">profile</a>), link_to("profile", "/user/edit", { class: "edit" })
   end
 
+  def test_link_to_if
+    assert_equal %(somewhere), link_to_if(false, "somewhere", "/")
+    assert_equal %(<a href="/">somewhere</a>), link_to_if(true, "somewhere", "/")
+
+    assert_equal %(article), link_to_if(false, "/article/1") { "article" }
+    assert_equal %(<a href="/article/1">article</a>), link_to_if(true, "/article/1") { "article" }
+
+    assert_equal %(profile), link_to_if(false, "profile", "/user/edit", { class: "edit" })
+    assert_equal %(<a class="edit" href="/user/edit">profile</a>), link_to_if(true, "profile", "/user/edit", { class: "edit" })
+  end
+
+  def test_link_to_unless
+    assert_equal %(somewhere), link_to_unless(true, "somewhere", "/")
+    assert_equal %(<a href="/">somewhere</a>), link_to_unless(false, "somewhere", "/")
+
+    assert_equal %(article), link_to_unless(true, "/article/1") { "article" }
+    assert_equal %(<a href="/article/1">article</a>), link_to_unless(false, "/article/1") { "article" }
+
+    assert_equal %(profile), link_to_unless(true, "profile", "/user/edit", { class: "edit" })
+    assert_equal %(<a class="edit" href="/user/edit">profile</a>), link_to_unless(false, "profile", "/user/edit", { class: "edit" })
+  end
+
   def test_button_to
     assert_equal %(<form action="/url" class="button_to" method="post">#{utf8_enforcer_tag}<button>btn</button></form>),
       button_to("btn", "/url")

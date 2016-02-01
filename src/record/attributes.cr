@@ -16,14 +16,14 @@ module Frost
         io << "def initialize("
         table.columns.each_with_index do |column, index|
           io << ", " unless index == 0
-          io << "@" << column.name << " = " << (column.default || "nil")
-
-          if types = column.to_crystal
-            io << " : " << types
-            io << " | ::Nil" unless types.includes?("::Nil") || types.index("?")
-          end
+          io << column.name << " = " << (column.default || "nil")
         end
         io << ")\n"
+        table.columns.each do |column|
+          io << "  unless " << column.name << ".is_a?(Nil)\n"
+          io << "    self." << column.name << " = " << column.name << "\n"
+          io << "  end\n"
+        end
         io << "end\n\n"
       end
 
@@ -37,9 +37,9 @@ module Frost
         io << "end\n\n"
       end
 
-      # TODO: should attributes= have loose type restriction and break at runtime,
-      #       or continue to break at compilation?
       def generate_attributes_setter(io)
+        # TODO: should attributes= have loose type restriction and break at runtime,
+        #       or continue to break at compilation?
         io << "def attributes=(attributes : Hash)\n"
 
         table.columns.each do |column|
@@ -55,16 +55,6 @@ module Frost
             io << "  if #{ column.name } = attributes[#{ column.name.inspect }]?\n"
             io << "    self.#{ column.name } = (#{ column.name } as RecordValue) as #{ column.to_crystal }\n"
           end
-
-          #io << "    if #{ column.name }.is_a?(#{ column.to_crystal })\n"
-          #io << "      self.#{ column.name } = #{ column.name }\n"
-          #if column.null?
-          #  io << "    elsif #{ column.name }.is_a?(Nil)\n"
-          #  io << "      self.#{ column.name } = nil\n"
-          #end
-          #io << "    else\n"
-          #io << "      raise TypeError.new(\"#{ column_name } expects a #{ column.to_crystal } but got a #{ #{ column.name }.class.name }\")\n"
-          #io << "    end\n"
 
           if column.default?
             io << "  else\n"
@@ -112,7 +102,6 @@ module Frost
 
           # TODO: validate value limit/range
           io << "def " << column.name << "=(value : " << column.to_crystal << ")\n"
-          #io << "def " << column.name << "=(value)\n"
           io << "  @" << column.name << " = " << column.to_cast << "\n"
           io << "end\n\n"
 

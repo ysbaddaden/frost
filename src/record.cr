@@ -71,8 +71,10 @@ module Frost
     end
 
     macro inherited
-      generate_attributes
-      generate_associations
+      {% unless @type.abstract? %}
+        generate_attributes
+        generate_associations
+      {% end %}
     end
   end
 end

@@ -116,7 +116,9 @@ module Frost
         io << "def to_hash\n"
         io << "  {\n"
         table.columns.each do |column|
-          io << "    " << column.name.inspect << " => " << column.name << ",\n"
+          io << "    " << column.name.inspect << " => " << column.name
+          io << ".try(&.to_utc)" if column.type.to_s == "datetime"
+          io << ",\n"
         end
         io << "  }\n"
         io << "end\n\n"

@@ -29,6 +29,10 @@ module Frost
           def to_sql
             "timestamp"
           end
+
+          def to_s(io)
+            io << to_s
+          end
         end
       end
     end

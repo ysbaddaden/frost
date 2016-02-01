@@ -31,6 +31,10 @@ module Frost
               str
             end
           end
+
+          def to_s
+            self.class.name.demodulize.downcase
+          end
         end
 
       end

@@ -15,15 +15,13 @@ module Frost
             super "::Time | ::Int32 | ::Int64 | ::String"
           end
 
-          # TODO: parse datetime from String, using different common patterns
-          #       (eg: JSON, HTTP Header, ...)
           def to_cast
             ::String.build do |str|
               str << "case value\n"
               str << "  when Nil  then nil\n" if @nullable
               str << "  when Time then value\n"
-              str << "  when Int  then Time.at(value)\n"
-              str << "  else           raise \"TODO: parse datetimes from strings\"\n"
+              str << "  when Int  then Time.epoch(value)\n"
+              str << "  else           Time.parse(value.to_s)\n"
               str << "  end"
             end
           end

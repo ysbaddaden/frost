@@ -1,5 +1,19 @@
 # The Frost Changelog
 
+## v0.2.2 - 2016-02-18
+
+Fixes:
+- Upgraded to Crystal 0.11: matches redesign of HTTP::Server
+- Upgraded to Crystal 0.12: minor changes
+- Use ECR escapes to generate application layout
+- Record#initialize now uses setter methods
+- Allow classes inheriting Record to be abstract (ie. `abstract ApplicationModel < Frost::Record`)
+- Always save Record datetimes at UTC
+- Parse time strings: ISO8601, RFC822, JSON (as generally accepted)
+
+Features:
+- `link_to_if` and `link_to_unless` view helpers
+
 ## v0.2.1 - 2016-01-22
 
 Security Fixes:

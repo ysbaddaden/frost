@@ -76,7 +76,7 @@ module Frost
 
       macro template(template_name, path)
         %contents = String.build do |__buf__|
-          embed_ecr {{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }}, "__buf__"
+          ECR.embed({{ "#{ TEMPLATES_PATH.id }/#{ template_name.id }.ecr" }}, "__buf__")
         end
         write {{ path }}, %contents
       end

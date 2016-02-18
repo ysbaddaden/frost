@@ -16,7 +16,7 @@ module Frost
         return if fixture_ids[table_name]?
 
         file_name = File.basename(fixture_path)
-        data = YAML.load(File.read(fixture_path))
+        data = YAML.parse(File.read(fixture_path)).raw
         raise FixtureError.new("expected #{file_name} file to be a Hash") unless data.is_a?(Hash)
 
         Record.connection.execute("TRUNCATE #{ table_name }")

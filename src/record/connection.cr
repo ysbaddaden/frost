@@ -40,7 +40,7 @@ module Frost
           # FIXME: centralize frost environment
           environment = ENV.fetch("FROST_ENV", "development")
 
-          unless (hsh = YAML.load(string)).is_a?(Hash)
+          unless (hsh = YAML.parse(string).raw).is_a?(Hash)
             raise ConnectionError.new("Invalid 'database.yml'")
           end
 

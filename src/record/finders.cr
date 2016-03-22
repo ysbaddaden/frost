@@ -15,15 +15,15 @@ module Frost
         delegate :{{ method.id }}, :query
       {% end %}
 
-      def count(column_name = "*", distinct = false, group = nil : Nil)
+      def count(column_name = "*", distinct = false, group : Nil = nil)
         query.count(column_name, distinct, nil)
       end
 
-      def count(column_name = "*", distinct = false, group = "" : String | Symbol)
+      def count(column_name = "*", distinct = false, group : String | Symbol = "")
         query.count(column_name, distinct, group)
       end
 
-      def count(column_name = "*", distinct = false, group = nil : Array | Tuple)
+      def count(column_name = "*", distinct = false, group : Array | Tuple = nil )
         query.count(column_name, distinct, group)
       end
 
@@ -122,14 +122,14 @@ module Frost
         end
 
         # TODO: raise if data.group isn't empty (use count(group: columns) instead)
-        def count(column_name = "*", distinct = false, group = nil : Nil)
+        def count(column_name = "*", distinct = false, group : Nil = nil)
           distinct = distinct ? "DISTINCT " : ""
           column_name = with_table_name(column_name.to_s) unless column_name == "*"
           sql = select("COUNT(#{ distinct }#{ column_name })").to_sql
           Record.connection.select_values(sql)[0][0] as Int64
         end
 
-        def count(column_name = "*", distinct = false, group = "" : String | Symbol)
+        def count(column_name = "*", distinct = false, group : String | Symbol = "")
           distinct = distinct ? "DISTINCT " : ""
           quoted_column_name = column_name == "*" ? "*" : with_table_name(column_name.to_s)
           as_column_name = column_name == "*" ? "count_all" : "count_#{ column_name }"
@@ -141,7 +141,7 @@ module Frost
           end
         end
 
-        def count(column_name = "*", distinct = false, group = Tuple(String).new : Tuple)
+        def count(column_name = "*", distinct = false, group : Tuple = Tuple(String).new)
           distinct = distinct ? "DISTINCT " : ""
           quoted_column_name = column_name == "*" ? "*" : with_table_name(column_name.to_s)
           as_column_name = column_name == "*" ? "count_all" : "count_#{ column_name }"

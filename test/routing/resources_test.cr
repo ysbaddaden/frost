@@ -9,7 +9,7 @@ module Frost::Routing
                             search publish) %}
           def {{ action.id }}
             args = params.map { |k, v| "#{k}:#{v}" }.compact
-            render text: "#{request.method}: posts\#{{ action.id }} (#{ args.join(", ") })"
+            render text: "#{request.method}: posts##{ action_name } (#{ args.join(", ") })"
           end
         {% end %}
       end
@@ -18,7 +18,7 @@ module Frost::Routing
         {% for action in %w(index show new edit create update replace destroy) %}
           def {{ action.id }}
             args = params.map { |k, v| "#{k}:#{v}" }.compact
-            render text: "#{request.method}: comments\#{{ action.id }} (#{ args.join(", ") })"
+            render text: "#{request.method}: comments##{ action_name } (#{ args.join(", ") })"
           end
         {% end %}
       end
@@ -27,7 +27,7 @@ module Frost::Routing
         {% for action in %w(show new edit create update replace destroy posts) %}
           def {{ action.id }}
             args = params.map { |k, v| "#{k}:#{v}" }.compact
-            render text: "#{request.method}: users\#{{ action.id }} (#{ args.join(", ") })"
+            render text: "#{request.method}: users##{ action_name } (#{ args.join(", ") })"
           end
         {% end %}
       end

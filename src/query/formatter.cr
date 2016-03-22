@@ -81,7 +81,7 @@ module Frost
         end
       end
 
-      def to_sql(type = Type::SELECT : Type)
+      def to_sql(type : Type = Type::SELECT)
         String.build do |sql|
           case type
           when Type::SELECT

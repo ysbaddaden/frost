@@ -111,7 +111,7 @@ module Frost
 
       {% for method in %w(post put patch) %}
         # Issues a {{ method.upcase }} request, with a String body.
-        def {{ method.id }}(uri, body = nil : String, headers = nil, userinfo = nil)
+        def {{ method.id }}(uri, body : String = nil, headers = nil, userinfo = nil)
           url = URI.parse(uri)
           path = url.path || "/"
           path += "?#{url.query}" if url.query

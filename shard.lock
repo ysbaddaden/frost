@@ -2,7 +2,7 @@ version: 1.0
 shards:
   minitest:
     github: ysbaddaden/minitest.cr
-    version: 0.3.1
+    version: 0.3.2
 
   pg:
     github: will/crystal-pg
@@ -10,5 +10,5 @@ shards:
 
   pool:
     github: ysbaddaden/pool
-    version: 0.2.1
+    version: 0.2.2
 

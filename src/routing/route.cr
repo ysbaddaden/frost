@@ -6,7 +6,7 @@ module Frost
 
       property :path, :method, :controller, :action, :route_name
 
-      def initialize(@method : String, @path : String, @controller : String, @action : String, @route_name = nil : String?)
+      def initialize(@method : String, @path : String, @controller : String, @action : String, @route_name : String? = nil)
         # FIXME: types are defined to avoid a compiler bug with an empty route set
         #        see https://github.com/ysbaddaden/frost/issues/1#issuecomment-167912888
       end

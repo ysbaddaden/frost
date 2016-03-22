@@ -62,12 +62,12 @@ module Frost
 
           when Array
             io << " " << attr_name << "=\""
-            HTML.escape(value.join(" "), io)
+            html_escape(value.join(" "), io)
             io << "\""
 
           else
             io << " " << attr_name << "=\""
-            HTML.escape(value.to_s, io)
+            html_escape(value.to_s, io)
             io << "\""
           end
         end
@@ -83,6 +83,21 @@ module Frost
           attrs.merge!(attributes)
         end
         attrs
+      end
+
+      # :nodoc:
+      HTML_ESCAPE = {
+        '&' => "&amp;",
+        '>' => "&gt;",
+        '<' => "&lt;",
+        '"' => "&quot;",
+        '\'' => "&#39;"
+      }
+
+      protected def html_escape(string, io : IO)
+        string.each_char do |char|
+          io << HTML_ESCAPE.fetch(char, char)
+        end
       end
     end
   end

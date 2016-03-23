@@ -7,9 +7,9 @@ module Frost
       include Formatter
 
       # :nodoc:
-      getter :data
+      getter data : Data
 
-      def initialize(@table_name, @adapter, data = nil)
+      def initialize(@table_name : String, @adapter, data : Data? = nil)
         @data = data || Data.new
       end
 

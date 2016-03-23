@@ -37,8 +37,10 @@ module Frost
       # TODO: #sample
       class Executor(T) < Frost::Query::Builder
         # :nodoc:
-        def initialize(@klass : T.class, data = Frost::Query::Data.new)
-          super(@klass.table_name, Record.connection, data)
+        def initialize(@klass : T.class, data : Frost::Query::Data? = nil)
+          @table_name = @klass.table_name
+          @adapter = Record.connection
+          @data = data || Frost::Query::Data.new
         end
 
         macro method_missing(name, args, block)

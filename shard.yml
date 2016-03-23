@@ -1,5 +1,5 @@
 name: frost
-version: 0.2.2
+version: 0.2.3
 description: Full featured Web framework (MVC)
 
 authors:
@@ -12,11 +12,11 @@ dependencies:
 
   pool:
     github: ysbaddaden/pool
-    version: ">= 0.2.0"
+    version: ">= 0.2.2"
 
 development_dependencies:
   minitest:
     github: ysbaddaden/minitest.cr
-    version: ">= 0.2.0"
+    version: ">= 0.3.2"
 
 license: MIT

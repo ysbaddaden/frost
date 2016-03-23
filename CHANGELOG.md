@@ -1,5 +1,10 @@
 # The Frost Changelog
 
+## v0.2.3 - 2016-03-23
+
+Fixes:
+- Upgraded to Crystal 0.14: breaking changes
+
 ## v0.2.2 - 2016-02-18
 
 Fixes:

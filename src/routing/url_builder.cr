@@ -6,7 +6,10 @@ module Frost
       PARAM_NAME_RE = /([*:][\w\d_]+)/
       URL_PARAMS = %w(protocol host)
 
-      getter :required_params, :optional_params
+      getter required_params
+      getter optional_params
+      @path : String
+      @parsed_path : String
 
       def initialize(@path)
         @required_params = [] of String

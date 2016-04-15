@@ -9,6 +9,8 @@ module Frost
 
         {% ASSOCIATIONS[name.symbolize] = :has_one %}
 
+        @{{ name }} : {{ model_name }}?
+
         def {{ name }}(reload = false)
           @{{ name }} = nil if reload
           @{{ name }} ||= {{ model_name }}.find_by({ {{ foreign_key }}: id })

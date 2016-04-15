@@ -4,7 +4,11 @@ module Frost
   module Database
     class PostgreSQL
       class Table
-        getter :name
+        getter pg : PostgreSQL
+        getter name : String
+        @primary_key : String?
+        @primary_key_type : String?
+        @columns : Array(Column)?
 
         def initialize(@pg, name)
           @name = name.to_s

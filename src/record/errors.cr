@@ -13,7 +13,7 @@ module Frost
     end
 
     class RecordInvalid < Error
-      getter :record
+      getter record : Record
 
       def initialize(@record)
         errors = record.errors.full_messages.join(", ")
@@ -22,7 +22,7 @@ module Frost
     end
 
     class RecordNotSaved < Error
-      getter :record
+      getter record : Record
 
       def initialize(@record)
         super "Failed to save #{ record.class.name }"
@@ -30,7 +30,7 @@ module Frost
     end
 
     class RecordNotDestroyed < Error
-      getter :record
+      getter record : Record
 
       def initialize(@record)
         super "Failed to destroy #{ record.class.name }"

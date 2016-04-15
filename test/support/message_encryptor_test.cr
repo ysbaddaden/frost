@@ -3,6 +3,8 @@ require "../../src/support/message_encryptor"
 
 module Frost::Support
   class MessageEncryptorTest < Minitest::Test
+    @key : String?
+
     def key
       @key ||= begin
                  cipher = OpenSSL::Cipher.new(MessageEncryptor::DEFAULT_CIPHER)

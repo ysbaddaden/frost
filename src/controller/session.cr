@@ -17,7 +17,7 @@ module Frost
       def session_options
         {
           cookie_name: "_session",
-          expire_after: 20.minutes.to_i,
+          expire_after: 20.minutes,
         }
       end
 
@@ -26,9 +26,11 @@ module Frost
         CookieStore
       end
 
+      @session : Store?
+
       # The actual session object. See `Store`.
       def session
-        @session ||= session_store.new(request, response, session_options)
+        @session ||= session_store.new(request, context.response, session_options)
       end
 
       # Overload to either enable or disable sessions automatically. Defaults to

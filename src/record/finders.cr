@@ -38,9 +38,7 @@ module Frost
       class Executor(T) < Frost::Query::Builder
         # :nodoc:
         def initialize(@klass : T.class, data : Frost::Query::Data? = nil)
-          @table_name = @klass.table_name
-          @adapter = Record.connection
-          @data = data || Frost::Query::Data.new
+          super(@klass.table_name, Record.connection, data)
         end
 
         macro method_missing(name, args, block)
@@ -50,6 +48,8 @@ module Frost
             @klass.{{ name.id }}(context: self)
           {% end %}
         end
+
+        @records : Array(T)?
 
         def to_a
           @records ||= begin
@@ -270,9 +270,7 @@ module Frost
         # # => UPDATE comments SET spam = 't' WHERE spam IS NULL;
         # ```
         def update_all(attributes)
-          query = dup
-          query.data.updates = attributes
-          Record.connection.execute(query.to_sql(Query::Type::UPDATE))
+          Record.connection.execute(to_sql(Query::Type::UPDATE, attributes))
         end
 
         def destroy

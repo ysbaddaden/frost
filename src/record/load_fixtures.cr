@@ -1,7 +1,9 @@
 require "../support/core_ext/string"
 
 class LoadFixtures
-  def initialize(@path)
+  @models : Array(Tuple(String, String, String))?
+
+  def initialize(@path : String)
   end
 
   def models

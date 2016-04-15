@@ -91,7 +91,8 @@ module Frost
       TEMPLATES_PATH = "#{ __DIR__ }/generators/application"
 
       include ShellActions
-      getter :name, :app_path, :templates_path
+      getter name : String
+      getter app_path : String
 
       def initialize(@app_path)
         @name = File.basename(app_path)

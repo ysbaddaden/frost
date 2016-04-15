@@ -8,7 +8,8 @@ module Frost
         COLUMN_TYPES = %w(
           string text integer float datetime date time boolean uuid json jsonb
         )
-        getter :name
+        getter name : Symbol
+        @pg : PostgreSQL
 
         def initialize(@pg, @name)
           @columns = [] of Column

@@ -4,7 +4,11 @@ module Frost
     class Route
       FIND_PARAM_NAME = /[*:]([\w\d_]+)/
 
-      property :path, :method, :controller, :action, :route_name
+      property path : String
+      property method : String
+      property controller : String
+      property action : String
+      property route_name : String?
 
       def initialize(@method : String, @path : String, @controller : String, @action : String, @route_name : String? = nil)
         # FIXME: types are defined to avoid a compiler bug with an empty route set

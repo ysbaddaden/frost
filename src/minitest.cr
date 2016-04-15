@@ -4,6 +4,7 @@ require "./controller/test"
 
 class Minitest::Test
   include Frost::Record::TransactionalFixtures
+  @transaction : Frost::Database::Transaction?
 
   def before_setup
     super

@@ -1,7 +1,9 @@
 module Frost
   module Database
     class Transaction
-      private getter :stack
+      private getter conn : Frost::Database::PostgreSQL
+      private getter stack : Array(Transaction)
+      @count : Int32
 
       def initialize(@conn, @stack)
         @committed = @rolledback = false
@@ -27,9 +29,9 @@ module Frost
 
       def begin
         if savepoint?
-          @conn.execute("SAVEPOINT #{ savepoint }")
+          conn.execute("SAVEPOINT #{ savepoint }")
         else
-          @conn.execute("BEGIN")
+          conn.execute("BEGIN")
         end
       end
 
@@ -39,9 +41,9 @@ module Frost
         end
 
         if savepoint?
-          @conn.execute("ROLLBACK TO SAVEPOINT #{ savepoint }")
+          conn.execute("ROLLBACK TO SAVEPOINT #{ savepoint }")
         else
-          @conn.execute("ROLLBACK")
+          conn.execute("ROLLBACK")
         end
 
         @rolledback = true
@@ -55,9 +57,9 @@ module Frost
         end
 
         if savepoint?
-          @conn.execute("RELEASE SAVEPOINT #{ savepoint }")
+          conn.execute("RELEASE SAVEPOINT #{ savepoint }")
         else
-          @conn.execute("COMMIT")
+          conn.execute("COMMIT")
         end
 
         @committed = true

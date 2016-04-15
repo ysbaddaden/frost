@@ -4,7 +4,8 @@ require "./connection"
 module Frost
   abstract class Record
     class Attributes
-      getter :class_name, :table
+      getter class_name : String
+      getter table : Database::PostgreSQL::Table
 
       def initialize(@class_name)
         @table = Record.connection do |conn|
@@ -35,6 +36,12 @@ module Frost
         end
         io << "  }\n"
         io << "end\n\n"
+      end
+
+      def generate_ivars(io)
+        table.columns.each do |column|
+          io << "@#{ column.name } : #{ column.as_crystal } | ::Nil\n"
+        end
       end
 
       def generate_attributes_setter(io)
@@ -140,6 +147,7 @@ module Frost
         io << "@@primary_key_type = " << (table.primary_key_type || "Int32") << "\n"
         io << "@@attribute_names = {" << table.attribute_names.map(&.inspect).join(", ") << "}\n\n"
 
+        generate_ivars(io)
         generate_initialize(io)
         generate_columns(io)
         generate_from_pg_result(io)

@@ -20,21 +20,25 @@ module Frost
           new(name, type, limit, null, row["column_default"], precision, scale, primary_key)
         end
 
-        property :name
-        property :type
-        property :limit
-        property :default
-        property :precision
-        property :scale
+        property name : String
+        property type : OID::Type
+        property limit : Int32?
+        property default : Array(JSON::Any) | Bool | Float32 | Float64 | Int8 | Int16 | Int32 | Int64 | JSON::Any | Slice(UInt8) | String | Time | Nil
+        property precision : Int32?
+        property scale : Int32?
 
-        def initialize(@name : String,
-                       @type,
-                       @limit = nil,
-                       @null = true,
-                       @default = nil,
-                       @precision = nil,
-                       @scale = nil,
-                       @primary_key = false)
+        def initialize(
+          @name : String,
+          @type,
+          @limit = nil,
+          @null = true,
+          @default = nil,
+          precision = nil,
+          scale = nil,
+          @primary_key = false
+        )
+          @precision = precision as Int32?
+          @scale = scale as Int32?
         end
 
         def default(drop_functions = true)

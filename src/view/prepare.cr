@@ -5,21 +5,17 @@ module Frost
   abstract class View
     # :nodoc:
     class PrepareViews
-      getter :views_path
+      getter views_path : String
 
       def initialize(views_path, controller_name)
-        @controller_path = controller_name
+        controller_path = controller_name
           .gsub(/View\Z/, "")
           .split("::")
           .map(&.underscore)
           .join('/')
 
-        path = File.join(views_path, @controller_path)
-        @views_path = if Dir.exists?(path)
-                        File.realpath(path)
-                      else
-                        path
-                      end
+        path = File.join(views_path, controller_path)
+        @views_path = Dir.exists?(path) ?  File.realpath(path) : path
 
         @actions = {} of String => Array(String)
       end

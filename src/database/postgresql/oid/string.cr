@@ -5,7 +5,7 @@ module Frost
     class PostgreSQL
       module OID
         class String < Type
-          getter :limit
+          getter limit : Int32?
 
           def initialize(@nullable, limit = 255)
             @limit = limit || 255

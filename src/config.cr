@@ -1,6 +1,8 @@
 module Frost
   module Config
     macro attribute(name, type)
+      @@{{ name.id }} : {{ type.id }}?
+
       def self.{{ name.id }}
         @@{{ name.id }} as {{ type.id }}
       end

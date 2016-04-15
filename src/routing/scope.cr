@@ -64,6 +64,10 @@ module Frost
       end
 
       private def scopes
+        Scope.scopes
+      end
+
+      protected def self.scopes
         @@scopes ||= [{} of Symbol => String]
       end
     end

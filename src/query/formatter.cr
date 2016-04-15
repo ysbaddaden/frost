@@ -69,13 +69,17 @@ module Frost
       end
 
       def limit_clause(sql)
-        sql << " LIMIT #{ data.limit }" if data.limit
-        sql << " OFFSET #{ data.offset }" if data.offset
+        if limit = data.limit
+          sql << " LIMIT #{ limit }"
+        end
+        if offset = data.offset
+          sql << " OFFSET #{ offset }"
+        end
       end
 
-      def update_clause(sql)
+      def update_clause(sql, values)
         sql << "SET "
-        data.updates.not_nil!.each_with_index do |attr, value, index|
+        values.each_with_index do |attr, value, index|
           sql << ", " unless index == 0
           sql << adapter.quote(attr) << " = " << adapter.escape(value)
         end
@@ -94,17 +98,26 @@ module Frost
             order_clause(sql)
             limit_clause(sql)
           when Type::UPDATE
-            sql << "UPDATE #{ adapter.quote(@table_name) } "
-            update_clause(sql)
-            where_clause(sql)
-            order_clause(sql)
-            limit_clause(sql)
+            raise "Can't UPDATE without values"
           when Type::DELETE
             sql << "DELETE FROM #{ adapter.quote(@table_name) }"
             where_clause(sql)
             order_clause(sql)
             limit_clause(sql)
           end
+        end
+      end
+
+      def to_sql(type : Type, values)
+        unless type = Type::UPDATE
+          raise "Can't #{type} with values"
+        end
+        String.build do |sql|
+          sql << "UPDATE #{ adapter.quote(@table_name) } "
+          update_clause(sql, values)
+          where_clause(sql)
+          order_clause(sql)
+          limit_clause(sql)
         end
       end
 

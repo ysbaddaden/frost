@@ -4,13 +4,14 @@ require "option_parser"
 
 module Frost
   abstract class Server
-    property :host, :port
+    property host
+    property port
 
     def initialize(@host = "localhost", @port = 9292)
     end
 
     def parse_cli_options
-        opts.parse(ARGV)
+      opts.parse(ARGV)
     rescue ex : OptionParser::InvalidOption
       STDERR.puts ex.message
       STDERR.puts

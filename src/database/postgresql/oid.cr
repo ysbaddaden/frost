@@ -33,7 +33,7 @@ module Frost
           when "uuid"
             UUID.new(nullable)
           else
-            Generic.new(nullable, udt_name)
+            Generic.new(udt_name, nullable)
           end
         end
 

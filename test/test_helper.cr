@@ -16,7 +16,7 @@ abstract class ApplicationView < Frost::View
 end
 
 class LayoutsView < ApplicationView
-  def initialize(@controller)
+  def initialize(@controller : Frost::Controller)
   end
 end
 

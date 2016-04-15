@@ -15,7 +15,14 @@ module Frost
         DEFAULT_POOL = 5
         DEFAULT_TIMEOUT = 5.0
 
-        property :adapter, :host, :port, :username, :password, :database, :pool, :timeout
+        property adapter : String
+        property host : String?
+        property port : Int32?
+        property username : String?
+        property password : String?
+        property database : String
+        property pool : Int32?
+        property timeout : Float64?
 
         def self.from(url)
           uri = URI.parse(url)
@@ -33,7 +40,7 @@ module Frost
             end
           end
 
-          new(uri.scheme, uri.host, uri.port, uri.user, uri.password, database, pool, timeout)
+          new(uri.scheme.not_nil!, uri.host, uri.port, uri.user, uri.password, database.not_nil!, pool, timeout)
         end
 
         def self.from_yaml(string)
@@ -94,6 +101,9 @@ module Frost
           @timeout || DEFAULT_TIMEOUT
         end
       end
+
+      @@pool : ConnectionPool(Database::PostgreSQL)?
+      @@configuration : Configuration?
 
       def self.pool
         @@pool ||= ConnectionPool.new(capacity: configuration.pool, timeout: configuration.timeout) do

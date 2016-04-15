@@ -31,7 +31,7 @@ module Frost
       }
 
       # :nodoc:
-      record Rule, re, block, replacement
+      record Rule, re : Regex, block : (String -> String)?, replacement : String?
 
       # :nodoc:
       PLURAL_RULES = [] of Rule

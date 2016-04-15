@@ -9,7 +9,7 @@ module Frost
       # :nodoc:
       getter data : Data
 
-      def initialize(@table_name : String, @adapter, data : Data? = nil)
+      def initialize(@table_name : String, @adapter : Database::Adapter, data : Data? = nil)
         @data = data || Data.new
       end
 

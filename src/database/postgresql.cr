@@ -1,8 +1,7 @@
 require "pg"
+require "./adapter"
 require "./errors"
 require "./transaction"
-require "./postgresql/table"
-require "./postgresql/table_definition"
 
 # :nodoc:
 module PG
@@ -26,8 +25,8 @@ end
 
 module Frost
   module Database
-    class PostgreSQL
-      getter :conn
+    class PostgreSQL < Adapter
+      getter conn : PG::Connection
 
       def initialize(url)
         @conn = PG.connect(url)
@@ -221,3 +220,6 @@ module Frost
     end
   end
 end
+
+require "./postgresql/table"
+require "./postgresql/table_definition"

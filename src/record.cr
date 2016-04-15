@@ -21,8 +21,14 @@ module Frost
     include Validation
     include Serialization
 
+    # FIXME: workaround until cvar types are inherited
+    macro inherited
+      @@table_name : String
+      @@table_name = name.tableize
+    end
+
     def self.table_name
-      @@table_name ||= name.tableize
+      @@table_name
     end
 
     def self.primary_key

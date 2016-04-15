@@ -5,6 +5,8 @@ module Frost
     class PostgreSQL
       module OID
         class Generic < String
+          @name : ::Symbol|::String
+
           def initialize(@name, @nullable)
           end
 

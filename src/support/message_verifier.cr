@@ -17,9 +17,10 @@ module Frost
 
       DEFAULT_DIGEST = :sha1
 
-      getter :key, :digest_name
+      getter key
+      getter digest_name
 
-      def initialize(@key : Slice, @digest_name = DEFAULT_DIGEST)
+      def initialize(@key : Slice(UInt8), @digest_name = DEFAULT_DIGEST)
       end
 
       def self.new(key : String, digest_name = DEFAULT_DIGEST)

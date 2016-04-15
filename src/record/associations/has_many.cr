@@ -7,7 +7,12 @@ module Frost
         # TODO: generate specific collection classes in has_many macro (+ yield
         #       macro block to add methods to the generated class)
 
-        def initialize(@relation, @foreign_key, @dependent)
+        # FIXME: Crystal won't infer these from Query::Builder
+        @adapter : Database::Adapter
+        @data : Query::Data
+        @table_name : String
+
+        def initialize(@relation : Record, @foreign_key : String, @dependent : Symbol?)
           super T
         end
 
@@ -111,6 +116,8 @@ module Frost
         {% foreign_key = (foreign_key || "#{ relation }_id").id %}
 
         {% ASSOCIATIONS[name.symbolize] = :has_many %}
+
+        @{{ name }} : HasManyCollection({{ model_name }})?
 
         def {{ name }}(reload = false)
           @{{ name }} = nil if reload

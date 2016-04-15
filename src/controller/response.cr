@@ -5,6 +5,8 @@ module Frost
     class Response
       forward_missing_to @original
 
+      @body : String?
+
       def initialize(@original : HTTP::Server::Response)
       end
 

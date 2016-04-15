@@ -21,7 +21,7 @@ module Frost
         end
 
         protected def data
-          @data ||= {} of String => String
+          @data ||= HTTP::Params.new({} of String => Array(String))
         end
       end
 
@@ -29,6 +29,8 @@ module Frost
         def generate_session_id
           SecureRandom.urlsafe_base64(16)
         end
+
+        @session_id : String?
 
         def regenerate_session_id
           @session_id = generate_session_id
@@ -47,6 +49,10 @@ module Frost
         include HashObject
         include Identifier
 
+        protected getter request : HTTP::Request
+        protected getter response : HTTP::Server::Response
+        protected getter options : Hash(Symbol, String | Time::Span)
+
         def initialize(@request, @response, @options)
         end
 
@@ -62,8 +68,6 @@ module Frost
         def inspect(io)
           @data.inspect(io)
         end
-
-        protected getter :request, :response, :options
 
         protected def set_cookie(name, value, expires = nil)
           expires ||= Time.at(Time.utc_now.to_i + options[:expire_after].to_i)

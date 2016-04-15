@@ -4,6 +4,9 @@ module Frost
       module OID
 
         abstract class Type
+          def initialize(@nullable = false)
+          end
+
           def to_crystal(str)
             if @nullable
               if str.not_nil!.index("|")

@@ -5,6 +5,7 @@ require "./controller/filtering"
 require "./controller/params"
 require "./controller/rendering"
 require "./controller/session"
+require "http/server/context"
 
 module Frost
   # Controllers are the logic of the Web Application.
@@ -74,24 +75,30 @@ module Frost
     include Rendering
     include Session
 
-    # The received `HTTP::Request` object.
-    getter :request
+    # The received request object.
+    getter context : HTTP::Server::Context
 
-    # The `HTTP::Response` object to be returned. Prefer the `Rendering` methods
-    # and avoid manipulating the response object directly.
-    getter :response
+    # The `Response` object to be returned. Prefer the `Rendering` methods and
+    # avoid manipulating the response object directly.
+    getter response : Frost::Controller::Response
 
     # Parsed request params (from the URI, query string and body).
-    getter :params
+    getter params : Hash(String, ParamType)|Hash(String, String)
 
     # Returns the current action as a String.
-    getter :action_name
+    getter action_name : String
 
     # :nodoc:
-    def initialize(context, @params, @action_name)
-      @request = context.request
+    def initialize(@context, @params, @action_name)
       @response = Response.new(context.response)
     end
+
+    # The received request object.
+    def request
+      context.request
+    end
+
+    @controller_name : String?
 
     # Returns the controller name as an underscored String.
     def controller_name

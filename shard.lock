@@ -2,13 +2,13 @@ version: 1.0
 shards:
   minitest:
     github: ysbaddaden/minitest.cr
-    version: 0.3.2
+    version: 0.3.3
 
   pg:
     github: will/crystal-pg
-    version: 0.5.0
+    commit: 4107a69d2d63a3c610b30e55be5de82f77ec06e9
 
   pool:
     github: ysbaddaden/pool
-    version: 0.2.2
+    commit: eda12cf38fcf0d70f10ea99ac0bb70a58ab0cdda
 

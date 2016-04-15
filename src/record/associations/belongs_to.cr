@@ -8,6 +8,8 @@ module Frost
 
         {% ASSOCIATIONS[name.symbolize] = :belongs_to %}
 
+        @{{ name }} : {{ model_name }}?
+
         def {{ name }}(reload = false)
           @{{ name }} = nil if reload
           @{{ name }} ||= begin

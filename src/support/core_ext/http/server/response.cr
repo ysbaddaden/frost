@@ -1,8 +1,9 @@
 require "http/server/response"
 
 class HTTP::Server::Response
-  class Cookies
-    def initialize(@response)
+  # FIXME: use crytal cookies
+  class FrostCookies
+    def initialize(@response : HTTP::Server::Response)
       @cookies = {} of String => Cookie
     end
 
@@ -37,7 +38,7 @@ class HTTP::Server::Response
     end
   end
 
-  def cookies
-    @cookies ||= Cookies.new(self)
+  def frost_cookies
+    @frost_cookies ||= FrostCookies.new(self)
   end
 end

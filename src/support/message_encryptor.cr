@@ -19,7 +19,7 @@ module Frost
 
       getter :key, :cipher_name
 
-      def initialize(@key : Slice, @cipher_name = DEFAULT_CIPHER)
+      def initialize(@key : Slice(UInt8), @cipher_name = DEFAULT_CIPHER)
       end
 
       def self.new(key : String, cipher_name = DEFAULT_CIPHER)

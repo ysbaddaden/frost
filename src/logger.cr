@@ -5,6 +5,8 @@ module Frost
     io << severity[0] << ", [" << datetime << " #" << Process.pid << "] " << message
   end
 
+  @@logger : Logger?
+
   def self.logger
     @@logger ||= begin
                    path = File.join(Frost.root, "log", "#{ Frost.environment }.log")

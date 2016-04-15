@@ -15,7 +15,9 @@ module Frost
         new(template, filename, buffer_name).process
       end
 
-      getter :lexer, :filename, :buffer_name
+      getter lexer : Lexer
+      getter filename : String
+      getter buffer_name : String
 
       def initialize(template, @filename, @buffer_name = "__buf__")
         @lexer = Lexer.new(template)

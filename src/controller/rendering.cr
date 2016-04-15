@@ -137,15 +137,12 @@ module Frost
       #
       # TODO: parse request's Accept header
       def format
-        @format ||= begin
-                      if format = params["format"]?
-                        if format.is_a?(String)
-                          return format
-                        end
-                      end
-
-                      default_format
-                    end
+        if format = params["format"]?
+          if format.is_a?(String)
+            return format
+          end
+        end
+        default_format
       end
 
       # Returns `"html"`. Overload to change to another format.

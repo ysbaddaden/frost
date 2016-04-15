@@ -300,6 +300,8 @@ module Frost
         end
       end
 
+      @@routes : Array(Route)?
+
       private def self.routes
         @@routes ||= begin
                        routes = Array(Route).new

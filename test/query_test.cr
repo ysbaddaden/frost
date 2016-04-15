@@ -132,7 +132,7 @@ module Frost
         end
       end
 
-      class MockAdapter
+      class MockAdapter < Database::Adapter
         def escape(value)
           case value
           when Int, Float

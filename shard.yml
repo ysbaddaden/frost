@@ -8,15 +8,17 @@ authors:
 dependencies:
   pg:
     github: will/crystal-pg
-    version: ">= 0.5.0"
+    #version: ">= 0.5.0"
+    branch: next-crystal
 
   pool:
     github: ysbaddaden/pool
-    version: ">= 0.2.2"
+    #version: ">= 0.2.2"
+    branch: master
 
 development_dependencies:
   minitest:
     github: ysbaddaden/minitest.cr
-    version: ">= 0.3.2"
+    version: ">= 0.3.3"
 
 license: MIT

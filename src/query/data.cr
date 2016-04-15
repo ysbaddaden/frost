@@ -2,15 +2,14 @@ module Frost
   module Query
     # :nodoc:
     class Data
-      property :selects
-      property :joins
-      property :wheres
-      property :groups
-      property :havings
-      property :orders
-      property :limit
-      property :offset
-      property :updates
+      property selects : Array(String)?
+      property joins : Array(String)?
+      property wheres : Array(String)?
+      property groups : Array(String)?
+      property havings : Array(String)?
+      property orders : Hash(String, String)?
+      property limit : Int32?
+      property offset : Int32?
 
       def dup
         Data.new.tap do |data|

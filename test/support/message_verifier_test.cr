@@ -4,12 +4,14 @@ require "../../src/support/message_verifier"
 
 module Frost::Support
   class MessageVerifierTest < Minitest::Test
+    @key : String?
+
     def key
       @key ||= SecureRandom.hex(16)
     end
 
     def verifier
-      MessageVerifier.new(key)
+      @verifier ||= MessageVerifier.new(key)
     end
 
     def test_sign_and_verify

@@ -93,6 +93,8 @@ module Frost
       include ShellActions
       getter :name, :app_path, :templates_path
 
+      @app_path : String
+
       def initialize(@app_path)
         @name = File.basename(app_path)
       end

@@ -83,7 +83,7 @@ class Frost::ControllerTest < Minitest::Test
 
   macro call(action, params = {} of String => String)
     %context, %io = new_context
-    %controller = X.new(%context, {{params}})
+    %controller = X.new(%context, ({{params}}).reduce(Hash(String, String?).new) { |a, (k, v)| a[k] = v; a })
     %controller.{{action.id}}()
     %context.response.close
     HTTP::Client::Response.from_io(%io.rewind)

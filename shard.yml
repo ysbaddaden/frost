@@ -4,10 +4,6 @@ version: 0.1.0.alpha
 authors:
   - Julien Portalier <julien@portalier.com>
 
-dependencies:
-  radix:
-    github: luislavena/radix
-
 development_dependencies:
   earl:
     github: ysbaddaden/earl

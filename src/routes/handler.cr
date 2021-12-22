@@ -1,15 +1,14 @@
 require "http/server"
-require "radix"
+require "./route_set"
 
-class Frost::Router::RadixHandler
+class Frost::Routes::Handler
   include HTTP::Handler
 
-  alias Callback = HTTP::Server::Context, Hash(String, String) -> Nil
-  alias Router = Radix::Tree(Callback)
+  alias Callback = Proc(HTTP::Server::Context, Frost::Routes::Params, Nil)
 
   # TODO: configure block to call on NO SUCH ROUTE event
   def initialize(@fallthrough = false)
-    @routers = {} of String => Router
+    @routes = {} of String => RouteSet(Callback)
   end
 
   def configure
@@ -23,23 +22,29 @@ class Frost::Router::RadixHandler
   {% end %}
 
   def match(http_method, path, &block : Callback)
-    router = @routers[http_method.upcase] ||= Router.new
-    router.add(path, block)
+    (@routes[http_method.upcase] ||= RouteSet(Callback).new).add(path, block)
   end
 
   def call(context : HTTP::Server::Context)
     request = context.request
-    router = @routers[request.method] ||= Router.new
-    result = router.try(&.find(request.path))
 
-    if result.found?
-      result.payload.call(context, result.params)
-      context.response.flush
-    elsif @fallthrough
+    if routes = @routes[request.method]?
+      routes.each(request.path) do |match|
+        # TODO: next unless matches constraints
+        return call(context, match)
+      end
+    end
+
+    if @fallthrough
       call_next(context)
     else
       no_such_route(context)
     end
+  end
+
+  private def call(context, result)
+    result.payload.call(context, result.params)
+    context.response.flush
   end
 
   private def no_such_route(context)

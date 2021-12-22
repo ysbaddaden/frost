@@ -7,7 +7,7 @@ class Frost::Controller
   protected getter context : HTTP::Server::Context
   protected getter request : HTTP::Request
   protected getter response : HTTP::Server::Response
-  protected getter params : Hash(String, String)
+  protected getter params : Frost::Routes::Params
 
   def initialize(@context, @params)
     @request = @context.request

@@ -1,2 +1,2 @@
 require "./env"
-require "./router"
+require "./routes"

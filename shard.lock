@@ -1,5 +1,9 @@
 version: 2.0
 shards:
+  amber_router:
+    git: https://github.com/amberframework/amber-router.git
+    version: 0.4.4
+
   earl:
     git: https://github.com/ysbaddaden/earl.git
     version: 0.2.0
@@ -7,8 +11,4 @@ shards:
   minitest:
     git: https://github.com/ysbaddaden/minitest.cr.git
     version: 1.0.1
-
-  radix:
-    git: https://github.com/luislavena/radix.git
-    version: 0.4.1
 

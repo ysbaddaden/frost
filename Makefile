@@ -2,7 +2,7 @@
 
 CRYSTAL = crystal
 CRFLAGS =
-TESTS = test/*_test.cr
+TESTS = test/*_test.cr test/**/*_test.cr
 OPTS =
 
 all: test

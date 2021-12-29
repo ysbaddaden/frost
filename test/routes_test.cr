@@ -135,10 +135,12 @@ class Frost::RoutesTest < Minitest::Test
   def test_match
     Frost.draw_routes do
       match "link", "/test", controller: X, action: "before"
+      match "get", "/", controller: X, action: "after"
     end
 
     request "link", "/test", body: "X#before"
     request "LINK", "/test", body: "X#before"
+    request "GET", "/", body: "X#after"
   end
 
   def test_glob
@@ -154,13 +156,21 @@ class Frost::RoutesTest < Minitest::Test
   def test_format
     Frost.draw_routes do
       get "/posts.pdf", D, :d
-      get "/posts(.:format)", X, :extname
+      get "/posts", X, :extname
+
+      get "/posts/:id", X, :extname
+      get "/posts/:id.pdf", D, :d
     end
 
-    request "get", "/posts.pdf", body: "D#d"
     request "get", "/posts", body: "FORMAT: "
     request "get", "/posts.json", body: "FORMAT: json"
     request "get", "/posts.rss", body: "FORMAT: rss"
+    request "get", "/posts.pdf", body: "D#d"
+
+    request "get", "/posts/:123", body: "FORMAT: "
+    request "get", "/posts/:123.json", body: "FORMAT: json"
+    request "get", "/posts/:123.rss", body: "FORMAT: rss"
+    request "get", "/posts/:123.pdf", body: "D#d"
   end
 
   def test_controller

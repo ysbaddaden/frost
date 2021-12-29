@@ -29,8 +29,7 @@ class Frost::Routes::Handler
     request = context.request
 
     if routes = @routes[request.method]?
-      routes.each(request.path) do |match|
-        # TODO: next unless matches constraints
+      if match = routes.find(request.path)
         return call(context, match)
       end
     end

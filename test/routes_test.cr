@@ -145,10 +145,14 @@ class Frost::RoutesTest < Minitest::Test
 
   def test_glob
     Frost.draw_routes do
+      get "/api/articles/:id", D, :d
       get "/api/*path", X, :api_catch_all
       get "*path", X, :catch_all
     end
 
+    request "get", "/api/articles/123", body: "D#d"
+    request "get", "/api/articles/whatever_path/to_image.jpg", body: "API: articles/whatever_path/to_image.jpg"
+    request "get", "/api/articles/123/whatever_path/to_image.jpg", body: "API: articles/123/whatever_path/to_image.jpg"
     request "get", "/api/with/whatever_path/to_image.jpg", body: "API: with/whatever_path/to_image.jpg"
     request "get", "/whatever_path/to_file.pdf", body: "whatever_path/to_file.pdf"
   end

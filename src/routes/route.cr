@@ -5,10 +5,15 @@ module Frost::Routes
     @payload : T?
     @param_name : String?
     property format : String?
+    @glob = false
+    @has_param_child = false
 
     def initialize(@key : String, @children : Array(Route(T))? = nil)
       if @key.starts_with?(':')
         @param_name = @key.lstrip(':')
+      elsif @key.starts_with?('*')
+        @glob = true
+        @param_name = @key.lstrip('*')
       end
     end
 
@@ -18,6 +23,10 @@ module Frost::Routes
 
     def param_name : String
       @param_name.not_nil!
+    end
+
+    def glob? : Bool
+      @glob
     end
 
     def payload : T
@@ -30,6 +39,10 @@ module Frost::Routes
 
     def payload=(payload : T?)
       @payload = payload
+    end
+
+    def has_param_child? : Bool
+      @has_param_child
     end
 
     def add(segment : String) : Route(T)
@@ -52,6 +65,8 @@ module Frost::Routes
         children << node
       end
 
+      @has_param_child = true if node.param?
+
       node
     end
 
@@ -69,6 +84,8 @@ module Frost::Routes
       else
         @children = [node]
       end
+
+      @has_param_child = true if node.param?
     end
 
     def dup : Route(T)

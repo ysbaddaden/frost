@@ -75,10 +75,23 @@ module Frost::Routes
       params = Params.new
 
       parts.value.each_with_index do |node, index|
-        next unless node.param?
-        value = segments.value[index]
-        value = URI.decode(value) if value.includes?('%')
-        params[node.param_name] = value
+        if node.glob?
+          value = String.build do |str|
+            index.upto(segments.value.size - 1) do |i|
+              str << '/' unless i == index
+              str << segments.value[i]
+            end
+            if format
+              str << '.'
+              str << format
+            end
+          end
+          params[node.param_name] = value
+        elsif node.param?
+          value = segments.value[index]
+          value = URI.decode(value) if value.includes?('%')
+          params[node.param_name] = value
+        end
       end
 
       if format
@@ -97,17 +110,14 @@ module Frost::Routes
         is_last = index == segments.value.size - 1
 
         found = children.find do |child|
-          if child.key == segments.value[index]
-            # select matching node
-            if is_last
-              try_route_constraints
-            else
-              true
-            end
-          elsif child.param?
-            if child.children
+          if child.param?
+            if child.glob?
+              # abort: collect all remaining segments
+              parts.value << child
+              return true
+            elsif child.children
+              # abort: a nested child matched
               if try_branch(child, segments, index + 1, parts, format)
-                # abort: a nested child matched
                 return true
               end
             elsif is_last
@@ -116,6 +126,20 @@ module Frost::Routes
             else
               # abort: no children despite having more segments to match
               false
+            end
+          elsif child.key == segments.value[index]
+            # select matching node
+            if is_last
+              try_route_constraints
+            elsif node.has_param_child?
+              # try the current branch, allowing to backtrack if a branch
+              # doesn't match (because of glob routes)
+              if try_branch(child, segments, index + 1, parts, format)
+                return true
+              end
+            else
+              # select the segment
+              true
             end
           end
         end

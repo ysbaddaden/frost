@@ -46,18 +46,6 @@ class Frost::RoutesTest < Minitest::Test
     def after
       render plain: "X#after"
     end
-
-    def api_catch_all
-      render plain: "API: #{params["path"]}"
-    end
-
-    def catch_all
-      render plain: params["path"].to_s
-    end
-
-    def extname
-      render plain: "FORMAT: #{params["format"]?}"
-    end
   end
 
   class PostsController < Controller
@@ -141,40 +129,6 @@ class Frost::RoutesTest < Minitest::Test
     request "link", "/test", body: "X#before"
     request "LINK", "/test", body: "X#before"
     request "GET", "/", body: "X#after"
-  end
-
-  def test_glob
-    Frost.draw_routes do
-      get "/api/articles/:id", D, :d
-      get "/api/*path", X, :api_catch_all
-      get "*path", X, :catch_all
-    end
-
-    request "get", "/api/articles/123", body: "D#d"
-    request "get", "/api/articles/whatever_path/to_image.jpg", body: "API: articles/whatever_path/to_image.jpg"
-    request "get", "/api/articles/123/whatever_path/to_image.jpg", body: "API: articles/123/whatever_path/to_image.jpg"
-    request "get", "/api/with/whatever_path/to_image.jpg", body: "API: with/whatever_path/to_image.jpg"
-    request "get", "/whatever_path/to_file.pdf", body: "whatever_path/to_file.pdf"
-  end
-
-  def test_format
-    Frost.draw_routes do
-      get "/posts.pdf", D, :d
-      get "/posts", X, :extname
-
-      get "/posts/:id", X, :extname
-      get "/posts/:id.pdf", D, :d
-    end
-
-    request "get", "/posts", body: "FORMAT: "
-    request "get", "/posts.json", body: "FORMAT: json"
-    request "get", "/posts.rss", body: "FORMAT: rss"
-    request "get", "/posts.pdf", body: "D#d"
-
-    request "get", "/posts/:123", body: "FORMAT: "
-    request "get", "/posts/:123.json", body: "FORMAT: json"
-    request "get", "/posts/:123.rss", body: "FORMAT: rss"
-    request "get", "/posts/:123.pdf", body: "D#d"
   end
 
   def test_controller

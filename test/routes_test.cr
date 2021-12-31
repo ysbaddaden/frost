@@ -1,5 +1,6 @@
 require "./test_helper"
 require "earl/http_server"
+require "../lib/earl/test/support/rwlock"
 
 class Frost::RoutesTest < Minitest::Test
   class A < Controller
@@ -86,8 +87,16 @@ class Frost::RoutesTest < Minitest::Test
     end
   end
 
+  @@rwlock = Earl::RWLock.new
+
+  def setup
+    @@rwlock.lock_write
+  end
+
   def teardown
     Frost.clear_routes
+  ensure
+    @@rwlock.unlock_write
   end
 
   {% for http_method in %w[options head get post put patch delete].map(&.id) %}

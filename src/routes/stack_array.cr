@@ -7,7 +7,11 @@ module Frost::Routes
     end
 
     def [](index : Int32) : T
-      @buffer[index]
+      if index < @pos
+        @buffer.to_unsafe[index]
+      else
+        raise IndexError.new
+      end
     end
 
     def <<(node : T)

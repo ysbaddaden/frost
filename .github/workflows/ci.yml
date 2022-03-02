@@ -3,7 +3,7 @@ name: Continuous Integration
 on:
   push:
     tags:
-      - "v[0-9.]+"
+      - "v[0-9]*"
     branches:
       - "**"
 

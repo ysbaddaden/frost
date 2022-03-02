@@ -3,6 +3,7 @@ require "json"
 require "mime"
 
 # TODO: prevent double rendering
+# TODO: add `status:` kwarg to `render` methods.
 class Frost::Controller
   protected getter context : HTTP::Server::Context
   protected getter request : HTTP::Request
@@ -41,19 +42,18 @@ class Frost::Controller
   protected def send_data(contents : String | Bytes, *, filename = nil, disposition = "inline", type = nil) : Nil
     set_content_disposition(filename, disposition) if filename || disposition
     set_content_type(type, filename, default: "application/octet-stream")
-    response << contents
+    response.write(contents.to_slice)
   end
 
   protected def send_data(io : IO, *, filename = nil, disposition = "inline", type = nil) : Nil
     set_content_disposition(filename, disposition) if filename || disposition
     set_content_type(type, filename, default: "application/octet-stream")
-    IO.copy(response)
+    IO.copy(io, response)
   end
 
   protected def send_file(path : String | Path, *, filename = nil, disposition = "inline", type = nil) : Nil
-    set_content_disposition(filename, disposition) if filename || disposition
-    set_content_type(type, filename, default: "application/octet-stream")
-    File.open(path) { |io| IO.copy(io, response) }
+    filename ||= File.basename(path)
+    File.open(path) { |io| send_data io, filename: filename, disposition: disposition, type: type }
   end
 
   private def set_content_type(type, filename, default) : Nil
@@ -81,7 +81,7 @@ class Frost::Controller
   private def mime_type(type : Nil) : Nil
   end
 
-  private def set_content_disposition(*, filename = nil, disposition = "attachment") : Nil
+  private def set_content_disposition(filename = nil, disposition = "attachment") : Nil
     response.headers["content-disposition"] =
       if filename
         content_disposition(filename, disposition)

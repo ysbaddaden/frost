@@ -26,6 +26,53 @@ class Frost::ControllerTest < Minitest::Test
       render html: "<p>this is a <strong>HTML</strong> response</p>"
     end
 
+    def json
+      render json: { "status" => "error", "description" => "Some error message" }
+    end
+
+    def data_string
+      send_data_with "some raw data"
+    end
+
+    def data_bytes
+      send_data_with ("\0" * 128).to_slice
+    end
+
+    def data_io
+      send_data_with IO::Memory.new("\b" * 128)
+    end
+
+    private def send_data_with(object)
+      filename = params["filename"]?
+      disposition = params["disposition"]?
+
+      if filename && disposition
+        send_data object, filename: filename, disposition: disposition, type: params["type"]?
+      elsif filename
+        send_data object, filename: filename, type: params["type"]?
+      elsif disposition
+        send_data object, disposition: disposition, type: params["type"]?
+      else
+        send_data object, type: params["type"]?
+      end
+    end
+
+    def file
+      path = params["path"]? || "test/test_helper.cr"
+      filename = params["filename"]?
+      disposition = params["disposition"]?
+
+      if filename && disposition
+        send_file path, filename: filename, disposition: disposition, type: params["type"]?
+      elsif filename
+        send_file path, filename: filename, type: params["type"]?
+      elsif disposition
+        send_file path, disposition: disposition, type: params["type"]?
+      else
+        send_file path, type: params["type"]?
+      end
+    end
+
     private def status
       if status = params["status"]?
         HTTP::Status.from_value(status.to_i)
@@ -70,15 +117,92 @@ class Frost::ControllerTest < Minitest::Test
   end
 
   def test_render_json
-    skip "TODO: missing test"
+    response = call :json
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal "application/json; charset=utf-8", response.headers["content-type"]
+
+    body = JSON.parse(response.body)
+    assert_equal "error", body.as_h["status"]
+    assert_equal "Some error message", body.as_h["description"]
   end
 
-  def test_send_data
-    skip "TODO: missing test"
-  end
+  {% for name in %w[string bytes io] %}
+    def test_send_data_with_{{name.id}}
+      contents =
+        case {{name}}
+        when "string" then "some raw data"
+        when "bytes" then "\0" * 128
+        when "io" then "\b" * 128
+        end
+
+      response = call :data_{{name.id}}
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "application/octet-stream", response.headers["content-type"]
+      assert_equal "inline", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "filename" => "example.jpg" }
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "image/jpeg", response.headers["content-type"]
+      assert_equal "inline; filename=example.jpg", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "disposition" => "attachment" }
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "application/octet-stream", response.headers["content-type"]
+      assert_equal "attachment", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "filename" => "report.pdf", "disposition" => "attachment" }
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "application/pdf", response.headers["content-type"]
+      assert_equal "attachment; filename=report.pdf", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "filename" => "schema.json", "type" => "application/schema+json", "disposition" => "attachment" }
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "application/schema+json", response.headers["content-type"]
+      assert_equal "attachment; filename=schema.json", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "filename" => "feed.xml", "type" => "application/rss+xml" }
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "application/rss+xml", response.headers["content-type"]
+      assert_equal "inline; filename=feed.xml", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "filename" => "日本語学習サイト.html" }
+      assert_equal HTTP::Status::OK, response.status
+      assert_equal "text/html", response.headers["content-type"]
+      assert_equal "inline; filename*=UTF-8''%E6%97%A5%E6%9C%AC%E8%AA%9E%E5%AD%A6%E7%BF%92%E3%82%B5%E3%82%A4%E3%83%88.html", response.headers["content-disposition"]
+      assert_equal contents, response.body
+    end
+  {% end %}
 
   def test_send_file
-    skip "TODO: missing test"
+    response = call :file
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal "application/octet-stream", response.headers["content-type"]
+    assert_equal "inline; filename=test_helper.cr", response.headers["content-disposition"]
+    assert_equal File.read("test/test_helper.cr"), response.body
+
+    response = call :file, { "disposition" =>  "attachment", "type" => "text/plain" }
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal "text/plain", response.headers["content-type"]
+    assert_equal "attachment; filename=test_helper.cr", response.headers["content-disposition"]
+    assert_equal File.read("test/test_helper.cr"), response.body
+
+    response = call :file, { "path" => "test/fixtures/files/empty.jpg" }
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal "image/jpeg", response.headers["content-type"]
+    assert_equal "inline; filename=empty.jpg", response.headers["content-disposition"]
+    assert_equal File.read("test/fixtures/files/empty.jpg"), response.body
+
+    response = call :file, { "path" => "test/fixtures/files/empty.png", "filename" => "dot.png"}
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal "image/png", response.headers["content-type"]
+    assert_equal "inline; filename=dot.png", response.headers["content-disposition"]
+    assert_equal File.read("test/fixtures/files/empty.png"), response.body
   end
 
   macro call(action, params = {} of String => String)

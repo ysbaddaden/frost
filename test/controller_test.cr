@@ -19,15 +19,27 @@ class Frost::ControllerTest < Minitest::Test
     end
 
     def plain
-      render plain: "this is a plain text response"
+      if st = status
+        render plain: "this is a plain text response", status: st
+      else
+        render plain: "this is a plain text response"
+      end
     end
 
     def html
-      render html: "<p>this is a <strong>HTML</strong> response</p>"
+      if st = status
+        render html: "<p>this is a <strong>HTML</strong> response</p>", status: st
+      else
+        render html: "<p>this is a <strong>HTML</strong> response</p>"
+      end
     end
 
     def json
-      render json: { "status" => "error", "description" => "Some error message" }
+      if st = status
+        render json: { "status" => "error", "description" => "Some error message" }, status: st
+      else
+        render json: { "status" => "error", "description" => "Some error message" }
+      end
     end
 
     def data_string
@@ -52,6 +64,8 @@ class Frost::ControllerTest < Minitest::Test
         send_data object, filename: filename, type: params["type"]?
       elsif disposition
         send_data object, disposition: disposition, type: params["type"]?
+      elsif st = status
+        send_data object, type: params["type"]?, status: st
       else
         send_data object, type: params["type"]?
       end
@@ -68,6 +82,8 @@ class Frost::ControllerTest < Minitest::Test
         send_file path, filename: filename, type: params["type"]?
       elsif disposition
         send_file path, disposition: disposition, type: params["type"]?
+      elsif st = status
+        send_file path, type: params["type"]?, status: st
       else
         send_file path, type: params["type"]?
       end
@@ -107,11 +123,21 @@ class Frost::ControllerTest < Minitest::Test
     assert_equal HTTP::Status::OK, response.status
     assert_equal "text/plain; charset=utf-8", response.headers["content-type"]
     assert_equal "this is a plain text response", response.body
+
+    response = call :plain, { "status" => "409" }
+    assert_equal HTTP::Status::CONFLICT, response.status
+    assert_equal "text/plain; charset=utf-8", response.headers["content-type"]
+    assert_equal "this is a plain text response", response.body
   end
 
   def test_render_html
     response = call :html
     assert_equal HTTP::Status::OK, response.status
+    assert_equal "text/html; charset=utf-8", response.headers["content-type"]
+    assert_equal "<p>this is a <strong>HTML</strong> response</p>", response.body
+
+    response = call :html, { "status" => "422" }
+    assert_equal HTTP::Status::UNPROCESSABLE_ENTITY, response.status
     assert_equal "text/html; charset=utf-8", response.headers["content-type"]
     assert_equal "<p>this is a <strong>HTML</strong> response</p>", response.body
   end
@@ -120,7 +146,13 @@ class Frost::ControllerTest < Minitest::Test
     response = call :json
     assert_equal HTTP::Status::OK, response.status
     assert_equal "application/json; charset=utf-8", response.headers["content-type"]
+    body = JSON.parse(response.body)
+    assert_equal "error", body.as_h["status"]
+    assert_equal "Some error message", body.as_h["description"]
 
+    response = call :json, { "status" => "500" }
+    assert_equal HTTP::Status::INTERNAL_SERVER_ERROR, response.status
+    assert_equal "application/json; charset=utf-8", response.headers["content-type"]
     body = JSON.parse(response.body)
     assert_equal "error", body.as_h["status"]
     assert_equal "Some error message", body.as_h["description"]
@@ -137,6 +169,12 @@ class Frost::ControllerTest < Minitest::Test
 
       response = call :data_{{name.id}}
       assert_equal HTTP::Status::OK, response.status
+      assert_equal "application/octet-stream", response.headers["content-type"]
+      assert_equal "inline", response.headers["content-disposition"]
+      assert_equal contents, response.body
+
+      response = call :data_{{name.id}}, { "status" => "201" }
+      assert_equal HTTP::Status::CREATED, response.status
       assert_equal "application/octet-stream", response.headers["content-type"]
       assert_equal "inline", response.headers["content-disposition"]
       assert_equal contents, response.body
@@ -182,6 +220,12 @@ class Frost::ControllerTest < Minitest::Test
   def test_send_file
     response = call :file
     assert_equal HTTP::Status::OK, response.status
+    assert_equal "application/octet-stream", response.headers["content-type"]
+    assert_equal "inline; filename=test_helper.cr", response.headers["content-disposition"]
+    assert_equal File.read("test/test_helper.cr"), response.body
+
+    response = call :file, { "status" => "400" }
+    assert_equal HTTP::Status::BAD_REQUEST, response.status
     assert_equal "application/octet-stream", response.headers["content-type"]
     assert_equal "inline; filename=test_helper.cr", response.headers["content-disposition"]
     assert_equal File.read("test/test_helper.cr"), response.body

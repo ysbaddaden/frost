@@ -3,7 +3,6 @@ require "json"
 require "mime"
 
 # TODO: prevent double rendering
-# TODO: add `status:` kwarg to `render` methods.
 class Frost::Controller
   protected getter context : HTTP::Server::Context
   protected getter request : HTTP::Request
@@ -24,36 +23,44 @@ class Frost::Controller
     response.status = status
   end
 
-  protected def render(*, plain text : String) : Nil
+  protected def render(*, plain text : String, status : HTTP::Status = :ok) : Nil
+    response.status = status
     response.headers["content-type"] = "text/plain; charset=utf-8"
     response << text
   end
 
-  protected def render(*, html : String) : Nil
+  protected def render(*, html : String, status : HTTP::Status = :ok) : Nil
+    response.status = status
     response.headers["content-type"] = "text/html; charset=utf-8"
     response << html
   end
 
-  protected def render(*, json contents) : Nil
+  protected def render(*, json contents, status : HTTP::Status = :ok) : Nil
+    response.status = status
     response.headers["content-type"] = "application/json; charset=utf-8"
     contents.to_json(response)
   end
 
-  protected def send_data(contents : String | Bytes, *, filename = nil, disposition = "inline", type = nil) : Nil
+  protected def send_data(contents : String | Bytes, *, filename = nil, disposition = "inline", type = nil, status : HTTP::Status = :ok) : Nil
+    response.status = status
     set_content_disposition(filename, disposition) if filename || disposition
     set_content_type(type, filename, default: "application/octet-stream")
     response.write(contents.to_slice)
   end
 
-  protected def send_data(io : IO, *, filename = nil, disposition = "inline", type = nil) : Nil
+  protected def send_data(io : IO, *, filename = nil, disposition = "inline", type = nil, status : HTTP::Status = :ok) : Nil
+    response.status = status
     set_content_disposition(filename, disposition) if filename || disposition
     set_content_type(type, filename, default: "application/octet-stream")
     IO.copy(io, response)
   end
 
-  protected def send_file(path : String | Path, *, filename = nil, disposition = "inline", type = nil) : Nil
+  protected def send_file(path : String | Path, *, filename = nil, disposition = "inline", type = nil, status : HTTP::Status = :ok) : Nil
     filename ||= File.basename(path)
-    File.open(path) { |io| send_data io, filename: filename, disposition: disposition, type: type }
+
+    File.open(path) do |io|
+      send_data io, filename: filename, disposition: disposition, type: type, status: status
+    end
   end
 
   private def set_content_type(type, filename, default) : Nil

@@ -3,7 +3,7 @@ require "./route"
 require "./stack_array"
 
 module Frost::Routes
-  alias Params = Hash(String, String?)
+  alias Params = Hash(String, String)
 
   record Match(T),
     payload : T,

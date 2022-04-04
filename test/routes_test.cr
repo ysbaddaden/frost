@@ -3,7 +3,13 @@ require "earl/http_server"
 require "../lib/earl/test/support/rwlock"
 
 class Frost::RoutesTest < Minitest::Test
-  class A < Controller
+  abstract class Controller < Frost::Controller
+    macro default_render(*args)
+      # disable default rendered
+    end
+  end
+
+  class AController < Controller
     def a_in
       render plain: "A#in"
     end
@@ -13,7 +19,7 @@ class Frost::RoutesTest < Minitest::Test
     end
   end
 
-  class B < Controller
+  class BController < Controller
     def b_in
       render plain: "B#in"
     end
@@ -23,13 +29,13 @@ class Frost::RoutesTest < Minitest::Test
     end
   end
 
-  class C < Controller
+  class CController < Controller
     def c
       render plain: "C#c"
     end
   end
 
-  class D < Controller
+  class DController < Controller
     def d
       render plain: "D#d"
     end
@@ -39,7 +45,7 @@ class Frost::RoutesTest < Minitest::Test
     end
   end
 
-  class X < Controller
+  class XController < Controller
     def before
       render plain: "X#before"
     end
@@ -102,8 +108,8 @@ class Frost::RoutesTest < Minitest::Test
   {% for http_method in %w[options head get post put patch delete].map(&.id) %}
     def test_{{http_method}}
       Frost.draw_routes do
-        {{http_method}} "/test_{{http_method}}", X, :before
-        {{http_method}} "/test_{{http_method}}_explicit", controller: X, action: "after"
+        {{http_method}} "/test_{{http_method}}", XController, :before
+        {{http_method}} "/test_{{http_method}}_explicit", controller: XController, action: "after"
       end
 
       request "{{http_method}}", "/test_{{http_method}}"
@@ -131,8 +137,8 @@ class Frost::RoutesTest < Minitest::Test
 
   def test_match
     Frost.draw_routes do
-      match "link", "/test", controller: X, action: "before"
-      match "get", "/", controller: X, action: "after"
+      match "link", "/test", controller: XController, action: "before"
+      match "get", "/", controller: XController, action: "after"
     end
 
     request "link", "/test", body: "X#before"
@@ -142,33 +148,33 @@ class Frost::RoutesTest < Minitest::Test
 
   def test_controller
     Frost.draw_routes do
-      get "/before", X, :before
+      get "/before", XController, :before
 
-      controller(A) do
+      controller(AController) do
         get "/a", :a_in
 
-        controller(B) do
+        controller(BController) do
           get "/b", :b_in
 
-          controller(C) do
+          controller(CController) do
             get "/c", :c
           end
 
-          controller(D) do
+          controller(DController) do
             get "/d", :d
           end
 
           get "/b2", :b_out
         end
 
-        controller(D) do
+        controller(DController) do
           get "/d2", :d2
         end
 
         get "/a2", :a_out
       end
 
-      get "/after", X, :after
+      get "/after", XController, :after
     end
 
     request :get, "/before", body: "X#before"
@@ -186,16 +192,16 @@ class Frost::RoutesTest < Minitest::Test
   def test_path
     Frost.draw_routes do
       path "/api" do
-        get "", controller: A, action: "a_in"
+        get "", controller: AController, action: "a_in"
 
         path "/posts" do
-          get "/:id", controller: D, action: "d"
+          get "/:id", controller: DController, action: "d"
         end
 
-        get "more", controller: A, action: "a_out"
+        get "more", controller: AController, action: "a_out"
       end
 
-      get "/", controller: C, action: "c"
+      get "/", controller: CController, action: "c"
     end
 
     request :get, "/api", body: "A#in"
@@ -206,18 +212,18 @@ class Frost::RoutesTest < Minitest::Test
 
   def test_scope
     Frost.draw_routes do
-      scope path: "/posts", controller: A do
+      scope path: "/posts", controller: AController do
         get "", action: "a_in"
 
-        scope path: "/comments", controller: B do
+        scope path: "/comments", controller: BController do
           get "", action: "b_in"
           post "", action: "b_out"
         end
 
-        get "more", controller: D, action: "d"
+        get "more", controller: DController, action: "d"
       end
 
-      get "/", controller: C, action: "c"
+      get "/", controller: CController, action: "c"
     end
 
     request :get, "/posts", body: "A#in"
@@ -235,7 +241,7 @@ class Frost::RoutesTest < Minitest::Test
         end
       end
 
-      get "", controller: X, action: "after"
+      get "", controller: XController, action: "after"
     end
 
     request :get, "/api/v1/comments", body: "Api::V1::CommentsController#index"

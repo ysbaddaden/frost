@@ -1,7 +1,7 @@
 require "./test_helper"
 
 class Frost::ControllerTest < Minitest::Test
-  class X < Controller
+  class XController < Controller
     def redirect
       if st = status
         redirect_to "https://some.other/resource", status: st
@@ -52,6 +52,22 @@ class Frost::ControllerTest < Minitest::Test
 
     def data_io
       send_data_with IO::Memory.new("\b" * 128)
+    end
+
+    def index
+      @posts = [1, 2, 3]
+      render :index
+    end
+
+    def show
+      @post = 1
+      render "show"
+    end
+
+    def default
+    end
+
+    def no_template
     end
 
     private def send_data_with(object)
@@ -249,16 +265,94 @@ class Frost::ControllerTest < Minitest::Test
     assert_equal File.read("test/fixtures/files/empty.png"), response.body
   end
 
-  macro call(action, params = {} of String => String)
-    %context, %io = new_context
-    %controller = X.new(%context, ({{params}}).reduce(Hash(String, String?).new) { |a, (k, v)| a[k] = v; a })
+  def test_render_template
+    response = call :index
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal <<-HTML, response.body.chomp
+    <!DOCTYPE html>
+    <html>
+    <body>
+      <h1>X#index</h1>
+    <ul><li>1</li><li>2</li><li>3</li></ul>
+
+    </body>
+    </html>
+    HTML
+
+    response = call :show
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal <<-HTML, response.body.chomp
+    <!DOCTYPE html>
+    <html>
+    <body>
+      <h1>X#show: 1</h1>
+
+    </body>
+    </html>
+    HTML
+  end
+
+  def test_default_render_with_existing_template
+    body = <<-HTML
+    <!DOCTYPE html>
+    <html>
+    <body>
+      <h1>X#default</h1>
+
+    </body>
+    </html>
+    HTML
+
+    # renders the template (it exists)
+    response = call :default
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal body, response.body.chomp
+
+    # whatever the HTTP method
+    response = call :default, method: "POST"
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal body, response.body.chomp
+
+    # even if XHR
+    response = call :default, headers: HTTP::Headers{"x-requested-with" => "xmlhttprequest"}
+    assert_equal HTTP::Status::OK, response.status
+    assert_equal body, response.body.chomp
+  end
+
+  def test_default_render_without_template
+    # expects templates for HTML GET request
+    assert_raises(MissingTemplateError) { call :no_template }
+
+    # template is optional for HTML GET XHR
+    response = call :no_template, headers: HTTP::Headers{"x-requested-with" => "xmlhttprequest"}
+    assert_equal HTTP::Status::NO_CONTENT, response.status
+    assert_empty response.body
+
+    # template is optional for other formats
+    response = call :no_template, { "format" => "text" }
+    assert_equal HTTP::Status::NO_CONTENT, response.status
+    assert_empty response.body
+
+    # template is optional for other methods
+    response = call :no_template, method: "POST"
+    assert_equal HTTP::Status::NO_CONTENT, response.status
+    assert_empty response.body
+  end
+
+  macro call(action, params = {} of String => String, headers = nil, method = "GET")
+    %context, %io = new_context({{method}}, "/", {{headers}})
+    %params = ({{params}}).reduce(Frost::Routes::Params.new) { |a, (k, v)| a[k] = v; a }
+
+    %controller = XController.new(%context, %params, {{action.id.stringify}})
     %controller.{{action.id}}()
+    XController.default_render(%controller, {{action.id.symbolize}})
+
     %context.response.close
     HTTP::Client::Response.from_io(%io.rewind)
   end
 
-  private def new_context
-    request = HTTP::Request.new("GET", "/")
+  private def new_context(method, path, headers)
+    request = HTTP::Request.new(method, path, headers)
     response = HTTP::Server::Response.new(io = IO::Memory.new)
     context = HTTP::Server::Context.new(request, response)
     {context, io}

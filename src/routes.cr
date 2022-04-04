@@ -334,9 +334,10 @@ module Frost
           controller = "#{namespace.id}::#{controller.id}"
         end
       %}
-      # p [:match, {{http_method}}, join_path({{path}}), {{controller}}, {{action}}]
       Frost.handler.match({{http_method}}, join_path({{path}})) do |ctx, params|
-        {{controller.id}}.new(ctx, params).{{action.id}}()
+        %controller = {{controller.id}}.new(ctx, params, {{action.id.stringify}})
+        %controller.{{action.id}}()
+        {{controller.id}}.default_render(%controller, {{action.id.symbolize}})
       end
     end
 

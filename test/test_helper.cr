@@ -8,4 +8,6 @@ module Frost
   def self.clear_routes
     @@handler = nil
   end
+
+  {% Frost::View::SEARCH_PATHS << "#{__DIR__}/views" %}
 end

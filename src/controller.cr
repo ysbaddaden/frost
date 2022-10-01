@@ -3,10 +3,13 @@ require "json"
 require "mime"
 require "./request"
 require "./view"
+require "./controller/callbacks"
 
 class Frost::Controller
   class DoubleRenderError < Exception
   end
+
+  include Frost::Controller::Callbacks
 
   getter context : HTTP::Server::Context
   getter request : Frost::Request
@@ -194,5 +197,9 @@ class Frost::Controller
     else
       @__rendered = true
     end
+  end
+
+  def already_rendered? : Bool
+    @__rendered
   end
 end

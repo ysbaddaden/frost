@@ -336,7 +336,9 @@ module Frost
       %}
       Frost.handler.match({{http_method}}, join_path({{path}})) do |ctx, params|
         %controller = {{controller.id}}.new(ctx, params, {{action.id.stringify}})
-        %controller.{{action.id}}()
+        %controller.run_action do
+          %controller.{{action.id}}()
+        end
         {{controller.id}}.default_render(%controller, {{action.id.symbolize}})
       end
     end

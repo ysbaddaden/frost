@@ -4,12 +4,14 @@ require "mime"
 require "./request"
 require "./view"
 require "./controller/callbacks"
+require "./controller/session"
 
 class Frost::Controller
   class DoubleRenderError < Exception
   end
 
   include Frost::Controller::Callbacks
+  include Frost::Controller::Session
 
   getter context : HTTP::Server::Context
   getter request : Frost::Request

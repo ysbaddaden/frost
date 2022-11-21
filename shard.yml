@@ -7,8 +7,11 @@ authors:
 development_dependencies:
   earl:
     github: ysbaddaden/earl
+    branch: main
 
   minitest:
     github: ysbaddaden/minitest.cr
+
+crystal: ">= 1.4.0, < 2"
 
 license: Apache-2.0

@@ -20,8 +20,8 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: oprypin/install-crystal@v1
+      - uses: actions/checkout@v3
+      - uses: crystal-lang/install-crystal@v1
       - run: shards install
       - run: make test
 
@@ -30,7 +30,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: oprypin/install-crystal@v1
+      - uses: actions/checkout@v3
+      - uses: crystal-lang/install-crystal@v1
       - run: shards install
       - run: make test CRFLAGS=-Dpreview_mt OPTS="--chaos --parallel=4"

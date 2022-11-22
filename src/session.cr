@@ -1,5 +1,5 @@
 class Frost::Session
-  def self.generate_sid
+  def self.generate_sid : String
     Random::Secure.hex(16)
   end
 

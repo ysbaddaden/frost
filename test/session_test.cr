@@ -10,7 +10,6 @@ class Frost::SessionTest < Minitest::Test
     session = Session.new
     assert_equal 32, session.id.bytesize
     assert_nil session["user_id"]?
-    assert session.updated_at
   end
 
   def test_existing_session
@@ -47,12 +46,6 @@ class Frost::SessionTest < Minitest::Test
     refute_equal sid, session.id
     assert_nil session["user_id"]?
     assert_nil session["dnt"]?
-  end
-
-  def test_touch!
-    original = session.updated_at
-    session.touch!
-    refute_equal original, session.updated_at
   end
 
   private def session

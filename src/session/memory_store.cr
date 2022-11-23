@@ -1,3 +1,4 @@
+require "earl"
 require "earl/scheduler"
 require "./store"
 
@@ -8,11 +9,11 @@ require "./store"
 class Frost::Session::MemoryStore < Frost::Session::Store
   include Earl::Artist(Time)
 
-  def initialize(@expire_after : Time::Span = 20.minutes)
+  def initialize(@expire_after : Time::Span = 20.minutes, schedule_clean_cron : String? = "*/5 * * * *")
     super()
     @mutex = Mutex.new(:unchecked)
-    @map = {} of String => Session
-    Earl.scheduler.add(self, cron: "*/5 * * * *")
+    @map = {} of String => {Time, Session}
+    Earl.scheduler.add(self, cron: schedule_clean_cron) if schedule_clean_cron
   end
 
   # Called every 5 minutes by Earl::Scheduler to cleanup expired sessions from
@@ -21,23 +22,26 @@ class Frost::Session::MemoryStore < Frost::Session::Store
     time -= @expire_after
 
     @mutex.synchronize do
-      @map.reject! { |_, session| session.updated_at < time }
+      @map.reject! { |_, (updated_at, _)| updated_at < time }
     end
   end
 
   def find_session(session_id : String) : Session?
-    return unless session = @mutex.synchronize { @map[session_id]? }
-    return delete_session(session) if session.updated_at < @expire_after.ago
+    return unless entry = @mutex.synchronize { @map[session_id]? }
+    updated_at, session = entry
 
-    session.touch!
-    session
+    if updated_at < @expire_after.ago
+      delete_session(session)
+    else
+      session
+    end
   end
 
-  private def write_session(session : Session) : Nil
-    @mutex.synchronize { @map[session.id] = session }
+  def write_session(session : Session) : Nil
+    @mutex.synchronize { @map[session.id] = {Time.utc, session} }
   end
 
-  private def delete_session(session : Session) : Nil
+  def delete_session(session : Session) : Nil
     @mutex.synchronize { @map.delete(session.id) }
   end
 end

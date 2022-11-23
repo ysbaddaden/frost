@@ -6,14 +6,19 @@ class Frost::SessionTest < Minitest::Test
     assert_equal 32, sid.bytesize
   end
 
+  def test_hash_id
+    sid = "499f3e7059280afa38e2c211ae8aab62"
+    assert_equal "SHA256;b36b844fbb18c46a9edf039271c760b3b89294e123ed061ac1de8476046ec867", Session.hash_id(sid)
+  end
+
   def test_new_session
     session = Session.new
-    assert_equal 32, session.id.bytesize
+    assert_equal 32, session.public_id.bytesize
     assert_nil session["user_id"]?
   end
 
   def test_existing_session
-    assert_equal "e58ffd6aa48b2d102583562e458c9423", session.id
+    assert_equal "e58ffd6aa48b2d102583562e458c9423", session.public_id
     assert_equal "12345", session["user_id"]
     assert_nil session["unknown"]?
   end
@@ -41,9 +46,9 @@ class Frost::SessionTest < Minitest::Test
   end
 
   def test_reset!
-    sid = session.id
+    sid = session.public_id
     session.reset!
-    refute_equal sid, session.id
+    refute_equal sid, session.public_id
     assert_nil session["user_id"]?
     assert_nil session["dnt"]?
   end

@@ -1,7 +1,7 @@
 require "timecop"
 
 class Frost::Session
-  def_equals @id, @data
+  def_equals @public_id, @data
 end
 
 module Frost::Session::StoreTestSuite
@@ -10,24 +10,24 @@ module Frost::Session::StoreTestSuite
       s1 = Session.new(data: { "user_id" => "1" })
       s2 = Session.new(data: { "key" => "value" })
 
-      assert_nil store.find_session(s1.id)
-      assert_nil store.find_session(s2.id)
+      assert_nil store.find_session(s1.public_id)
+      assert_nil store.find_session(s2.public_id)
 
       store.write_session(s1)
-      assert_equal s1, store.find_session(s1.id)
-      assert_nil store.find_session(s2.id)
+      assert_equal s1, store.find_session(s1.public_id)
+      assert_nil store.find_session(s2.public_id)
 
       store.write_session(s2)
-      assert_equal s1, store.find_session(s1.id)
-      assert_equal s2, store.find_session(s2.id)
+      assert_equal s1, store.find_session(s1.public_id)
+      assert_equal s2, store.find_session(s2.public_id)
 
       store.delete_session(s1)
-      assert_nil store.find_session(s1.id)
-      assert_equal s2, store.find_session(s2.id)
+      assert_nil store.find_session(s1.public_id)
+      assert_equal s2, store.find_session(s2.public_id)
 
       store.delete_session(s2)
-      assert_nil store.find_session(s1.id)
-      assert_nil store.find_session(s2.id)
+      assert_nil store.find_session(s1.public_id)
+      assert_nil store.find_session(s2.public_id)
     end
 
     def test_find_expired_session_returns_nil
@@ -35,7 +35,7 @@ module Frost::Session::StoreTestSuite
       store.write_session(session)
 
       Timecop.travel(1.day.from_now) do
-        assert_nil store.find_session(session.id)
+        assert_nil store.find_session(session.public_id)
       end
     end
 

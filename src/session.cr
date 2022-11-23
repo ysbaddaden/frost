@@ -1,17 +1,29 @@
+require "digest/sha256"
+
 class Frost::Session
   def self.generate_sid : String
     Random::Secure.hex(16)
   end
 
-  getter id : String
+  def self.hash_id(public_id : String) : String
+    "SHA256;#{Digest::SHA256.hexdigest(public_id)}"
+  end
+
+  getter public_id : String
 
   def initialize(
-    @id : String = self.class.generate_sid,
+    @public_id : String = self.class.generate_sid,
     @data : Hash(String, String) = {} of String => String,
   )
+    @changed = false
+  end
+
+  def private_id : String
+    self.class.hash_id(@public_id)
   end
 
   def []=(key : String, value : String) : String
+    @changed = true
     @data[key] = value
   end
 
@@ -24,15 +36,22 @@ class Frost::Session
   end
 
   def delete(key : String) : String?
+    @changed = true
     @data.delete(key)
   end
 
   def clear : Nil
+    @changed = true
     @data.clear
   end
 
   def reset! : Nil
-    @id = Frost::Session.generate_sid
+    @public_id = self.class.generate_sid
     @data.clear
+    @changed = true
+  end
+
+  def changed? : Bool
+    @changed
   end
 end

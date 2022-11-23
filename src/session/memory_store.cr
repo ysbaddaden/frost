@@ -27,7 +27,8 @@ class Frost::Session::MemoryStore < Frost::Session::Store
   end
 
   def find_session(session_id : String) : Session?
-    return unless entry = @mutex.synchronize { @map[session_id]? }
+    private_id = Session.hash_id(session_id)
+    return unless entry = @mutex.synchronize { @map[private_id]? }
     updated_at, session = entry
 
     if updated_at < @expire_after.ago
@@ -38,10 +39,10 @@ class Frost::Session::MemoryStore < Frost::Session::Store
   end
 
   def write_session(session : Session) : Nil
-    @mutex.synchronize { @map[session.id] = {Time.utc, session} }
+    @mutex.synchronize { @map[session.private_id] = {Time.utc, session} }
   end
 
   def delete_session(session : Session) : Nil
-    @mutex.synchronize { @map.delete(session.id) }
+    @mutex.synchronize { @map.delete(session.private_id) }
   end
 end

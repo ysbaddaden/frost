@@ -14,12 +14,12 @@ class Frost::Session::MemoryStoreTest < Minitest::Test
       Timecop.travel(15.minutes.from_now) do
         store.call(Time.utc)
 
-        assert_nil store.find_session(s1.id)
-        assert_equal s2, store.find_session(s2.id)
+        assert_nil store.find_session(s1.public_id)
+        assert_equal s2, store.find_session(s2.public_id)
 
         Timecop.travel(10.minutes.from_now) do
           store.call(Time.utc)
-          assert_nil store.find_session(s2.id)
+          assert_nil store.find_session(s2.public_id)
         end
       end
     end

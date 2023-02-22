@@ -1,10 +1,9 @@
 require "uri"
+require "./params"
 require "./route"
 require "./stack_array"
 
 module Frost::Routes
-  alias Params = Hash(String, String)
-
   record Match(T),
     payload : T,
     params : Params
@@ -71,7 +70,7 @@ module Frost::Routes
     end
 
     @[AlwaysInline]
-    private def extract_params(segments, parts, format)
+    private def extract_params(segments, parts, format) : Params
       params = Params.new
 
       parts.value.each_with_index do |node, index|
@@ -101,6 +100,7 @@ module Frost::Routes
       params
     end
 
+    # ameba:disable Metrics/CyclomaticComplexity
     private def try_branch(node, segments, index, parts, format) : Bool
       original_index = index
       parts.value << node unless index == 0

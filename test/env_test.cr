@@ -5,6 +5,7 @@ class Frost::EnvTest < Minitest::Test
     env = Env.new("development")
     assert_equal "development", env.name
     assert env.development?
+    assert env.local?
     refute env.production?
     refute env.test?
   end
@@ -13,6 +14,7 @@ class Frost::EnvTest < Minitest::Test
     env = Env.new("test")
     assert_equal "test", env.name
     refute env.development?
+    assert env.local?
     refute env.production?
     assert env.test?
   end
@@ -21,6 +23,7 @@ class Frost::EnvTest < Minitest::Test
     env = Env.new("production")
     assert_equal "production", env.name
     refute env.development?
+    refute env.local?
     assert env.production?
     refute env.test?
   end
@@ -29,6 +32,7 @@ class Frost::EnvTest < Minitest::Test
     env = Env.new("staging")
     assert_equal "staging", env.name
     refute env.development?
+    refute env.local?
     refute env.production?
     refute env.test?
     assert env.staging?

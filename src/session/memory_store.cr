@@ -4,8 +4,8 @@ require "./store"
 
 # Implements an in-memory store for session data.
 #
-# The sessions are tied to the current process. They are only available in this
-# process. All sessions will be lost when the process is restarted.
+# WARNING: The sessions are tied to the current process. All sessions will be
+# lost when the process is restarted.
 class Frost::Session::MemoryStore < Frost::Session::Store
   include Earl::Artist(Time)
 

@@ -1,6 +1,7 @@
 require "http/server"
 require "json"
 require "mime"
+require "./params"
 require "./request"
 require "./view"
 require "./controller/callbacks"
@@ -10,22 +11,23 @@ class Frost::Controller
   class DoubleRenderError < Exception
   end
 
-  include Frost::Controller::Callbacks
-  include Frost::Controller::Session
+  include Controller::Callbacks
+  include Controller::Session
 
   getter context : HTTP::Server::Context
-  getter request : Frost::Request
+  getter request : Request
   getter response : HTTP::Server::Response
-  getter params : Frost::Routes::Params
+  getter params : Params
   getter action_name : String
 
-  def initialize(@context, @params, @action_name)
-    @request = Frost::Request.new(@context.request, @params)
+  def initialize(@context, route_params : Routes::Params, @action_name)
+    @request = Request.new(@context.request)
     @response = @context.response
+    @params = Params.new(@request, route_params)
     @__rendered = false
   end
 
-  def redirect_to(url : URI | String, status : HTTP::Status = :found) : Nil
+  def redirect_to(url : URI | String, status : HTTP::Status = :see_other) : Nil
     response.headers["location"] = url.to_s
     head status
   end
@@ -35,69 +37,11 @@ class Frost::Controller
     response.status = status
   end
 
-  private macro render(action, status = :ok, layout = nil)
-    {% unless action.is_a?(SymbolLiteral) || action.is_a?(StringLiteral) %}
-      {% raise "action must be a symbol or string literal" %}
-    {% end %}
-
+  def render(view : View, *, status : HTTP::Status = :ok) : Nil
     prevent_double_rendering!
-    response.status = HTTP::Status.new({{status}})
-    __render self, {{action}}, {{layout}}
-  end
-
-  private macro render(status = :ok, layout = nil)
-    render \{{@def.name.id.symbolize}}, {{status}}, {{layout}}
-  end
-
-  # :nodoc:
-  macro default_render(controller, action)
-    {% unless action.is_a?(SymbolLiteral) || action.is_a?(StringLiteral) %}
-      {% raise "action must be a symbol or string literal" %}
-    {% end %}
-
-    unless {{controller}}.@__rendered
-      if {{controller}}.template_exists?({{action}})
-        # the template exists: render it
-        {{controller}}.prevent_double_rendering!
-        {{@type}}.__render {{controller}}, {{action}}
-      else
-        %request = {{controller}}.request
-
-        # render default template for browser GET requests (unless XHR):
-        if %request.method == "GET" && %request.format == "html" && !%request.xhr?
-          {{controller}}.prevent_double_rendering!
-          {{@type}}.__render {{controller}}, {{action}}
-        end
-      end
-
-      # fallback to a 204 No Content response
-      unless {{controller}}.@__rendered
-        {{controller}}.head :no_content
-      end
-    end
-  end
-
-  def template_exists?(action) : Bool
-    {{ @type.name.gsub(/Controller$/, "View").id }}
-      .template_exists?(action, request.format)
-  end
-
-  # :nodoc:
-  macro __render(controller, action, layout = nil)
-    %view_class = {{@type.name.gsub(/Controller$/, "View")}}
-    %view = %view_class.new({{controller}})
-
-    %format = {{controller}}.request.format
-
-    if {{layout}} == false
-      %view.{{action.id}}(%format)
-    else
-      %view.layout({{layout}} || "application", %format) do
-        %view.{{action.id}}(%format)
-      end
-    end
-
-    nil
+    response.status = status
+    response.headers["content-type"] = view.content_type
+    view.render(response)
   end
 
   def render(*, plain text : String, status : HTTP::Status = :ok) : Nil

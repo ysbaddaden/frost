@@ -1,0 +1,7 @@
+Globs:
+  - src/**/*.cr
+  - test/**/*.cr
+  - examples/blog.cr
+
+Lint/Formatting:
+  Enabled: false

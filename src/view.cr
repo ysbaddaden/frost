@@ -11,7 +11,8 @@ module Frost
       __render(io) { template(&block) }
     end
 
-    private def __render(io : IO, &) : Nil
+    @[AlwaysInline]
+    protected def __render(io : IO, &) : Nil
       original_io, @__io__ = @__io__, io
       original_valid, @__io_valid__ = @__io_valid__, true
       begin
@@ -23,17 +24,27 @@ module Frost
     end
 
     def render(view : View, &block) : Nil
-      raise ArgumentError.new("No IO to render to: you must call #{self.class.name}#render(io : IO)") unless @__io_valid__
+      if @__io_valid__
+        view.render(@__io__, &block)
+      else
+        raise ArgumentError.new("No IO to render to: you must call #{self.class.name}#render(io : IO)")
+      end
+    end
 
-      view.render(@__io__, &block)
+    def render(view : View) : Nil
+      if @__io_valid__
+        view.render(@__io__)
+      else
+        raise ArgumentError.new("No IO to render to: you must call #{self.class.name}#render(io : IO)")
+      end
     end
 
     def template : Nil
       {% raise "ERROR: you must define #{@type.name}#template" %}
     end
 
-    def template(&block) : Nil
-      {% raise "ERROR: you must define #{@type.name}#template(&block)" %}
+    def template(&) : Nil
+      {% raise "ERROR: you must define #{@type.name}#template(&)" %}
     end
 
     # Returns the content type to use in the response.

@@ -26,20 +26,22 @@ module Frost
     end
 
     # Registers a DOM Element.
-    macro register_element(tag_name)
+    macro register_element(tag_name, *, as method = nil)
+      {% method ||= tag_name %}
+
       @[AlwaysInline]
-      def {{tag_name.id}}(contents = nil, **attributes) : Nil
+      def {{method.id}}(contents = nil, **attributes) : Nil
         if contents.nil? && PREFERS_CLOSED_ELEMENTS
           @__io__ << "<{{tag_name.id}}"
           render_attributes(attributes) unless attributes.empty?
           @__io__ << '/' << '>'
         else
-          self.{{tag_name.id}}(**attributes) { contents }
+          self.{{method.id}}(**attributes) { contents }
         end
       end
 
       @[AlwaysInline]
-      def {{tag_name.id}}(**attributes, &block) : Nil
+      def {{method.id}}(**attributes, &) : Nil
         @__io__ << "<{{tag_name.id}}"
         render_attributes(attributes) unless attributes.empty?
         @__io__ << '>'
@@ -64,23 +66,31 @@ module Frost
 
     private def render_attributes(attributes, prefix = nil) : Nil
       attributes.each do |attr_name, attr_value|
-        if attr_value.is_a?(NamedTuple)
-          if prefix
-            render_attributes(attr_value, "#{prefix}-#{attr_name}")
-          else
-            render_attributes(attr_value, prefix: attr_name)
-          end
-        else
-          render_attribute_name(attr_name, prefix)
-          render_attribute_value(attr_value)
-        end
+        render_attribute(attr_name, attr_value, prefix)
       end
+    end
+
+    private def render_attribute(attr_name, attr_value : NamedTuple, prefix)
+      if prefix
+        render_attributes(attr_value, "#{prefix}-#{attr_name}")
+      else
+        render_attributes(attr_value, prefix: attr_name)
+      end
+    end
+
+    private def render_attribute(attr_name, attr_value : Bool, prefix)
+      render_attribute_name(attr_name, prefix) if attr_value
+    end
+
+    private def render_attribute(attr_name, attr_value, prefix)
+      render_attribute_name(attr_name, prefix)
+      render_attribute_value(attr_value)
     end
 
     # NOTE: since we expect attributes to be a NamedTuple with symbol keys and
     #       not a hash that could be unsafe data, maybe we don't need to escape
     #       the attribute name?
-    private def render_attribute_name(attr_name, prefix = nil) : Nil
+    private def render_attribute_name(attr_name, prefix) : Nil
       @__io__ << ' '
       if prefix
         escape(@__io__, prefix)
@@ -102,10 +112,6 @@ module Frost
       @__io__ << '=' << '"'
       escape(@__io__, attr_value)
       @__io__ << '"'
-    end
-
-    private def render_attribute_value(attr_value : Bool) : Nil
-      @__io__ << %(="false") unless attr_value
     end
 
     # Casts `contents` to a String then escapes and appends it to the output.

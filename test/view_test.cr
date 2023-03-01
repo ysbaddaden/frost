@@ -8,9 +8,9 @@ class Frost::ViewTest < Minitest::Test
       @__io__ << "contents"
     end
 
-    def template(&block)
+    def template(&)
       @__io__ << "before "
-      block.call
+      yield
       @__io__ << " after"
     end
   end

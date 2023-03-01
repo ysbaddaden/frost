@@ -7,7 +7,7 @@ module Frost::View::TestHelpers
     io.rewind.to_s
   end
 
-  def render(view : Frost::View, &block) : String
+  def render(view : Frost::View, &block : -> T) : String forall T
     view.render(io = IO::Memory.new, &block)
     io.rewind.to_s
   end
@@ -17,7 +17,7 @@ module Frost::View::TestHelpers
     io.rewind.to_s
   end
 
-  def render(io : IO, view : Frost::View, &block) : String
+  def render(io : IO, view : Frost::View, &block : -> T) : String forall T
     view.render(io, &block)
     io.rewind.to_s
   end

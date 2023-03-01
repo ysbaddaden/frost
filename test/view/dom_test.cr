@@ -18,7 +18,7 @@ describe "Frost::DOM" do
     end
   end
 
-  describe "prefers explicit close elements" do
+  describe "prefers closing elements" do
     struct Example < Frost::DOM
       PREFERS_CLOSED_ELEMENTS = false
       register_element :content
@@ -51,7 +51,6 @@ describe "Frost::DOM" do
 
   describe "register_void_element" do
     struct Example < Frost::DOM
-      PREFERS_CLOSED_ELEMENTS = false
       register_void_element :tag
 
       def template
@@ -62,6 +61,27 @@ describe "Frost::DOM" do
     it "renders safe DOM" do
       assert_equal %(<tag href="/url" class="link is-active" data-escapes="&amp;&lt;&gt;&quot;&apos;" data-action="ctrl-&gt;call"/>),
         render Example.new
+    end
+  end
+
+  describe "boolean attributes" do
+    struct Example < Frost::DOM
+      register_void_element :input
+
+      def initialize(@value : Bool)
+      end
+
+      def template
+        input(type: "radio", checked: @value)
+      end
+    end
+
+    it "renders attribute when true" do
+      assert_equal %(<input type="radio" checked/>), render(Example.new(true))
+    end
+
+    it "skips attribute when false" do
+      assert_equal %(<input type="radio"/>), render(Example.new(false))
     end
   end
 

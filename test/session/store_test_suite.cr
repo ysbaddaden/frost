@@ -39,6 +39,28 @@ module Frost::Session::StoreTestSuite
       end
     end
 
+    def test_extend_session
+      s1 = Session.new
+      store.write_session(s1)
+
+      s2 = Session.new
+      store.write_session(s2)
+
+      Timecop.travel(10.minutes.from_now) do
+        store.extend_session(s1)
+      end
+
+      Timecop.travel(25.minutes.from_now) do
+        assert_equal s1, store.find_session(s1.public_id)
+        assert_nil store.find_session(s2.public_id)
+      end
+
+      Timecop.travel(31.minutes.from_now) do
+        assert_nil store.find_session(s1.public_id)
+        assert_nil store.find_session(s2.public_id)
+      end
+    end
+
     def test_overwrite_session
       sid = Session.generate_sid
       s1 = Session.new(sid, { "key" => "value" })
@@ -56,5 +78,5 @@ module Frost::Session::StoreTestSuite
     end
   end
 
-  private abstract def store
+  private abstract def store(expire_after = 20.minutes)
 end

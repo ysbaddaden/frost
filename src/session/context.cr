@@ -25,8 +25,12 @@ module Frost
       end
 
       def write_session : Nil
-        if (session = @session) && session.changed?
-          Session.store.write_session(session)
+        if session = @session
+          if session.changed?
+            Session.store.write_session(session)
+          else
+            Session.store.extend_session(session)
+          end
         end
       end
 

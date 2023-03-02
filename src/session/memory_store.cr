@@ -11,7 +11,7 @@ class Frost::Session::MemoryStore < Frost::Session::Store
 
   def initialize(@expire_after : Time::Span = 20.minutes, schedule_clean_cron : String? = "*/5 * * * *")
     super()
-    @mutex = Mutex.new(:unchecked)
+    @mutex = Mutex.new(:unchecked) # TODO: Earl::UnsafeMutex (when it gets merged)
     @map = {} of String => {Time, Session}
     Earl.scheduler.add(self, cron: schedule_clean_cron) if schedule_clean_cron
   end
@@ -40,6 +40,14 @@ class Frost::Session::MemoryStore < Frost::Session::Store
 
   def write_session(session : Session) : Nil
     @mutex.synchronize { @map[session.private_id] = {Time.utc, session} }
+  end
+
+  def extend_session(session : Session) : Nil
+    @mutex.synchronize do
+      if @map.has_key?(session.private_id)
+        @map[session.private_id] = {Time.utc, session}
+      end
+    end
   end
 
   def delete_session(session : Session) : Nil

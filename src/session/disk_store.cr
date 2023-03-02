@@ -5,9 +5,11 @@ require "json"
 
 # Implements an on-disk store for session data.
 #
-# WARNING: multiple instances must have access to the same `path`.
+# WARNING: multiple instances must have access to the same `path` on disk!
 class Frost::Session::DiskStore < Frost::Session::Store
   include Earl::Artist(Time)
+
+  class ValidationError < Exception; end
 
   def initialize(
     path : Path | String,
@@ -16,6 +18,7 @@ class Frost::Session::DiskStore < Frost::Session::Store
   )
     super()
     @path = Path.new(path)
+    __validate!
     Earl.scheduler.add(self, cron: schedule_clean_cron) if schedule_clean_cron
   end
 
@@ -24,21 +27,22 @@ class Frost::Session::DiskStore < Frost::Session::Store
   def call(time : Time) : Nil
     time -= @expire_after
 
-    Dir[@path.join("**", "**")].each do |path|
-      if File.file?(path) && File.info(path).modification_time < time
-        File.delete(path)
+    Dir.glob(@path.join("**", "**")) do |path|
+      if (info = File.info?(path)) && info.file? && info.modification_time < time
+        File.delete?(path)
       end
     end
   end
 
   def find_session(session_id : String) : Session?
     path = __path(Session.hash_id(session_id))
-    return unless File.exists?(path)
+    return unless info = File.info?(path)
 
-    if File.info(path).modification_time < @expire_after.ago
-      __delete(path)
-    else
-      Session.new(session_id, __read(path))
+    if info.modification_time < @expire_after.ago
+      File.delete?(path)
+      nil
+    elsif data = __read(path)
+      Session.new(session_id, data)
     end
   end
 
@@ -48,25 +52,42 @@ class Frost::Session::DiskStore < Frost::Session::Store
     unless Dir.exists?(path.dirname)
       path.each_parent do |parent|
         Dir.mkdir(parent) unless Dir.exists?(parent)
+      rescue File::AlreadyExistsError
       end
     end
 
     File.write(path, session.to_json)
   end
 
+  def extend_session(session : Session) : Nil
+    path = __path(session.private_id)
+    File.utime(Time.utc, Time.utc, path) if File.exists?(path)
+  rescue File::NotFoundError
+  end
+
   def delete_session(session : Session) : Nil
-    __delete(__path(session.private_id))
+    path = __path(session.private_id)
+    File.delete?(path)
   end
 
   private def __path(private_id : String) : Path
     @path.join(private_id[-2..-1], private_id[-4..-3], private_id)
   end
 
-  private def __read(path : Path) : Hash(String, String)
-    JSON.parse(File.read(path)).as_h.transform_values(&.as_s)
+  private def __read(path)
+    File
+      .open(path, "r") { |io| JSON.parse(io) }
+      .as_h
+      .transform_values(&.as_s)
+  rescue File::NotFoundError
   end
 
-  private def __delete(path : Path) : Nil
-    File.delete(path) if File.exists?(path)
+  private def __validate! : Nil
+    unless Dir.exists?(@path)
+      raise ValidationError.new("The path at #{@path} isn't a directory.")
+    end
+    unless File.writable?(@path)
+      raise ValidationError.new("The path at #{@path} isn't writable. You might be missing write permissions.")
+    end
   end
 end

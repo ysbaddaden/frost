@@ -5,7 +5,7 @@ require "./store_test_suite"
 class Frost::Session::MemoryStoreTest < Minitest::Test
   include StoreTestSuite
 
-  def test_call_removes_expired_sessions_only
+  def test_call_removes_expired_sessions
     store.write_session(s1 = Session.new)
 
     Timecop.travel(10.minutes.from_now) do
@@ -25,7 +25,7 @@ class Frost::Session::MemoryStoreTest < Minitest::Test
     end
   end
 
-  private def store
-    @store ||= MemoryStore.new(schedule_clean_cron: nil)
+  private def store(expire_after = 20.minutes)
+    @store ||= MemoryStore.new(expire_after, schedule_clean_cron: nil)
   end
 end

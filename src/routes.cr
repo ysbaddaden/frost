@@ -51,12 +51,12 @@ module Frost
     end
 
     @[AlwaysInline]
-    def self.match(path : String, via : String, &block : Callback)
+    def self.match(path : String, *, via : String, &block : Callback)
       @@handler.match(via.upcase, path, &block)
     end
 
     @[AlwaysInline]
-    def self.match(path : String, via : Enumerable(String), &block : Callback)
+    def self.match(path : String, *, via : Enumerable(String), &block : Callback)
       via.each do |http_method|
         @@handler.match(http_method.upcase, path, &block)
       end

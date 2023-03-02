@@ -33,4 +33,4 @@ jobs:
       - uses: actions/checkout@v3
       - uses: crystal-lang/install-crystal@v1
       - run: shards install
-      - run: make test CRFLAGS=-Dpreview_mt OPTS="--chaos --parallel=4"
+      - run: make test_mt

@@ -57,6 +57,7 @@ struct Frost::Params
     return unless body = @request.body
 
     if @request.urlencoded?
+      # NOTE: consider limiting how many params a single request can send?
       @body = URI::Params.parse(body.gets_to_end)
     elsif @request.multipart?
       parse_multipart_request_body
@@ -67,10 +68,15 @@ struct Frost::Params
 
   @[AlwaysInline]
   private def parse_multipart_request_body : Nil
+    parts_limit = Params.multipart_parts_limit
+    files_limit = Params.multipart_files_limit
     params, files = URI::Params.new, UploadedFiles.new
 
     HTTP::FormData.parse(@request.@request) do |part|
+      check_multipart_limit(parts_limit -= 1) { "Maximum multipart parts reached" }
+
       if part.filename
+        check_multipart_limit(files_limit -= 1) { "Maximum multipart files reached" }
         files.add(part.name, UploadedFile.new(part))
       else
         params.add(part.name, part.body.gets_to_end)

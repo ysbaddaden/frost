@@ -1,6 +1,6 @@
 # Parses CSS selectors and attempts to tranform them into XML Path Language
 # (XPath) 1.0. This is required to use CSS selectors against `XML` documents
-# that rely on `libxml2`.
+# that is built on top of `libxml2` and doesn't support CSS selectors.
 #
 # The generated XPath have only been tested against `libxml2` v2.9.10 as
 # packaged on Ubuntu 20.04.

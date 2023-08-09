@@ -20,7 +20,7 @@ class Frost::Integration::Session
 
     # generate request
     @request = request = HTTP::Request.new(http_method.upcase, resource, headers)
-    @cookie_jar.add(request)
+    @cookie_jar.fill(request)
     if params
       request.headers["content-type"] = "application/x-www-form-urlencoded"
       request.body = URI::Params.encode(params)

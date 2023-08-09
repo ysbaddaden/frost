@@ -10,12 +10,12 @@ struct Frost::Integration::CookieJar
   end
 
   # Adds cookies to the jar. Replaces existing cookies.
-  def add(cookies : HTTP::Cookies)
+  def add(cookies : HTTP::Cookies) : Nil
     cookies.each { |cookie| add(cookie) }
   end
 
   # Adds a cookie to the jar. Replaces an existing cookie.
-  def add(cookie : HTTP::Cookie)
+  def add(cookie : HTTP::Cookie) : Nil
     if cookie.expired?
       @cookies.delete(cookie.name)
     else
@@ -24,7 +24,7 @@ struct Frost::Integration::CookieJar
   end
 
   # Adds cookies from to the jar to `request`. Skips expired cookies.
-  def fill(request : HTTP::Request)
+  def fill(request : HTTP::Request) : Nil
     @cookies.each { |cookie| @cookies.delete(cookie.name) if cookie.expired? }
     @cookies.add_request_headers(request.headers)
   end

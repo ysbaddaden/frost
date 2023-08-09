@@ -1,6 +1,6 @@
 require "./test_helper"
 require "earl/http_server"
-require "../lib/earl/test/support/rwlock"
+require "syn/mutex"
 
 class Frost::RoutesTest < Minitest::Test
   class AController < Controller
@@ -87,16 +87,16 @@ class Frost::RoutesTest < Minitest::Test
     end
   end
 
-  @@rwlock = Earl::RWLock.new
+  @@mutex = Syn::Mutex.new
 
   def setup
-    @@rwlock.lock_write
+    @@mutex.lock
   end
 
   def teardown
     Frost::Routes.handler.clear
   ensure
-    @@rwlock.unlock_write
+    @@mutex.unlock
   end
 
   {% for http_method in %w[options head get post put patch delete].map(&.id) %}

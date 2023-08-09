@@ -1,9 +1,23 @@
 require "minitest/autorun"
 require "../src/frost"
 require "../src/session/memory_store"
+require "syn/mutex"
+require "timecop"
 
 # initialize the mimetype library to avoid lazy loading it on-demand (MT unsafe)
 MIME.init(true)
+
+module Timecop
+  MUTEX = Syn::Mutex.new(:reentrant)
+
+  self.safe_mode = true
+
+  def self.travel(time : Time, & : Time -> V) : V forall V
+    MUTEX.synchronize do
+      send_travel(:travel, time) { |t| yield t }
+    end
+  end
+end
 
 module Frost
   Session.store = Session::MemoryStore.new(schedule_clean_cron: nil)

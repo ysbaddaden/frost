@@ -1,6 +1,5 @@
 require "../test_helper"
 require "../../src/integration/cookie_jar"
-require "timecop"
 
 class Frost::Integration::CookieJarTest < Minitest::Test
   def test_add

@@ -5,7 +5,7 @@ require "json"
 
 # Implements an on-disk store for session data.
 #
-# WARNING: multiple instances must have access to the same `path` on disk!
+# WARNING: multiple server instances must have access to the same `path` on disk
 class Frost::Session::DiskStore < Frost::Session::Store
   include Earl::Artist(Time)
 
@@ -19,7 +19,7 @@ class Frost::Session::DiskStore < Frost::Session::Store
     super()
     @path = Path.new(path)
     __validate!
-    Earl.scheduler.add(self, cron: schedule_clean_cron) if schedule_clean_cron
+    Earl.schedule(self, cron: schedule_clean_cron) if schedule_clean_cron
   end
 
   # Called every 5 minutes by Earl::Scheduler to cleanup expired sessions from

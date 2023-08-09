@@ -1,5 +1,3 @@
-require "timecop"
-
 class Frost::Session
   def_equals @public_id, @data
 end

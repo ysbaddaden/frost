@@ -13,7 +13,7 @@ class Frost::Session::MemoryStore < Frost::Session::Store
     super()
     @mutex = Mutex.new(:unchecked) # TODO: Earl::UnsafeMutex (when it gets merged)
     @map = {} of String => {Time, Session}
-    Earl.scheduler.add(self, cron: schedule_clean_cron) if schedule_clean_cron
+    Earl.schedule(self, cron: schedule_clean_cron) if schedule_clean_cron
   end
 
   # Called every 5 minutes by Earl::Scheduler to cleanup expired sessions from

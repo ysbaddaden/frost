@@ -7,10 +7,12 @@ class Frost::Integration::Test < Minitest::Test
   include TestRequests
   include Assertions
 
-  @@request_processor = HTTP::Server::RequestProcessor.new(HTTP::Server.build_middleware([
-    Frost::Session::Handler.new(Frost::Session::MemoryStore.new),
-    Frost::Routes.handler,
-  ]))
+  def self.middlewares : Array(HTTP::Handler)
+    [Frost::Routes.handler]
+  end
+
+  @@request_processor =
+    HTTP::Server::RequestProcessor.new(HTTP::Server.build_middleware(middlewares))
 
   def default_session : Session
     @default_session ||= Session.new(@@request_processor)

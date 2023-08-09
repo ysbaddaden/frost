@@ -12,7 +12,7 @@ class Frost::Controller::CallbacksTest < Minitest::Test
 
     before_action do
       @@callbacks << :before_action
-      head :no_content if params["render_before"]?
+      head :no_content if params.route["render_before"]?
     end
 
     after_action do
@@ -56,7 +56,10 @@ class Frost::Controller::CallbacksTest < Minitest::Test
   end
 
   def test_render_in_before_action_interrupts_action
-    call :index, params: { "render_before" => "1" }
-    assert_equal %i[before_action], XController.callbacks
+    call :index, { "render_before" => "1" }
+    assert_equal %i[
+      before_action
+      after_action
+    ], XController.callbacks
   end
 end

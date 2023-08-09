@@ -4,33 +4,24 @@ require "./route_set"
 class Frost::Routes::Handler
   include HTTP::Handler
 
-  alias Callback = Proc(HTTP::Server::Context, Frost::Routes::Params, Nil)
-
-  # TODO: configure block to call on NO SUCH ROUTE event
   def initialize(@fallthrough = false)
     @routes = {} of String => RouteSet(Callback)
   end
 
-  def configure
+  def configure(&) : Nil
     with self yield self
   end
 
-  {% for http_method in %w[options head get post patch put delete] %}
-    def {{http_method.id}}(path, &block : Callback)
-      match({{http_method.upcase}}, path, &block)
-    end
-  {% end %}
-
-  def match(http_method, path, &block : Callback)
+  def match(http_method : String, path : String, &block : Callback) : Nil
     (@routes[http_method.upcase] ||= RouteSet(Callback).new).add(path, block)
   end
 
-  def call(context : HTTP::Server::Context)
+  def call(context : HTTP::Server::Context) : Nil
     request = context.request
 
     if routes = @routes[request.method]?
-      if match = routes.find(request.path)
-        return call(context, match)
+      if route = routes.find(request.path)
+        return call(context, route)
       end
     end
 
@@ -41,12 +32,12 @@ class Frost::Routes::Handler
     end
   end
 
-  private def call(context, result)
-    result.payload.call(context, result.params)
+  private def call(context, route) : Nil
+    route.payload.call(context, route.params)
     context.response.flush
   end
 
-  private def no_such_route(context)
+  private def no_such_route(context) : Nil
     response = context.response
     response.status = :not_found
     response << "404 Not Found"

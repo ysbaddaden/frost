@@ -13,27 +13,33 @@ module Frost
         end
     end
 
-    def development?
+    def local? : Bool
+      test? || development?
+    end
+
+    def development? : Bool
       @name == "development"
     end
 
-    def production?
+    def production? : Bool
       @name == "production"
     end
 
-    def test?
+    def test? : Bool
       @name == "test"
     end
 
-    def name
+    def name : String
       @name
     end
 
-    def to_s
+    # :nodoc:
+    def to_s : String
       @name
     end
 
-    def to_s(io : IO)
+    # :nodoc:
+    def to_s(io : IO) : Nil
       io << @name
     end
 

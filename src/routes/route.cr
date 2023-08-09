@@ -22,7 +22,7 @@ module Frost::Routes
     end
 
     def param_name : String
-      @param_name.not_nil!
+      @param_name.not_nil! # ameba:disable Lint/NotNil
     end
 
     def glob? : Bool
@@ -30,7 +30,7 @@ module Frost::Routes
     end
 
     def payload : T
-      @payload.not_nil!
+      @payload.not_nil! # ameba:disable Lint/NotNil
     end
 
     def payload? : T?

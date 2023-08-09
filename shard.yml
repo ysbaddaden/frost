@@ -1,5 +1,5 @@
 name: frost
-version: 0.1.0.alpha
+version: 0.1.0-alpha
 
 authors:
   - Julien Portalier <julien@portalier.com>
@@ -11,6 +11,10 @@ development_dependencies:
 
   minitest:
     github: ysbaddaden/minitest.cr
+    version: ">= 1.2.0"
+
+  timecop:
+    github: crystal-community/timecop.cr
 
 crystal: ">= 1.4.0, < 2"
 

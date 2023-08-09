@@ -23,9 +23,9 @@ class Frost::Controller
     # make sure that the ancestor's `#before_action` method is invoked, unless
     # it's a deliberate choice to not call it.
     #
-    # If the controller rendered anything, redirected or called `#head` then
-    # the request will stop being processed. None of `#around_action`, the
-    # actual action or `#after_action` will be called.
+    # If the method rendered anything, redirected or called `#head` then the
+    # request will stop being processed. None of `#around_action`, the actual
+    # action or `#after_action` will be called.
     def before_action
     end
 
@@ -47,13 +47,37 @@ class Frost::Controller
     # Invokes the `#before_action` method, then `#around_action` that must
     # yield to run the provided callback to invoke the action. Eventually calls
     # the `#after_action` method.
-    def run_action(&)
+    #
+    # If `#before_action` renders, then the execution will stop, skipping the
+    # `#around_action` and the actual action.
+    #
+    # The `#after_action` method will always be invoked, even if a previous step
+    # rendered (thus halting the chain) or raised raised an exception.
+    def run_action(&) : Nil
       self.before_action
       return if already_rendered?
 
-      around_action { yield }
+      around_action do
+        yield
+      end
+    ensure
+      begin
+        self.after_action
+      ensure
+        # IMPORTANT: we must always reset Frost::Current, leaving any state in
+        # the current Fiber may leak data to other requests:
+        __reset_frost_storage
 
-      self.after_action
+        # close and delete uploaded files to avoid leaking file descriptors and
+        # leave pending tempfiles on the disk:
+        params.close
+      end
+    end
+
+    private def __reset_frost_storage : Nil
+      {% if Fiber.instance_vars.any? { |m| m.name == "__frost_storage" } %}
+        Fiber.current.@__frost_storage.try(&.reset!)
+      {% end %}
     end
   end
 end

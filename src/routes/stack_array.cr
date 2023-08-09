@@ -14,7 +14,7 @@ module Frost::Routes
       end
     end
 
-    def <<(node : T)
+    def <<(node : T) : Nil
       if @pos < N
         @buffer.to_unsafe[@pos] = node
         @pos += 1
@@ -23,13 +23,13 @@ module Frost::Routes
       end
     end
 
-    def each(&block : T ->)
+    def each(& : T ->) : Nil
       @pos.times do |index|
         yield @buffer.to_unsafe[index]
       end
     end
 
-    def each_with_index(&block : T ->)
+    def each_with_index(& : T ->) : Nil
       @pos.times do |index|
         yield @buffer.to_unsafe[index], index
       end
@@ -41,15 +41,15 @@ module Frost::Routes
       ary
     end
 
-    def truncate(index)
+    def truncate(index) : Nil
       @pos = index.clamp(0, @pos)
     end
 
-    def size
+    def size : Int32
       @pos
     end
 
-    def last
+    def last : T
       if @pos > 0
         @buffer[@pos - 1]
       else

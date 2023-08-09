@@ -3,7 +3,7 @@
 CRYSTAL = crystal
 CRFLAGS =
 TESTS = test/*_test.cr test/**/*_test.cr
-OPTS =
+OPTS = --chaos --parallel 4
 
 all: bin/utils
 
@@ -15,6 +15,9 @@ bin: .phony
 
 test: .phony
 	$(CRYSTAL) run $(CRFLAGS) $(TESTS) -- $(OPTS)
+
+test_mt: .phony
+	$(CRYSTAL) run -Dpreview_mt $(CRFLAGS) $(TESTS) -- $(OPTS)
 
 clean: .phony
 	rm -f bin/utils

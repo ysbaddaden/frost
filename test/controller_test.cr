@@ -3,6 +3,40 @@ require "./test_helper"
 class Frost::ControllerTest < Minitest::Test
   include Frost::Controller::TestHelper
 
+  struct LayoutPage < Frost::HTML
+    def template(&block) : Nil
+      doctype
+      html do
+        body(&block)
+      end
+    end
+  end
+
+  struct IndexPage < Frost::HTML
+    def initialize(@posts : Enumerable(Int32))
+    end
+
+    def template : Nil
+      render LayoutPage.new do
+        h1 "X#index"
+        ul do
+          @posts.each { |post| li post }
+        end
+      end
+    end
+  end
+
+  struct ShowPage < Frost::HTML
+    def initialize(@post : Int32)
+    end
+
+    def template : Nil
+      render LayoutPage.new do
+        h1 "X#show: #{@post}"
+      end
+    end
+  end
+
   class XController < Controller
     def redirect
       if st = status
@@ -57,13 +91,13 @@ class Frost::ControllerTest < Minitest::Test
     end
 
     def index
-      @posts = [1, 2, 3]
-      render :index
+      posts = [1, 2, 3]
+      render IndexPage.new(posts)
     end
 
     def show
-      @post = 1
-      render "show"
+      post = 1
+      render ShowPage.new(post)
     end
 
     def default
@@ -73,42 +107,44 @@ class Frost::ControllerTest < Minitest::Test
     end
 
     private def send_data_with(object)
-      filename = params["filename"]?
-      disposition = params["disposition"]?
+      filename = params.route["filename"]?
+      disposition = params.route["disposition"]?
+      type = params.route["type"]?
 
       if filename && disposition
-        send_data object, filename: filename, disposition: disposition, type: params["type"]?
+        send_data object, filename: filename, disposition: disposition, type: type
       elsif filename
-        send_data object, filename: filename, type: params["type"]?
+        send_data object, filename: filename, type: type
       elsif disposition
-        send_data object, disposition: disposition, type: params["type"]?
+        send_data object, disposition: disposition, type: type
       elsif st = status
-        send_data object, type: params["type"]?, status: st
+        send_data object, type: type, status: st
       else
-        send_data object, type: params["type"]?
+        send_data object, type: type
       end
     end
 
     def file
-      path = params["path"]? || "test/test_helper.cr"
-      filename = params["filename"]?
-      disposition = params["disposition"]?
+      path = params.route["path"]? || "test/test_helper.cr"
+      filename = params.route["filename"]?
+      disposition = params.route["disposition"]?
+      type = params.route["type"]?
 
       if filename && disposition
-        send_file path, filename: filename, disposition: disposition, type: params["type"]?
+        send_file path, filename: filename, disposition: disposition, type: type
       elsif filename
-        send_file path, filename: filename, type: params["type"]?
+        send_file path, filename: filename, type: type
       elsif disposition
-        send_file path, disposition: disposition, type: params["type"]?
+        send_file path, disposition: disposition, type: type
       elsif st = status
-        send_file path, type: params["type"]?, status: st
+        send_file path, type: type, status: st
       else
-        send_file path, type: params["type"]?
+        send_file path, type: type
       end
     end
 
     private def status
-      if status = params["status"]?
+      if status = params.route["status"]?
         HTTP::Status.from_value(status.to_i)
       end
     end
@@ -116,7 +152,7 @@ class Frost::ControllerTest < Minitest::Test
 
   def test_redirect
     response = call :redirect
-    assert_equal HTTP::Status::FOUND, response.status
+    assert_equal HTTP::Status::SEE_OTHER, response.status
     assert_equal "https://some.other/resource", response.headers["location"]
 
     response = call :redirect, { "status" => "301" }
@@ -267,77 +303,13 @@ class Frost::ControllerTest < Minitest::Test
     assert_equal File.read("test/fixtures/files/empty.png"), response.body
   end
 
-  def test_render_template
+  def test_render_view
     response = call :index
     assert_equal HTTP::Status::OK, response.status
-    assert_equal <<-HTML, response.body.chomp
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <h1>X#index</h1>
-    <ul><li>1</li><li>2</li><li>3</li></ul>
-
-    </body>
-    </html>
-    HTML
+    assert_equal "<!DOCTYPE html><html><body><h1>X#index</h1><ul><li>1</li><li>2</li><li>3</li></ul></body></html>", response.body
 
     response = call :show
     assert_equal HTTP::Status::OK, response.status
-    assert_equal <<-HTML, response.body.chomp
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <h1>X#show: 1</h1>
-
-    </body>
-    </html>
-    HTML
-  end
-
-  def test_default_render_with_existing_template
-    body = <<-HTML
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <h1>X#default</h1>
-
-    </body>
-    </html>
-    HTML
-
-    # renders the template (it exists)
-    response = call :default
-    assert_equal HTTP::Status::OK, response.status
-    assert_equal body, response.body.chomp
-
-    # whatever the HTTP method
-    response = call :default, method: "POST"
-    assert_equal HTTP::Status::OK, response.status
-    assert_equal body, response.body.chomp
-
-    # even if XHR
-    response = call :default, headers: HTTP::Headers{"x-requested-with" => "xmlhttprequest"}
-    assert_equal HTTP::Status::OK, response.status
-    assert_equal body, response.body.chomp
-  end
-
-  def test_default_render_without_template
-    # expects templates for HTML GET request
-    assert_raises(MissingTemplateError) { call :no_template }
-
-    # template is optional for HTML GET XHR
-    response = call :no_template, headers: HTTP::Headers{"x-requested-with" => "xmlhttprequest"}
-    assert_equal HTTP::Status::NO_CONTENT, response.status
-    assert_empty response.body
-
-    # template is optional for other formats
-    response = call :no_template, { "format" => "text" }
-    assert_equal HTTP::Status::NO_CONTENT, response.status
-    assert_empty response.body
-
-    # template is optional for other methods
-    response = call :no_template, method: "POST"
-    assert_equal HTTP::Status::NO_CONTENT, response.status
-    assert_empty response.body
+    assert_equal "<!DOCTYPE html><html><body><h1>X#show: 1</h1></body></html>", response.body
   end
 end

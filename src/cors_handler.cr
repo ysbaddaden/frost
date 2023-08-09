@@ -4,7 +4,7 @@ class Frost::CORSHandler
   include HTTP::Handler
 
   DEFAULT_METHODS = %w[HEAD GET POST PUT PATCH DELETE]
-  DEFAULT_HEADERS = %w["*"]
+  DEFAULT_HEADERS = %w[*]
 
   @origins : Array(String)
   @methods : Array(String)

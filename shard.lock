@@ -6,7 +6,7 @@ shards:
 
   minitest:
     git: https://github.com/ysbaddaden/minitest.cr.git
-    version: 1.1.0
+    version: 1.2.2
 
   syn:
     git: https://github.com/ysbaddaden/syn.git

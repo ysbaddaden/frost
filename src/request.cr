@@ -41,19 +41,26 @@ struct Frost::Request
 
   # Returns true if the request's `accept` header includes the given mimetype.
   #
+  # Doesn't match partial matchers like `text/*` and `*/*` unless `implicit` is
+  # set to true, in order to avoid the default `Accept` header of browsers that
+  # all include a `*/*` matcher by default that would make the call to always
+  # return true.
+  #
   # For example: `request.accept?("text/event-stream")`
-  def accept?(mime : String) : Bool
+  # For example: `request.accept?("text/html", implicit: true)`
+  def accept?(mime : String, *, implicit = false) : Bool
     if header = @request.headers["accept"]?
       return true if header == mime
 
       header.split(',') do |accept|
         accept = accept.strip
-
         return true if accept == mime
-        return true if accept.includes?("*/*")
 
-        if index = accept.index("/*")
-          return true if mime.to_slice[0..index] == accept.to_slice[0..index]
+        if implicit
+          return true if accept.includes?("*/*")
+          if index = accept.index("/*")
+            return true if mime.to_slice[0..index] == accept.to_slice[0..index]
+          end
         end
 
         if index = accept.index(';')

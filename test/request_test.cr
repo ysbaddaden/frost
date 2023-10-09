@@ -60,9 +60,12 @@ class Frost::RequestTest < Minitest::Test
     request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
       "accept" => "*/*",
     }))
-    assert request.accept?("text/event-stream")
-    assert request.accept?("text/plain")
-    assert request.accept?("image/jpeg")
+    refute request.accept?("text/event-stream")
+    assert request.accept?("text/event-stream", implicit: true)
+    refute request.accept?("text/plain")
+    assert request.accept?("text/plain", implicit: true)
+    refute request.accept?("image/jpeg")
+    assert request.accept?("image/jpeg", implicit: true)
 
     request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
       "accept" => "text/event-stream",
@@ -74,10 +77,12 @@ class Frost::RequestTest < Minitest::Test
     request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
       "accept" => "text/*",
     }))
-    assert request.accept?("text/event-stream")
-    assert request.accept?("text/plain")
-    refute request.accept?("text-x/other")
-    refute request.accept?("image/jpeg")
+    refute request.accept?("text/event-stream")
+    assert request.accept?("text/event-stream", implicit: true)
+    refute request.accept?("text/plain")
+    assert request.accept?("text/plain", implicit: true)
+    refute request.accept?("text-x/other", implicit: true)
+    refute request.accept?("image/jpeg", implicit: true)
 
     request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
       "accept" => "text/html , application/xhtml+xml, application/xml;q=0.9",

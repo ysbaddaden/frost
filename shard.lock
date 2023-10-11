@@ -2,7 +2,7 @@ version: 2.0
 shards:
   earl:
     git: https://github.com/ysbaddaden/earl.git
-    version: 0.2.0+git.commit.6d66924889394d854a9e99c07729fa543f1d9c49
+    version: 0.2.0+git.commit.3f4c145e11946eaa137c8bd42ddd1d1cb46bfc5d
 
   minitest:
     git: https://github.com/ysbaddaden/minitest.cr.git
@@ -10,7 +10,7 @@ shards:
 
   syn:
     git: https://github.com/ysbaddaden/syn.git
-    version: 0.1.0+git.commit.d87e275f139537d505033eee5b346a878f85cda7
+    version: 0.2.0
 
   timecop:
     git: https://github.com/crystal-community/timecop.cr.git

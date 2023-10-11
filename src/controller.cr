@@ -6,6 +6,7 @@ require "./request"
 require "./view"
 require "./controller/callbacks"
 require "./controller/session"
+require "./controller/web_socket"
 
 class Frost::Controller
   class DoubleRenderError < Exception
@@ -13,6 +14,7 @@ class Frost::Controller
 
   include Controller::Callbacks
   include Controller::Session
+  include Controller::WebSocket
 
   getter context : HTTP::Server::Context
   getter request : Request
@@ -147,5 +149,11 @@ class Frost::Controller
 
   def already_rendered? : Bool
     @__rendered
+  end
+
+  def upgrade_request?(value : String) : Bool
+    return false unless upgrade = request.headers["upgrade"]?
+    return false unless upgrade.compare(value, case_insensitive: true) == 0
+    request.headers.includes_word?("connection", "Upgrade")
   end
 end

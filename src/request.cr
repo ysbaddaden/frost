@@ -71,4 +71,17 @@ struct Frost::Request
 
     false
   end
+
+  # Returns true if the request asks for an upgrade. Checks that the `Connection`
+  # header includes the `Upgrade` word, and the `Upgrade` header is the expected
+  # word. For example:
+  #
+  # ```
+  # request.upgrade?("websocket")
+  # ```
+  def upgrade?(value : String) : Bool
+    return false unless upgrade = @request.headers["upgrade"]?
+    return false unless upgrade.compare(value, case_insensitive: true) == 0
+    @request.headers.includes_word?("connection", "Upgrade")
+  end
 end

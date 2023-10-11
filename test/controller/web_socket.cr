@@ -6,7 +6,7 @@ class Frost::ControllerTest < Minitest::Test
 
   class XController < Controller
     def socket
-      if upgrade_request?("websocket")
+      if request.upgrade?("websocket")
         web_socket do |ws|
           ws.on_message do |msg|
             ws.send "echo: #{msg}"

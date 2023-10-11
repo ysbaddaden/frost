@@ -150,10 +150,4 @@ class Frost::Controller
   def already_rendered? : Bool
     @__rendered
   end
-
-  def upgrade_request?(value : String) : Bool
-    return false unless upgrade = request.headers["upgrade"]?
-    return false unless upgrade.compare(value, case_insensitive: true) == 0
-    request.headers.includes_word?("connection", "Upgrade")
-  end
 end

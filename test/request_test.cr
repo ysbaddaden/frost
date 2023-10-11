@@ -91,4 +91,31 @@ class Frost::RequestTest < Minitest::Test
     assert request.accept?("application/xhtml+xml")
     assert request.accept?("application/xml")
   end
+
+  def test_upgrade?
+    request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers.new))
+    refute request.upgrade?("websocket")
+
+    request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
+      "upgrade" => "websocket",
+    }))
+    refute request.upgrade?("websocket")
+
+    request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
+      "connection" => "keep-alive, upgrade",
+    }))
+    refute request.upgrade?("websocket")
+
+    request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
+      "upgrade" => "whatever",
+      "connection" => "keep-alive, upgrade",
+    }))
+    refute request.upgrade?("websocket")
+
+    request = Request.new(HTTP::Request.new("GET", "/", HTTP::Headers{
+      "upgrade" => "websocket",
+      "connection" => "keep-alive, upgrade",
+    }))
+    assert request.upgrade?("websocket")
+  end
 end

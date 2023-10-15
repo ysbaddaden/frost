@@ -1,0 +1,2 @@
+my_conf_public_path: "default"
+my_conf_database_url: "postgres://"

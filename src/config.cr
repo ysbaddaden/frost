@@ -3,15 +3,28 @@ require "./env"
 
 # Central place to store your application configuration.
 #
+# YAML Configuration
+#
 # Configuration files are YAML files and expected to be under `$PWD/config` and
 # named by the environment(s) your application is meant to run (see
 # `Frost::Env`). For example if the current environment is `development` then it
 # will try to load `config/development.yaml` then `config/development.yml` and
 # finally fall back to an empty configuration.
 #
-# It will then load configuration from environment variables.
+# Environment variables
 #
-# For example:
+# It will then load configuration from environment variables. The environment
+# variables are the attribute name but uppercase.
+#
+# Secrets
+#
+# Supports docker-like secrets. If a file named with the attribute name exists
+# in the secrets folder (`/run/secrets` by default) it will be read.
+#
+# You can also specify an environment variable ending with `_FILE` that points
+# to the secret file to read.
+#
+# Example:
 #
 # ```
 # class App::Config < Frost::Config
@@ -25,14 +38,15 @@ require "./env"
 # ```
 #
 # In the above example the associated configuration file is expected to be a map
-# of each config attribute. An attribute may be missing.
+# of each config attribute. Attributes aren't required, and may be missing from
+# the file.
 #
 # ```yaml
 # public_path: "public"
 # database_url: "postgres://postgres@/db_development"
 # ```
 #
-# The environment variables are the attribute name but uppercase, hence:
+# The environment variables are the uppercase attribute names:
 #
 # ```shell
 # PUBLIC_PATH="public"
@@ -45,6 +59,7 @@ abstract class Frost::Config
   annotation Attribute; end
 
   class_property config_path : String = "config"
+  class_property secrets_path : String = "/run/secrets"
 
   # Declares an attribute. The behavior is similar to the `getter!` macro.
   # Only String, Int64, Float64 and Bool types are supported.
@@ -69,6 +84,7 @@ abstract class Frost::Config
   end
 
   def initialize
+    # needed because YAML::Serializable injects a new(YAML::Context, YAML::Nodes::Node) method
   end
 
   # Loads configuration from the `config` folder then overrides them from `ENV`.
@@ -99,34 +115,49 @@ abstract class Frost::Config
   end
 
   macro env(key)
-    if %value = ENV[{{key.id.upcase.stringify}}]?.presence
+    if %value = env_read({{key.id.stringify}})
       @{{key.id}} = %value
     end
   end
 
   macro env_int(key)
-    if %value = ENV[{{key.id.upcase.stringify}}]?.presence
+    if %value = env_read({{key.id.stringify}})
       @{{key.id}} = %value.to_i64
     end
   end
 
   macro env_float(key)
-    if %value = ENV[{{key.id.upcase.stringify}}]?.presence
+    if %value = env_read({{key.id.stringify}})
       @{{key.id}} = %value.to_f64
     end
   end
 
   macro env_bool(key)
-    {% env_key = key.id.upcase.stringify %}
-    if %value = ENV[{{env_key}}]?.presence
+    if %value = env_read({{key.id.stringify}})
       case %value
       when "1", "true"
         @{{key.id}} = true
       when "0", "false"
         @{{key.id}} = false
       else
-        raise %(Error: invalid config bool value for {{env_key.id}}: expected "1", "0", "true" or "false" but got #{%value.inspect})
+        raise %(Error: invalid config bool value for {{key.id}}: expected "1", "0", "true" or "false" but got #{%value.inspect})
       end
+    end
+  end
+
+  @[AlwaysInline]
+  def env_read(key : String) : String?
+    env_key = key.upcase
+
+    if value = ENV[env_key]?.presence
+      return value
+    end
+
+    secret_path = File.join(self.class.secrets_path, key)
+    return File.read(secret_path) if File.exists?(secret_path)
+
+    if value = ENV["#{env_key}_FILE"]?.presence
+      File.read(value).presence
     end
   end
 end
